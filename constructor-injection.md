@@ -6,7 +6,7 @@ title: Constructor Injection
 
 # Constructor Injection
 
-The container can be used to register objects and inject constructor arguments such as dependencies or config items.
+Container can be used to register objects and inject constructor arguments such as dependencies or config items.
 
 For example, if we have a `Session` object that depends on an implementation of a `StorageInterface` and also requires a session key string. We could do the following:
 
