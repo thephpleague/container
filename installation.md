@@ -16,7 +16,7 @@ You need **PHP >= 5.4.0** to use `League\Container` but the latest stable versio
 Container is available on [Packagist](https://packagist.org/packages/league/container) and can be installed using [Composer](https://getcomposer.org/):
 
 ~~~
-composer install league/container
+composer require league/container
 ~~~
 
 Most modern frameworks will include Composer out of the box, but ensure the following file is included:
