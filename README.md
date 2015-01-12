@@ -58,6 +58,8 @@ Please see [CONTRIBUTING](https://github.com/thephpleague/container/blob/master/
 - [Phil Bennett](https://github.com/philipobenito)
 - [All Contributors](https://github.com/thephpleague/container/contributors)
 
+All `Orno\Di` contributions can be found [here](https://github.com/orno/di/graphs/contributors).
+
 ## License
 
 The MIT License (MIT). Please see [License File](https://github.com/thephpleague/container/blob/master/LICENSE.md) for more information.
