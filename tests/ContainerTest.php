@@ -204,71 +204,6 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $c->get('League\Container\Test\Asset\FooWithNoDefaultArg');
     }
 
-    public function testEnablingAndDisablingCachingWorksCorrectly()
-    {
-        $cache = $this->getMockBuilder('Orno\Cache\Cache')->disableOriginalConstructor()->getMock();
-
-        $c = new Container($cache);
-
-        $this->assertTrue($c->isCaching());
-
-        $c->disableCaching();
-
-        $this->assertFalse($c->isCaching());
-
-        $c->enableCaching();
-
-        $this->assertTrue($c->isCaching());
-    }
-
-    public function testContainerSetsCacheWhenAvailableAndEnabled()
-    {
-        $cache = $this->getMockBuilder('Orno\Cache\Cache')
-                      ->setMethods(['get', 'set'])
-                      ->disableOriginalConstructor()
-                      ->getMock();
-
-        $cache->expects($this->once())
-              ->method('set')
-              ->with($this->equalTo('orno::container::League\Container\Test\Asset\Baz'));
-
-        $cache->expects($this->once())
-              ->method('get')
-              ->with($this->equalTo('orno::container::League\Container\Test\Asset\Baz'))
-              ->will($this->returnValue(false));
-
-        $c = new Container($cache);
-
-        $this->assertInstanceOf('League\Container\Test\Asset\Baz', $c->get('League\Container\Test\Asset\Baz'));
-    }
-
-    public function testContainerGetsFromCacheWhenAvailableAndEnabled()
-    {
-        $cache = $this->getMockBuilder('Orno\Cache\Cache')
-                      ->setMethods(['get', 'set'])
-                      ->disableOriginalConstructor()
-                      ->getMock();
-
-        $definition = $this->getMockBuilder('League\Container\Definition\ClassDefinition')
-                           ->disableOriginalConstructor()
-                           ->getMock();
-
-        $definition->expects($this->any())
-                   ->method('__invoke')
-                   ->will($this->returnValue(new Asset\Baz));
-
-        $definition = serialize($definition);
-
-        $cache->expects($this->once())
-              ->method('get')
-              ->with($this->equalTo('orno::container::League\Container\Test\Asset\Baz'))
-              ->will($this->returnValue($definition));
-
-        $c = new Container($cache);
-
-        $this->assertInstanceOf('League\Container\Test\Asset\Baz', $c->get('League\Container\Test\Asset\Baz'));
-    }
-
     public function testArrayAccessMapsToCorrectMethods()
     {
         $c = new Container;
@@ -286,7 +221,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
 
     public function testContainerAcceptsArrayWithKey()
     {
-        $c = new Container(null, ['di' => $this->configArray]);
+        $c = new Container(['di' => $this->configArray]);
 
         $foo = $c->get('League\Container\Test\Asset\Foo');
 
@@ -303,7 +238,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     {
         $this->setExpectedException('RuntimeException');
 
-        $c = new Container(null, $this->configArray);
+        $c = new Container($this->configArray);
     }
 
     public function testContainerAcceptsArrayAccess()
@@ -320,7 +255,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
                ->will($this->returnValue(true));
 
 
-        $c = new Container(null, $config);
+        $c = new Container($config);
 
         $foo = $c->get('League\Container\Test\Asset\Foo');
 
@@ -337,7 +272,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     {
         $this->setExpectedException('InvalidArgumentException');
 
-        $c = new Container(null, new \stdClass());
+        $c = new Container(new \stdClass());
     }
 
     public function testExtendThrowsExceptionWhenUnregisteredServiceIsGiven()
@@ -384,7 +319,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     {
         $method = '\League\Container\Test\Asset\sayHi';
 
-        $c = new Container();
+        $c = new Container;
         $returned = $c->call($method);
         $this->assertSame($returned, 'hi');
     }
@@ -392,9 +327,9 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     public function testCallExecutesCallableDefinedByArray()
     {
         $expected = 'qux';
-        $baz = new BazStatic();
+        $baz = new BazStatic;
 
-        $c = new Container();
+        $c = new Container;
         $returned = $c->call([$baz, 'qux']);
 
         $this->assertSame($returned, $expected);
@@ -417,7 +352,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $method = '\League\Container\Test\Asset\BazStatic::baz';
         $expected = 'qux';
 
-        $c = new Container();
+        $c = new Container;
         $returned = $c->call($method, ['foo' => $expected]);
         $this->assertSame($returned, $expected);
     }

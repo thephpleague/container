@@ -75,25 +75,4 @@ interface ContainerInterface
      * @return boolean
      */
     public function isSingleton($alias);
-
-    /**
-     * Enable caching
-     *
-     * @return \League\Container\ContainerInterface
-     */
-    public function enableCaching();
-
-    /**
-     * Disable caching
-     *
-     * @return \League\Container\ContainerInterface
-     */
-    public function disableCaching();
-
-    /**
-     * Checks if the container is currently caching reflection results
-     *
-     * @return boolean
-     */
-    public function isCaching();
 }

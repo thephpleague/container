@@ -2,7 +2,6 @@
 
 namespace League\Container;
 
-use Orno\Cache\Cache;
 use League\Container\Definition\ClassDefinition;
 use League\Container\Definition\ClosureDefinition;
 use League\Container\Definition\DefinitionInterface;
@@ -14,11 +13,6 @@ class Container implements ContainerInterface, \ArrayAccess
      * @var \League\Container\Definition\Factory
      */
     protected $factory;
-
-    /**
-     * @var \Orno\Cache\Cache
-     */
-    protected $cache;
 
     /**
      * @var array
@@ -43,17 +37,14 @@ class Container implements ContainerInterface, \ArrayAccess
     /**
      * Constructor
      *
-     * @param \Orno\Cache\Cache           $cache
-     * @param array|ArrayAccess           $config
+     * @param array|ArrayAccess|ArrayObject        $config
      * @param \League\Container\Definition\Factory $factory
      */
     public function __construct(
-        Cache   $cache   = null,
         $config          = [],
         Factory $factory = null
     ) {
-        $this->factory = (is_null($factory)) ? new Factory() : $factory;
-        $this->cache   = $cache;
+        $this->factory = (is_null($factory)) ? new Factory : $factory;
 
         $this->addItemsFromConfig($config);
 
@@ -143,19 +134,10 @@ class Container implements ContainerInterface, \ArrayAccess
             return $this->resolveDefinition($alias, $args);
         }
 
-        // check for and invoke a definition that was reflected on then cached
-        if ($this->isCaching() && $cached = $this->getCachedDefinition($alias)) {
-            return $cached;
-        }
-
         // if we've got this far, we can assume we need to reflect on a class
         // and automatically resolve it's dependencies, we also cache the
         // result if a caching adapter is available
         $definition = $this->reflect($alias);
-
-        if ($this->isCaching()) {
-            $this->cache->set('orno::container::' . $alias, serialize($definition));
-        }
 
         $this->items[$alias]['definition'] = $definition;
 
@@ -210,23 +192,6 @@ class Container implements ContainerInterface, \ArrayAccess
     }
 
     /**
-     * Return a cached definition object
-     *
-     * @param  string $alias
-     * @return \League\Container\Definition\DefinitionInterface|boolean
-     */
-    protected function getCachedDefinition($alias)
-    {
-        if ($cached = $this->cache->get('orno::container::' . $alias)) {
-            $definition = unserialize($cached);
-
-            return $definition();
-        }
-
-        return false;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function isRegistered($alias)
@@ -243,34 +208,6 @@ class Container implements ContainerInterface, \ArrayAccess
             array_key_exists($alias, $this->singletons) ||
             (array_key_exists($alias, $this->items) && $this->items[$alias]['singleton'] === true)
         );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function enableCaching()
-    {
-        $this->caching = true;
-
-        return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function disableCaching()
-    {
-        $this->caching = false;
-
-        return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isCaching()
-    {
-        return (! is_null($this->cache) && $this->caching === true);
     }
 
     /**
