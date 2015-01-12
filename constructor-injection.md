@@ -34,7 +34,7 @@ class Storage implements StorageInterface
     // ..
 }
 
-$container = new \Orno\Di\Container;
+$container = new League\Container\Container;
 
 $container->add('Storage');
 
