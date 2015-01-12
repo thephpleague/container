@@ -2,8 +2,7 @@
 
 Contributions are **welcome** and will be fully **credited**.
 
-We accept contributions via Pull Requests on [Github](https://github.com/thephpleague/:package_name).
-
+We accept contributions via Pull Requests on [Github](https://github.com/thephpleague/container).
 
 ## Pull Requests
 
@@ -21,12 +20,10 @@ We accept contributions via Pull Requests on [Github](https://github.com/thephpl
 
 - **Send coherent history** - Make sure each individual commit in your pull request is meaningful. If you had to make multiple intermediate commits while developing, please squash them before submitting.
 
-
 ## Running Tests
 
 ``` bash
 $ phpunit
 ```
-
 
 **Happy coding**!
