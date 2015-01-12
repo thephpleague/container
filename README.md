@@ -1,4 +1,4 @@
-# Container (Dependency Injection Container)
+# Container (Dependency Injection)
 
 [![Author](http://img.shields.io/badge/author-@philipobenito-blue.svg?style=flat-square)](https://twitter.com/philipobenito)
 [![Latest Version](https://img.shields.io/github/release/thephpleague/container.svg?style=flat-square)](https://github.com/thephpleague/container/releases)
@@ -34,14 +34,13 @@ The following versions of PHP are supported by this version.
 
 ## Documentation
 
-Dic has [full documentation](http://container.thephpleague.com), powered by [Jekyll](http://jekyllrb.com/).
+Container has [full documentation](http://container.thephpleague.com), powered by [Jekyll](http://jekyllrb.com/).
 
 Contribute to this documentation in the [gh-pages branch](https://github.com/thephpleague/container/tree/gh-pages/).
 
 ## Todo
 
-- Implement League version of Di when migrated from Orno.
-- Add knowledge of variadic uri wildcard arguments to `MethodArgumentStrategy`. (Blocked by changes to Di).
+- Improve callable functionality and allow runtime arguments on `call`
 
 ## Testing
 
