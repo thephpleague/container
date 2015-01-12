@@ -1,3 +1,10 @@
 Getting Started:
     Introduction: '/'
     Installation: '/installation/'
+Usage:
+    Constructor Injection: '/constructor-injection/'
+    Setter Injection: '/setter-injection/'
+    Factory Closures: '/factory-closures/'
+    Auto Dependency Resolution: '/auto-dependency-resolution/'
+    Registering Callables: '/registering-callables/'
+    Configuration: '/configuration/'
