@@ -174,11 +174,7 @@ class Container implements ContainerInterface, \ArrayAccess
         $definition = $this->items[$alias]['definition'];
         $return     = $definition;
 
-        if (
-            $definition instanceof CallableDefinition ||
-            $definition instanceof ClosureDefinition ||
-            $definition instanceof ClassDefinition)
-        {
+        if ($definition instanceof CallableDefinition || $definition instanceof ClassDefinition) {
             $return = $definition($args);
         }
 
