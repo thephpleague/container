@@ -4,13 +4,12 @@ namespace League\Container;
 
 use League\Container\Definition\ClassDefinition;
 use League\Container\Definition\ClosureDefinition;
-use League\Container\Definition\DefinitionInterface;
 use League\Container\Definition\Factory;
 
 class Container implements ContainerInterface, \ArrayAccess
 {
     /**
-     * @var \League\Container\Definition\Factory
+     * @var \League\Container\Definition\FactoryInterface
      */
     protected $factory;
 

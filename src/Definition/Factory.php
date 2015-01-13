@@ -11,11 +11,7 @@ class Factory implements FactoryInterface
      */
     public function __invoke($alias, $concrete, ContainerInterface $container, $callable = false)
     {
-        if ($callable === true) {
-            return new CallableDefinition($alias, $concrete, $container);
-        }
-
-        if ($concrete instanceof \Closure) {
+        if ($concrete instanceof \Closure || $callable === true) {
             return new ClosureDefinition($alias, $concrete, $container);
         }
 
