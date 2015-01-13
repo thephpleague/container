@@ -15,8 +15,8 @@ class CallableDefinition extends AbstractDefinition implements DefinitionInterfa
     /**
      * Constructor
      *
-     * @param string                      $alias
-     * @param callable                    $concrete
+     * @param string                               $alias
+     * @param callable                             $concrete
      * @param \League\Container\ContainerInterface $container
      */
     public function __construct($alias, callable $concrete, ContainerInterface $container)
