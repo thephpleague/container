@@ -78,7 +78,9 @@ class ClassDefinition extends AbstractDefinition implements ClassDefinitionInter
             $args = [];
 
             foreach ($method['arguments'] as $arg) {
-                $args[] = ($this->container->isRegistered($arg)) ? $this->container->get($arg) : $arg;
+                $args[] = ($this->container->isRegistered($arg) || $this->container->isSingleton($arg))
+                        ? $this->container->get($arg)
+                        : $arg;
             }
 
             $reflection->invokeArgs($object, $args);
