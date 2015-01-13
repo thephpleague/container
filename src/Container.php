@@ -30,21 +30,16 @@ class Container implements ContainerInterface, \ArrayAccess
     protected $callables = [];
 
     /**
-     * @var boolean
-     */
-    protected $caching = true;
-
-    /**
      * Constructor
      *
-     * @param array|ArrayAccess|ArrayObject        $config
-     * @param \League\Container\Definition\Factory $factory
+     * @param array|ArrayAccess                             $config
+     * @param \League\Container\Definition\FactoryInterface $factory
      */
     public function __construct(
-        $config          = [],
-        Factory $factory = null
+        $config                   = [],
+        FactoryInterface $factory = null
     ) {
-        $this->factory = (is_null($factory)) ? new Factory : $factory;
+        $this->factory = (is_null($factory)) ? new Definition\Factory : $factory;
 
         $this->addItemsFromConfig($config);
 
