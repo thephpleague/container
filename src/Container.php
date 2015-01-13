@@ -84,8 +84,22 @@ class Container implements ContainerInterface, \ArrayAccess
     /**
      * {@inheritdoc}
      */
-    public function invokable($alias, callable $concrete)
+    public function invokable($alias, callable $concrete = null)
     {
+        if (is_null($concrete)) {
+            $concrete = $alias;
+        }
+
+        if (is_string($concrete) && strpos($concrete, '::') !== false) {
+            $concrete = explode('::', $concrete);
+        }
+
+        if (! is_callable($concrete)) {
+            throw new \InvalidArgumentException(
+                sprintf('Cannot register callable attached to alias [%s]', $alias)
+            );
+        }
+
         $factory = $this->getDefinitionFactory();
         $definition = $factory($alias, $concrete, $this, true);
 
@@ -143,17 +157,17 @@ class Container implements ContainerInterface, \ArrayAccess
      */
     public function call($alias, array $args = [])
     {
+        if (is_string($alias) && array_key_exists($alias, $this->callables)) {
+            $definition = $this->callables[$alias];
+
+            return $definition($args);
+        }
+
         if (is_callable($alias)) {
             $callable = $this->reflectCallable($alias);
             $args     = $this->resolveCallableArguments($callable, $args);
 
             return call_user_func_array($alias, $args);
-        }
-
-        if (array_key_exists($alias, $this->callables)) {
-            $definition = $this->callables[$alias];
-
-            return $definition($args);
         }
 
         throw new \RuntimeException(
