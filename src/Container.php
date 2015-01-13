@@ -2,15 +2,14 @@
 
 namespace League\Container;
 
+use League\Container\Definition\CallableDefinition;
 use League\Container\Definition\ClassDefinition;
-use League\Container\Definition\ClosureDefinition;
-use League\Container\Definition\DefinitionInterface;
-use League\Container\Definition\Factory;
+use League\Container\Definition\FactoryInterface;
 
 class Container implements ContainerInterface, \ArrayAccess
 {
     /**
-     * @var \League\Container\Definition\Factory
+     * @var \League\Container\Definition\FactoryInterface
      */
     protected $factory;
 
@@ -30,21 +29,16 @@ class Container implements ContainerInterface, \ArrayAccess
     protected $callables = [];
 
     /**
-     * @var boolean
-     */
-    protected $caching = true;
-
-    /**
      * Constructor
      *
-     * @param array|ArrayAccess|ArrayObject        $config
-     * @param \League\Container\Definition\Factory $factory
+     * @param array|ArrayAccess                             $config
+     * @param \League\Container\Definition\FactoryInterface $factory
      */
     public function __construct(
-        $config          = [],
-        Factory $factory = null
+        $config                   = [],
+        FactoryInterface $factory = null
     ) {
-        $this->factory = (is_null($factory)) ? new Factory : $factory;
+        $this->factory = (is_null($factory)) ? new Definition\Factory : $factory;
 
         $this->addItemsFromConfig($config);
 
@@ -90,8 +84,22 @@ class Container implements ContainerInterface, \ArrayAccess
     /**
      * {@inheritdoc}
      */
-    public function invokable($alias, callable $concrete)
+    public function invokable($alias, callable $concrete = null)
     {
+        if (is_null($concrete)) {
+            $concrete = $alias;
+        }
+
+        if (is_string($concrete) && strpos($concrete, '::') !== false) {
+            $concrete = explode('::', $concrete);
+        }
+
+        if (! is_callable($concrete)) {
+            throw new \InvalidArgumentException(
+                sprintf('Cannot register callable attached to alias [%s]', $alias)
+            );
+        }
+
         $factory = $this->getDefinitionFactory();
         $definition = $factory($alias, $concrete, $this, true);
 
@@ -149,17 +157,17 @@ class Container implements ContainerInterface, \ArrayAccess
      */
     public function call($alias, array $args = [])
     {
+        if (is_string($alias) && array_key_exists($alias, $this->callables)) {
+            $definition = $this->callables[$alias];
+
+            return $definition($args);
+        }
+
         if (is_callable($alias)) {
             $callable = $this->reflectCallable($alias);
             $args     = $this->resolveCallableArguments($callable, $args);
 
             return call_user_func_array($alias, $args);
-        }
-
-        if (array_key_exists($alias, $this->callables)) {
-            $definition = $this->callables[$alias];
-
-            return $definition($args);
         }
 
         throw new \RuntimeException(
@@ -179,7 +187,7 @@ class Container implements ContainerInterface, \ArrayAccess
         $definition = $this->items[$alias]['definition'];
         $return     = $definition;
 
-        if ($definition instanceof ClosureDefinition || $definition instanceof ClassDefinition) {
+        if ($definition instanceof CallableDefinition || $definition instanceof ClassDefinition) {
             $return = $definition($args);
         }
 

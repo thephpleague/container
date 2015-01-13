@@ -26,11 +26,11 @@ interface ContainerInterface
     /**
      * Add a callable definition to the container
      *
-     * @param  string   $alias
-     * @param  callable $concrete
+     * @param  string          $alias
+     * @param  callable        $concrete
      * @return \League\Container\Definition\DefinitionInterface
      */
-    public function invokable($alias, callable $concrete);
+    public function invokable($alias, callable $concrete = null);
 
     /**
      * Modify the definition of an already defined service

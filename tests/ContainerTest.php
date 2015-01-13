@@ -4,15 +4,16 @@ namespace League\Container\Test;
 
 use League\Container\Container;
 use League\Container\Definition\Factory;
+use League\Container\Test\Asset\Bar;
 use League\Container\Test\Asset\Baz;
 use League\Container\Test\Asset\BazStatic;
 use League\Container\Test\Asset\Foo;
 
-/**
- * ContainerTest
- */
 class ContainerTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var array
+     */
     protected $configArray = [
         'League\Container\Test\Asset\Foo' => [
             'class' => 'League\Container\Test\Asset\Foo',
@@ -28,6 +29,12 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         'League\Container\Test\Asset\Baz' => 'League\Container\Test\Asset\Baz',
     ];
 
+    /**
+     * Asserts that container auto resolves dependencies with defined interface
+     * alias
+     *
+     * @return void
+     */
     public function testAutoResolvesNestedDependenciesWithAliasedInterface()
     {
         $c = new Container;
@@ -42,6 +49,12 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('League\Container\Test\Asset\BazInterface', $foo->bar->baz);
     }
 
+    /**
+     * Asserts that container injects arguments and invokes methods on
+     * definition
+     *
+     * @return void
+     */
     public function testInjectsArgumentsAndInvokesMethods()
     {
         $c = new Container;
@@ -62,6 +75,12 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('League\Container\Test\Asset\Baz', $foo->baz);
     }
 
+    /**
+     * Asserts that container favours runtime arguments and invokes methods on
+     * definition
+     *
+     * @return void
+     */
     public function testInjectsRuntimeArgumentsAndInvokesMethods()
     {
         $c = new Container;
@@ -97,6 +116,12 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('League\Container\Test\Asset\Bar', $fooClosure->bar);
     }
 
+    /**
+     * Asserts that container returns same instance every call when registered
+     * as singleton
+     *
+     * @return void
+     */
     public function testSingletonReturnsSameInstanceEverytime()
     {
         $c = new Container;
@@ -112,6 +137,11 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($baz1, $baz2);
     }
 
+    /**
+     * Asserts that container stores and invokes closure
+     *
+     * @return void
+     */
     public function testStoresAndInvokesClosure()
     {
         $c = new Container;
@@ -135,6 +165,11 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('League\Container\Test\Asset\Baz', $foo->baz);
     }
 
+    /**
+     * Asserts that container invokes closure with defined arguments
+     *
+     * @return void
+     */
     public function testStoresAndInvokesClosureWithDefinedArguments()
     {
         $c = new Container;
@@ -142,7 +177,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $baz = new \League\Container\Test\Asset\Baz;
         $bar = new \League\Container\Test\Asset\Bar($baz);
 
-        $c->add('foo', function ($bar, $baz) {
+        $c->add('foo', function (Bar $bar, Baz $baz) {
             $foo = new \League\Container\Test\Asset\Foo($bar);
 
             $foo->injectBaz($baz);
@@ -157,7 +192,12 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('League\Container\Test\Asset\Baz', $foo->baz);
     }
 
-    public function testStoresAndReturnsArbitraryValues()
+    /**
+     * Asserts that container stores and returns arbitrary types
+     *
+     * @return void
+     */
+    public function testStoresAndReturnsArbitraryTypes()
     {
         $baz1 = new \League\Container\Test\Asset\Baz;
         $array1 = ['Phil', 'Bennett'];
@@ -174,6 +214,11 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($array1, $array2);
     }
 
+    /**
+     * Asserts that reflection on non class throws exception
+     *
+     * @return void
+     */
     public function testReflectionOnNonClassThrowsException()
     {
         $this->setExpectedException('League\Container\Exception\ReflectionException');
@@ -181,6 +226,11 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         (new Container)->get('FakeClass');
     }
 
+    /**
+     * Asserts that reflecting on class with no constructor creates a definition
+     *
+     * @return void
+     */
     public function testReflectionOnClassWithNoConstructorCreatesDefinition()
     {
         $c = new Container;
@@ -188,6 +238,11 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('League\Container\Test\Asset\Baz', $c->get('League\Container\Test\Asset\Baz'));
     }
 
+    /**
+     * Asserts that reflection injects a default value when available
+     *
+     * @return void
+     */
     public function testReflectionInjectsDefaultValue()
     {
         $c = new Container;
@@ -195,6 +250,12 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('Phil Bennett', $c->get('League\Container\Test\Asset\FooWithDefaultArg')->name);
     }
 
+    /**
+     * Asserts that an exception is thrown when trying to reflect on argument
+     * with no default value
+     *
+     * @return void
+     */
     public function testReflectionThrowsExceptionForArgumentWithNoDefaultValue()
     {
         $this->setExpectedException('League\Container\Exception\UnresolvableDependencyException');
@@ -204,6 +265,11 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $c->get('League\Container\Test\Asset\FooWithNoDefaultArg');
     }
 
+    /**
+     * Asserts that array access is mapped to correct methods
+     *
+     * @return void
+     */
     public function testArrayAccessMapsToCorrectMethods()
     {
         $c = new Container;
@@ -219,6 +285,11 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse(isset($c['League\Container\Test\Asset\Baz']));
     }
 
+    /**
+     * Asserts that config is accepted with correct key
+     *
+     * @return void
+     */
     public function testContainerAcceptsArrayWithKey()
     {
         $c = new Container(['di' => $this->configArray]);
@@ -234,6 +305,11 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('League\Container\Test\Asset\Baz', $foo->baz);
     }
 
+    /**
+     * Asserts that an exception is thrown when config key is absent
+     *
+     * @return void
+     */
     public function testContainerDoesntAcceptArrayWithoutKey()
     {
         $this->setExpectedException('RuntimeException');
@@ -241,6 +317,11 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $c = new Container($this->configArray);
     }
 
+    /**
+     * Asserts that container accepts instance of \ArrayAccess as config
+     *
+     * @return void
+     */
     public function testContainerAcceptsArrayAccess()
     {
         $config = $this->getMock('ArrayAccess', ['offsetGet', 'offsetSet', 'offsetUnset', 'offsetExists']);
@@ -268,6 +349,11 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('League\Container\Test\Asset\Baz', $foo->baz);
     }
 
+    /**
+     * Asserts that container rejects invalid config types
+     *
+     * @return void
+     */
     public function testContainerDoesntAcceptInvalidConfigType()
     {
         $this->setExpectedException('InvalidArgumentException');
@@ -275,7 +361,13 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $c = new Container(new \stdClass());
     }
 
-    public function testExtendThrowsExceptionWhenUnregisteredServiceIsGiven()
+    /**
+     * Asserts that exception is thrown when attempting to extend unregistered
+     * definition
+     *
+     * @return void
+     */
+    public function testExtendThrowsExceptionWhenUnregisteredDefinitionIsGiven()
     {
         $this->setExpectedException('InvalidArgumentException');
 
@@ -283,6 +375,12 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $c->extend('does_not_exist');
     }
 
+    /**
+     * Asserts that exception is thrown when trying to extend definition being
+     * managed as a singleton
+     *
+     * @return void
+     */
     public function testExtendsThrowsExceptionWhenModifyingAnExistingSingleton()
     {
         $this->setExpectedException('League\Container\Exception\ServiceNotExtendableException');
@@ -293,6 +391,11 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $c->extend('service');
     }
 
+    /**
+     * Asserts that definition is returned for extending
+     *
+     * @return void
+     */
     public function testExtendReturnsDefinitionForModificationWhenCalledWithAValidService()
     {
         $c = new Container;
@@ -303,7 +406,12 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($definition, $extend);
     }
 
-    public function testCallExecutesAnonymousFunction()
+    /**
+     * Asserts that call invokes closure
+     *
+     * @return void
+     */
+    public function testCallInvokesClosure()
     {
         $expected = 'foo';
 
@@ -315,7 +423,12 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($result, $expected);
     }
 
-    public function testCallExecutesNamedFunction()
+    /**
+     * Asserts that call invokes named function
+     *
+     * @return void
+     */
+    public function testCallInvokesNamedFunction()
     {
         $method = '\League\Container\Test\Asset\sayHi';
 
@@ -324,7 +437,12 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($returned, 'hi');
     }
 
-    public function testCallExecutesCallableDefinedByArray()
+    /**
+     * Asserts that call accepts array based callable
+     *
+     * @return void
+     */
+    public function testCallInvokesCallableDefinedByArray()
     {
         $expected = 'qux';
         $baz = new BazStatic;
@@ -335,7 +453,12 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($returned, $expected);
     }
 
-    public function testCallExecutesMethodsWithNamedParameters()
+    /**
+     * Asserts that call invokes callable with named arguments
+     *
+     * @return void
+     */
+    public function testCallInvokesMethodsWithNamedArguments()
     {
         $expected = 'bar';
 
@@ -347,7 +470,12 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($returned, $expected);
     }
 
-    public function testCallExecutesStaticMethod()
+    /**
+     * Asserts that call invokes a static method
+     *
+     * @return void
+     */
+    public function testCallInvokesStaticMethod()
     {
         $method = '\League\Container\Test\Asset\BazStatic::baz';
         $expected = 'qux';
@@ -357,6 +485,11 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($returned, $expected);
     }
 
+    /**
+     * Asserts that call auto resolves a type hinted argument
+     *
+     * @return void
+     */
     public function testCallResolvesTypeHintedArgument()
     {
         $expected = 'League\Container\Test\Asset\Baz';
@@ -369,19 +502,29 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($returned, $expected);
     }
 
-    public function testCallMergesTypeHintedAndProvidedAttributes()
+    /**
+     * Asserts that call merges resolved and provided arguments
+     *
+     * @return void
+     */
+    public function testCallMergesTypeHintedAndProvidedArguments()
     {
         $expected = 'bar+League\Container\Test\Asset\Baz';
 
         $c = new Container;
-        $returned = $c->call(function ($foo, Baz $baz) use ($expected) {
-            return $foo.'+'.get_class($baz);
+        $returned = $c->call(function ($foo, Baz $baz) {
+            return $foo . '+' . get_class($baz);
         }, ['foo' => 'bar']);
 
         $this->assertSame($returned, $expected);
     }
 
-    public function testCallFillsInDefaultParameterValues()
+    /**
+     * Asserts call resolves arguments with default value
+     *
+     * @return void
+     */
+    public function testCallResolvesDefaultArgumentValues()
     {
         $expected = 'bar';
 
@@ -394,10 +537,14 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException RuntimeException
+     * Asserts that exception is thrown if auto resolution of arguments fails
+     *
+     * @return void
      */
-    public function testCallThrowsRuntimeExceptionIfParameterResolutionFails()
+    public function testCallThrowsRuntimeExceptionIfArgumentResolutionFails()
     {
+        $this->setExpectedException('RuntimeException');
+
         $c = new Container;
         $c->call(function (array $foo) {
             return implode(',', $foo);
@@ -406,9 +553,14 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse(true);
     }
 
-    public function testCallDoesntThinksArrayTypeHintAreToBeResolvedByContainer()
+    /**
+     * Asserts that array type hint is ignore when auto resolving arguments
+     *
+     * @return void
+     */
+    public function testCallIgnoresArrayTypeHint()
     {
-        $c = new Container();
+        $c = new Container;
         $returned = $c->call(function (array $foo = []) {
             return $foo;
         });
@@ -417,7 +569,12 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertEmpty($returned);
     }
 
-    public function testContainerResolvesRegisteredCallable()
+    /**
+     * Assert container resolves a registered closure via call
+     *
+     * @return void
+     */
+    public function testContainerResolvesRegisteredClosure()
     {
         $c = new Container;
 
@@ -435,6 +592,54 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('League\Container\Test\Asset\BazInterface', $foo->bar->baz);
     }
 
+    /**
+     * Assert container resolves a registered named function via call
+     *
+     * @return void
+     */
+    public function testContainerResolvesRegisteredNamedFunction()
+    {
+        $c = new Container;
+
+        $c->invokable('function', '\League\Container\Test\Asset\withArgument')->withArgument('hello');
+
+        $this->assertSame($c->call('function'), 'hello');
+    }
+
+    /**
+     * Asserts that a class method is registered as a callable when aliased as string
+     *
+     * @return void
+     */
+    public function testContainerResolvesRegisteredClassMethodWhenRegisteredAsString()
+    {
+        $c = new Container;
+
+        $c->invokable('League\Container\Test\Asset\BazStatic::qux');
+
+        $this->assertSame($c->call('League\Container\Test\Asset\BazStatic::qux'), 'qux');
+    }
+
+    /**
+     * Asserts that an exception is thrown when attempting to register a non
+     * callable
+     *
+     * @return void
+     */
+    public function testExceptionThrownWhenRegisteringNonCallable()
+    {
+        $this->setExpectedException('InvalidArgumentException');
+
+        $c = new Container;
+
+        $c->invokable('League\Container\Test\Asset\BazStatic');
+    }
+
+    /**
+     * Assert exception is thrown when callable cannot be resolved
+     *
+     * @return void
+     */
     public function testCallThrowsExceptionWhenCannotResolveCallable()
     {
         $this->setExpectedException('RuntimeException');

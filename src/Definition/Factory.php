@@ -4,25 +4,15 @@ namespace League\Container\Definition;
 
 use League\Container\ContainerInterface;
 
-class Factory
+class Factory implements FactoryInterface
 {
     /**
-     * Return a definition based on type of concrete
-     *
-     * @param  string                       $alias
-     * @param  mixed                        $concrete
-     * @param  \League\Container\ContainerInterface  $container
-     * @param  boolean                      $callable
-     * @return mixed
+     * {@inheritdoc}
      */
     public function __invoke($alias, $concrete, ContainerInterface $container, $callable = false)
     {
-        if ($callable === true) {
+        if ($concrete instanceof \Closure || $callable === true) {
             return new CallableDefinition($alias, $concrete, $container);
-        }
-
-        if ($concrete instanceof \Closure) {
-            return new ClosureDefinition($alias, $concrete, $container);
         }
 
         if (is_string($concrete) && class_exists($concrete)) {
