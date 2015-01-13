@@ -4,7 +4,6 @@ namespace League\Container;
 
 use League\Container\Definition\CallableDefinition;
 use League\Container\Definition\ClassDefinition;
-use League\Container\Definition\ClosureDefinition;
 use League\Container\Definition\Factory;
 
 class Container implements ContainerInterface, \ArrayAccess
