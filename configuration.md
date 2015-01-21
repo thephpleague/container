@@ -6,7 +6,7 @@ title: Configuration
 
 # Configuration
 
-As your project grows, so will your dependency map. At this point it may be worth abstracting your mappins in to a config file. You can store your mappings in an array, or any object implementing the `ArrayAccess` interface.
+As your project grows, so will your dependency map. At this point it may be worth abstracting your mappings in to a config file. You can store your mappings in an array, or any object implementing the `ArrayAccess` interface.
 
 > **Note:** When using an array, or other ArrayAccess object, the mappings **must** be under a key named `di`.
 
