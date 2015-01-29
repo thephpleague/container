@@ -2,9 +2,9 @@
 
 namespace League\Container;
 
-use League\Container\Definition\DefinitionInterface;
 use League\Container\Definition\CallableDefinition;
 use League\Container\Definition\ClassDefinition;
+use League\Container\Definition\DefinitionInterface;
 use League\Container\Definition\FactoryInterface;
 
 class Container implements ContainerInterface, \ArrayAccess
