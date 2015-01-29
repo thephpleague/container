@@ -2,7 +2,7 @@
 
 All Notable changes to `League\Container` will be documented in this file
 
-## 1.1.1 - 2015-01-29
+## 1.2.1 - 2015-01-29
 
 ### Added
 - Nothing
@@ -11,7 +11,42 @@ All Notable changes to `League\Container` will be documented in this file
 - Nothing
 
 ### Fixed
-- Allow for plain values to be passed in container config.
+- Allow arbitrary values to be registered via container config.
+
+### Removed
+- Nothing
+
+### Security
+- Nothing
+
+## 1.2.0 - 2015-01-13
+
+### Added
+- Improvements to `Container::call` functionality.
+
+### Deprecated
+- Nothing
+
+### Fixed
+- General code tidy.
+- Improvements to test suite.
+
+### Removed
+- Nothing
+
+### Security
+- Nothing
+
+## 1.1.1 - 2015-01-13
+
+### Added
+- Nothing
+
+### Deprecated
+- Nothing
+
+### Fixed
+- Allow singleton to be passed as method argument.
 
 ### Removed
 - Nothing
