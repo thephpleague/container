@@ -648,4 +648,20 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
 
         $c->call('hello');
     }
+
+    /**
+     * https://github.com/thephpleague/container/issues/10
+     *
+     * @group regression
+     */
+    public function testValuesInConfigurationShouldBeRetreivableFromContainerAfterInstantiation()
+    {
+        $c = new Container([
+            'di'    => [
+                'a_key' => 123,
+            ],
+        ]);
+
+        $this->assertEquals(123, $c->get('a_key'));
+    }
 }
