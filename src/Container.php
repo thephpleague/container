@@ -2,11 +2,13 @@
 
 namespace League\Container;
 
+use ArrayAccess;
 use League\Container\Definition\CallableDefinition;
 use League\Container\Definition\ClassDefinition;
+use League\Container\Definition\DefinitionInterface;
 use League\Container\Definition\FactoryInterface;
 
-class Container implements ContainerInterface, \ArrayAccess
+class Container implements ContainerInterface, ArrayAccess
 {
     /**
      * @var \League\Container\Definition\FactoryInterface
@@ -280,7 +282,9 @@ class Container implements ContainerInterface, \ArrayAccess
         // define in the container, with constructor arguments and method calls
         $definition = $this->add($alias, $concrete, $singleton);
 
-        $definition->withArguments($arguments);
+        if ($definition instanceof DefinitionInterface) {
+            $definition->withArguments($arguments);
+        }
 
         if ($definition instanceof ClassDefinition) {
             $definition->withMethodCalls($methods);
