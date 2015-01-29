@@ -2,6 +2,23 @@
 
 All Notable changes to `League\Container` will be documented in this file
 
+## 1.1.1 - 2015-01-29
+
+### Added
+- Nothing
+
+### Deprecated
+- Nothing
+
+### Fixed
+- Allow for plain values to be passed in container config.
+
+### Removed
+- Nothing
+
+### Security
+- Nothing
+
 ## 1.1.0 - 2015-01-12
 
 ### Added
