@@ -221,6 +221,14 @@ class Container implements ContainerInterface, ArrayAccess
     }
 
     /**
+     * @param $config
+     */
+    public function addFromConfig($config)
+    {
+        array_walk($config, [$this, 'createDefinitionFromConfig']);
+    }
+
+    /**
      * Encapsulate the definition factory to allow for invokation
      *
      * @return \League\Container\Definition\Factory
@@ -254,9 +262,7 @@ class Container implements ContainerInterface, ArrayAccess
             );
         }
 
-        $definitions = $config['di'];
-
-        array_walk($definitions, [$this, 'createDefinitionFromConfig']);
+        $this->addFromConfig($config['di']);
     }
 
     /**
