@@ -57,6 +57,11 @@ class Container implements ContainerInterface, ArrayAccess
             $concrete = $alias;
         }
 
+        // are we dealing with a service provider?
+        if ($concrete instanceof ServiceProvider) {
+            return $this->addServiceProvider($concrete);
+        }
+
         // if the concrete is an already instantiated object, we just store it
         // as a singleton
         if (is_object($concrete) && ! $concrete instanceof \Closure) {
@@ -64,15 +69,42 @@ class Container implements ContainerInterface, ArrayAccess
             return null;
         }
 
-        // get a definition of the item
-        $this->items[$alias]['singleton'] = (boolean) $singleton;
-
+        // we need to build a definition
         $factory    = $this->getDefinitionFactory();
         $definition = $factory($alias, $concrete, $this);
 
-        $this->items[$alias]['definition'] = $definition;
+        $this->items[$alias] = [
+            'definition' => $definition,
+            'singleton'  => (boolean) $singleton
+        ];
 
         return $definition;
+    }
+
+    /**
+     * Adds a service provider to the container
+     *
+     * @param  string $name
+     * @param  string|\League\Container\ServiceProvider $provider
+     * @return \League\Container\Container
+     */
+    public function addServiceProvider($alias, $provider = null)
+    {
+        if ($alias instanceof ServiceProvider) {
+            $this->items[$alias->getName()]['service_provider'] = $alias;
+
+            return $this;
+        }
+
+        if (! is_string($alias) && ! is_integer($alias)) {
+            throw new \InvalidArgumentException(
+                'When adding a service provider by reference, a (string|integer) $alias must be provided'
+            );
+        }
+
+        $this->items[$alias]['service_provider'] = $provider;
+
+        return $this;
     }
 
     /**
@@ -139,8 +171,13 @@ class Container implements ContainerInterface, ArrayAccess
             return $this->singletons[$alias];
         }
 
+        // resolve a service via service provider
+        if (array_key_exists($alias, $this->items) && array_key_exists('service_provider', $this->items[$alias])) {
+            return $this->resolveFromServiceProvider($this->items[$alias]['service_provider']);
+        }
+
         // invoke the correct definition
-        if (array_key_exists($alias, $this->items)) {
+        if (array_key_exists($alias, $this->items) && array_key_exists('definition', $this->items[$alias])) {
             return $this->resolveDefinition($alias, $args);
         }
 
@@ -175,6 +212,24 @@ class Container implements ContainerInterface, ArrayAccess
         throw new \RuntimeException(
             sprintf('Unable to call callable [%s], does it exist and is it registered with the container?', $alias)
         );
+    }
+
+    /**
+     * Resolves a service via a service provider
+     *
+     * @param  string|\League\Container\ServiceProvider $provider
+     * @return mixed
+     */
+    protected function resolveFromServiceProvider($provider)
+    {
+        $provider = ($provider instanceof ServiceProvider) ? $provider : new $provider;
+        $resolved = $provider->setContainer($this)->resolve();
+
+        if ($provider->isSingleton()) {
+            $this->singletons[$provider->getName()] = $resolved;
+        }
+
+        return $resolved;
     }
 
     /**

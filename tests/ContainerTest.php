@@ -30,6 +30,74 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     ];
 
     /**
+     * Asserts that a service provider can be registered and service resolved
+     * via it
+     *
+     * @return void
+     */
+    public function testContainerAddAcceptsServiceProvider()
+    {
+        $c = new Container;
+
+        $c->add((new Asset\ServiceProviderFake)->setName('test'));
+
+        $this->assertInstanceOf('stdClass', $c->get('test'));
+    }
+
+    /**
+     * Asserts that service provider can be registered by string reference with alias
+     *
+     * @return void
+     */
+    public function testContainerAddServiceProviderAcceptsServiceProviderByReference()
+    {
+        $c = new Container;
+
+        $c->addServiceProvider('test', 'League\Container\Test\Asset\ServiceProviderFake');
+
+        $this->assertInstanceOf('stdClass', $c->get('test'));
+    }
+
+    /**
+     * Asserts that the same result is returned when service provider is set to manage
+     * result as singleton
+     *
+     * @return void
+     */
+    public function testtestContainerAddServiceProviderAcceptsServiceProviderAsSingleton()
+    {
+        $c = new Container;
+
+        $c->add((new Asset\ServiceProviderFake)->setName('test')->storeAsSingleton());
+
+        $this->assertSame($c->get('test'), $c->get('test'));
+    }
+
+    /**
+     * Asserts that an exception is thrown when attempting to register a service
+     * provider with no name/alias
+     *
+     * @return void
+     */
+    public function testExceptionIsThrownWhenRegisteringServiceProviderWithNoName()
+    {
+        $this->setExpectedException('League\Container\Exception\NoServiceProviderNameException');
+
+        $c = new Container;
+
+        $c->add((new Asset\ServiceProviderFake));
+    }
+
+    public function testExceptionIsThrownWhenRegisteringServiceProviderWithInvalidAlias()
+    {
+        $this->setExpectedException('InvalidArgumentException');
+
+        $c = new Container;
+
+        $c->addServiceProvider(new \stdClass, 'League\Container\Test\Asset\ServiceProviderFake');
+    }
+
+    /**
      * Asserts that container auto resolves dependencies with defined interface
      * alias
      *
