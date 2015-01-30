@@ -17,8 +17,8 @@ abstract class ServiceProvider implements ContainerAwareInterface
     protected $singleton = false;
 
     /**
-     * Resolve a service. Access to the container can be achievied via the
-     * `getContainer` method.
+     * Resolve a service. Access to the container can be achieved via the protected $this->container attribute
+     * or the `getContainer` method from the ContainerAwareTrait.
      *
      * @return mixed
      */
