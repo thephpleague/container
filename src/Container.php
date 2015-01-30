@@ -84,7 +84,7 @@ class Container implements ContainerInterface, ArrayAccess
     /**
      * Adds a service provider to the container
      *
-     * @param  string $name
+     * @param  string|\League\Container\ServiceProvider $alias
      * @param  string|\League\Container\ServiceProvider $provider
      * @return \League\Container\Container
      */
