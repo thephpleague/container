@@ -6,8 +6,13 @@ use League\Container\ServiceProvider;
 
 class ServiceProviderFake extends ServiceProvider
 {
-    public function resolve()
+    protected $provides = [
+        'test'
+    ];
+
+    public function register()
     {
-        return new \stdClass;
+        $this->getContainer()->add('test', 'League\Container\Test\Asset\Baz');
+        $this->getContainer()->add('test.instance', new \stdClass);
     }
 }

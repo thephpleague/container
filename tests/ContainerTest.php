@@ -39,9 +39,10 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     {
         $c = new Container;
 
-        $c->add((new Asset\ServiceProviderFake)->setName('test'));
+        $c->add((new Asset\ServiceProviderFake));
 
-        $this->assertInstanceOf('stdClass', $c->get('test'));
+        $this->assertInstanceOf('League\Container\Test\Asset\Baz', $c->get('test'));
+        $this->assertInstanceOf('stdClass', $c->get('test.instance'));
     }
 
     /**
@@ -53,48 +54,25 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     {
         $c = new Container;
 
-        $c->addServiceProvider('test', 'League\Container\Test\Asset\ServiceProviderFake');
+        $c->addServiceProvider('League\Container\Test\Asset\ServiceProviderFake');
 
-        $this->assertInstanceOf('stdClass', $c->get('test'));
+        $this->assertInstanceOf('League\Container\Test\Asset\Baz', $c->get('test'));
+        $this->assertInstanceOf('stdClass', $c->get('test.instance'));
     }
 
     /**
-     * Asserts that the same result is returned when service provider is set to manage
-     * result as singleton
+     * Asserts that an exteption is thrown when attempting to register an invalid
+     * type as a service provider.
      *
      * @return void
      */
-    public function testtestContainerAddServiceProviderAcceptsServiceProviderAsSingleton()
-    {
-        $c = new Container;
-
-        $c->add((new Asset\ServiceProviderFake)->setName('test')->storeAsSingleton());
-
-        $this->assertSame($c->get('test'), $c->get('test'));
-    }
-
-    /**
-     * Asserts that an exception is thrown when attempting to register a service
-     * provider with no name/alias
-     *
-     * @return void
-     */
-    public function testExceptionIsThrownWhenRegisteringServiceProviderWithNoName()
-    {
-        $this->setExpectedException('League\Container\Exception\NoServiceProviderNameException');
-
-        $c = new Container;
-
-        $c->add((new Asset\ServiceProviderFake));
-    }
-
-    public function testExceptionIsThrownWhenRegisteringServiceProviderWithInvalidAlias()
+    public function testExceptionIsThrownWhenRegisteringServiceProviderWithInvalidType()
     {
         $this->setExpectedException('InvalidArgumentException');
 
         $c = new Container;
 
-        $c->addServiceProvider(new \stdClass, 'League\Container\Test\Asset\ServiceProviderFake');
+        $c->addServiceProvider(new \stdClass);
     }
 
     /**

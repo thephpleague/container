@@ -17,11 +17,10 @@ interface ContainerInterface
     /**
      * Adds a service provider to the container
      *
-     * @param  string|\League\Container\ServiceProvider $alias
      * @param  string|\League\Container\ServiceProvider $provider
-     * @return \League\Container\Container
+     * @return \League\Container\ContainerInterface
      */
-    public function addServiceProvider($alias, $provider = null);
+    public function addServiceProvider($provider);
 
     /**
      * Add a singleton definition to the container

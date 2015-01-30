@@ -21,6 +21,11 @@ class Container implements ContainerInterface, ArrayAccess
     protected $items = [];
 
     /**
+     * @var array - \League\Container\ServiceProvider[]
+     */
+    protected $providers = [];
+
+    /**
      * @var array
      */
     protected $singletons = [];
@@ -36,10 +41,8 @@ class Container implements ContainerInterface, ArrayAccess
      * @param array|ArrayAccess                             $config
      * @param \League\Container\Definition\FactoryInterface $factory
      */
-    public function __construct(
-        $config                   = [],
-        FactoryInterface $factory = null
-    ) {
+    public function __construct($config = [], FactoryInterface $factory = null)
+    {
         $this->factory = (is_null($factory)) ? new Definition\Factory : $factory;
 
         $this->addItemsFromConfig($config);
@@ -82,27 +85,18 @@ class Container implements ContainerInterface, ArrayAccess
     }
 
     /**
-     * Adds a service provider to the container
-     *
-     * @param  string|\League\Container\ServiceProvider $alias
-     * @param  string|\League\Container\ServiceProvider $provider
-     * @return \League\Container\Container
+     * {@inheritdoc}
      */
-    public function addServiceProvider($alias, $provider = null)
+    public function addServiceProvider($provider)
     {
-        if ($alias instanceof ServiceProvider) {
-            $this->items[$alias->getName()]['service_provider'] = $alias;
-
-            return $this;
-        }
-
-        if (! is_string($alias) && ! is_integer($alias)) {
+        if ((! is_string($provider)) && (! $provider instanceof ServiceProvider)) {
             throw new \InvalidArgumentException(
-                'When adding a service provider by reference, a (string|integer) $alias must be provided'
+                'When registering a service provider, you must provide either and instance of ' .
+                '[\League\Container\ServiceProvider] or a fully qualified class name'
             );
         }
 
-        $this->items[$alias]['service_provider'] = $provider;
+        $this->providers[] = $provider;
 
         return $this;
     }
@@ -153,7 +147,7 @@ class Container implements ContainerInterface, ArrayAccess
 
         if (array_key_exists($alias, $this->singletons)) {
             throw new Exception\ServiceNotExtendableException(sprintf(
-                '[%s] is being managed singleton and cannot be modified.',
+                '[%s] is being managed as a singleton and cannot be modified.',
                 $alias
             ));
         }
@@ -171,14 +165,14 @@ class Container implements ContainerInterface, ArrayAccess
             return $this->singletons[$alias];
         }
 
-        // resolve a service via service provider
-        if (array_key_exists($alias, $this->items) && array_key_exists('service_provider', $this->items[$alias])) {
-            return $this->resolveFromServiceProvider($this->items[$alias]['service_provider']);
-        }
-
         // invoke the correct definition
         if (array_key_exists($alias, $this->items) && array_key_exists('definition', $this->items[$alias])) {
             return $this->resolveDefinition($alias, $args);
+        }
+
+        // is the definition registered via a service provider?
+        if ($this->providedByServiceProvider($alias)) {
+            return $this->get($alias, $args);
         }
 
         // if we've got this far, we can assume we need to reflect on a class
@@ -215,21 +209,25 @@ class Container implements ContainerInterface, ArrayAccess
     }
 
     /**
-     * Resolves a service via a service provider
+     * Determines if a definition is registered via a service provider.
      *
-     * @param  string|\League\Container\ServiceProvider $provider
-     * @return mixed
+     * @param  string $alias
+     * @return boolean
      */
-    protected function resolveFromServiceProvider($provider)
+    protected function providedByServiceProvider($alias)
     {
-        $provider = ($provider instanceof ServiceProvider) ? $provider : new $provider;
-        $resolved = $provider->setContainer($this)->resolve();
+        foreach ($this->providers as $provider) {
+            $provider = ($provider instanceof ServiceProvider) ? $provider : new $provider;
 
-        if ($provider->isSingleton()) {
-            $this->singletons[$provider->getName()] = $resolved;
+            $provider->setContainer($this);
+
+            if ($provider->provides($alias)) {
+                $provider->register();
+                return true;
+            }
         }
 
-        return $resolved;
+        return false;
     }
 
     /**
