@@ -32,7 +32,6 @@ class CallableDefinition extends AbstractDefinition implements DefinitionInterfa
     public function __invoke(array $args = [])
     {
         $resolved   = $this->resolveArguments($args);
-        $registered = false;
 
         if (is_array($this->callable) && is_string($this->callable[0])) {
             $registered = (
