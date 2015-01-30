@@ -28,7 +28,7 @@ interface ContainerInterface
      *
      * @param  string $alias
      * @param  mixed  $concrete
-     * @return \League\Container\Definition\DefinitionInterface
+     * @return \League\Container\Definition\DefinitionInterface|\League\Container\ContainerInterface
      */
     public function singleton($alias, $concrete = null);
 
