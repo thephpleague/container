@@ -15,6 +15,15 @@ interface ContainerInterface
     public function add($alias, $concrete = null, $singleton = false);
 
     /**
+     * Adds a service provider to the container
+     *
+     * @param  string|\League\Container\ServiceProvider $alias
+     * @param  string|\League\Container\ServiceProvider $provider
+     * @return \League\Container\Container
+     */
+    public function addServiceProvider($alias, $provider = null);
+
+    /**
      * Add a singleton definition to the container
      *
      * @param  string $alias
