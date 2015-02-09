@@ -2,6 +2,14 @@
 
 All Notable changes to `League\Container` will be documented in this file
 
+## Unreleased
+
+### Added
+- Added `ServiceProvider` functionality to allow cleaner resolving of complex dependencies.
+
+### Fixed
+- Setter in `ContainerAwareTrait` now returns self (`$this`).
+
 ## 1.2.1 - 2015-01-29
 
 ### Fixed

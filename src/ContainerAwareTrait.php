@@ -12,11 +12,14 @@ trait ContainerAwareTrait
     /**
      * Set a container.
      *
-     * @param \League\Container\ContainerInterface $container
+     * @param  \League\Container\ContainerInterface $container
+     * @return mixed
      */
     public function setContainer(ContainerInterface $container)
     {
         $this->container = $container;
+
+        return $this;
     }
 
     /**

@@ -10,24 +10,32 @@ interface ContainerInterface
      * @param string  $alias
      * @param mixed   $concrete
      * @param boolean $singleton
-     * @return \League\Container\Definition\DefinitionInterface
+     * @return \League\Container\Definition\DefinitionInterface|\League\Container\ContainerInterface
      */
     public function add($alias, $concrete = null, $singleton = false);
+
+    /**
+     * Adds a service provider to the container
+     *
+     * @param  string|\League\Container\ServiceProvider $provider
+     * @return \League\Container\ContainerInterface
+     */
+    public function addServiceProvider($provider);
 
     /**
      * Add a singleton definition to the container
      *
      * @param  string $alias
      * @param  mixed  $concrete
-     * @return \League\Container\Definition\DefinitionInterface
+     * @return \League\Container\Definition\DefinitionInterface|\League\Container\ContainerInterface
      */
     public function singleton($alias, $concrete = null);
 
     /**
      * Add a callable definition to the container
      *
-     * @param  string          $alias
-     * @param  callable        $concrete
+     * @param  string   $alias
+     * @param  callable $concrete
      * @return \League\Container\Definition\DefinitionInterface
      */
     public function invokable($alias, callable $concrete = null);
@@ -75,4 +83,12 @@ interface ContainerInterface
      * @return boolean
      */
     public function isSingleton($alias);
+
+    /**
+     * Determines if a definition is registered via a service provider.
+     *
+     * @param  string $alias
+     * @return boolean
+     */
+    public function isInServiceProvider($alias);
 }

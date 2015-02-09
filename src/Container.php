@@ -21,6 +21,11 @@ class Container implements ContainerInterface, ArrayAccess
     protected $items = [];
 
     /**
+     * @var array - \League\Container\ServiceProvider[]
+     */
+    protected $providers = [];
+
+    /**
      * @var array
      */
     protected $singletons = [];
@@ -36,10 +41,8 @@ class Container implements ContainerInterface, ArrayAccess
      * @param array|ArrayAccess                             $config
      * @param \League\Container\Definition\FactoryInterface $factory
      */
-    public function __construct(
-        $config                   = [],
-        FactoryInterface $factory = null
-    ) {
+    public function __construct($config = [], FactoryInterface $factory = null)
+    {
         $this->factory = (is_null($factory)) ? new Definition\Factory : $factory;
 
         $this->addItemsFromConfig($config);
@@ -57,6 +60,11 @@ class Container implements ContainerInterface, ArrayAccess
             $concrete = $alias;
         }
 
+        // are we dealing with a service provider?
+        if ($concrete instanceof ServiceProvider) {
+            return $this->addServiceProvider($concrete);
+        }
+
         // if the concrete is an already instantiated object, we just store it
         // as a singleton
         if (is_object($concrete) && ! $concrete instanceof \Closure) {
@@ -64,15 +72,33 @@ class Container implements ContainerInterface, ArrayAccess
             return null;
         }
 
-        // get a definition of the item
-        $this->items[$alias]['singleton'] = (boolean) $singleton;
-
+        // we need to build a definition
         $factory    = $this->getDefinitionFactory();
         $definition = $factory($alias, $concrete, $this);
 
-        $this->items[$alias]['definition'] = $definition;
+        $this->items[$alias] = [
+            'definition' => $definition,
+            'singleton'  => (boolean) $singleton
+        ];
 
         return $definition;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addServiceProvider($provider)
+    {
+        if ((! is_string($provider)) && (! $provider instanceof ServiceProvider)) {
+            throw new \InvalidArgumentException(
+                'When registering a service provider, you must provide either and instance of ' .
+                '[\League\Container\ServiceProvider] or a fully qualified class name'
+            );
+        }
+
+        $this->providers[] = $provider;
+
+        return $this;
     }
 
     /**
@@ -119,9 +145,9 @@ class Container implements ContainerInterface, ArrayAccess
             throw new \InvalidArgumentException(sprintf('[%s] is not registered in the container.', $alias));
         }
 
-        if (array_key_exists($alias, $this->singletons)) {
+        if ($this->isSingleton($alias)) {
             throw new Exception\ServiceNotExtendableException(sprintf(
-                '[%s] is being managed singleton and cannot be modified.',
+                '[%s] is being managed as a singleton and cannot be modified.',
                 $alias
             ));
         }
@@ -140,8 +166,13 @@ class Container implements ContainerInterface, ArrayAccess
         }
 
         // invoke the correct definition
-        if (array_key_exists($alias, $this->items)) {
+        if (array_key_exists($alias, $this->items) && array_key_exists('definition', $this->items[$alias])) {
             return $this->resolveDefinition($alias, $args);
+        }
+
+        // is the definition registered via a service provider?
+        if ($this->isInServiceProvider($alias)) {
+            return $this->get($alias, $args);
         }
 
         // if we've got this far, we can assume we need to reflect on a class
@@ -218,6 +249,25 @@ class Container implements ContainerInterface, ArrayAccess
             array_key_exists($alias, $this->singletons) ||
             (array_key_exists($alias, $this->items) && $this->items[$alias]['singleton'] === true)
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isInServiceProvider($alias)
+    {
+        foreach ($this->providers as $provider) {
+            $provider = ($provider instanceof ServiceProvider) ? $provider : new $provider;
+
+            $provider->setContainer($this);
+
+            if ($provider->provides($alias)) {
+                $provider->register();
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -461,6 +511,10 @@ class Container implements ContainerInterface, ArrayAccess
      */
     public function offsetExists($key)
     {
-        return $this->isRegistered($key);
+        return (
+            $this->isRegistered($key) ||
+            $this->isSingleton($key)  ||
+            $this->isInServiceProvider($key)
+        );
     }
 }

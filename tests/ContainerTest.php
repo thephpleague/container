@@ -30,6 +30,52 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     ];
 
     /**
+     * Asserts that a service provider can be registered and service resolved
+     * via it
+     *
+     * @return void
+     */
+    public function testContainerAddAcceptsServiceProvider()
+    {
+        $c = new Container;
+
+        $c->add((new Asset\ServiceProviderFake));
+
+        $this->assertInstanceOf('League\Container\Test\Asset\Baz', $c->get('test'));
+        $this->assertInstanceOf('stdClass', $c->get('test.instance'));
+    }
+
+    /**
+     * Asserts that service provider can be registered by string reference with alias
+     *
+     * @return void
+     */
+    public function testContainerAddServiceProviderAcceptsServiceProviderByReference()
+    {
+        $c = new Container;
+
+        $c->addServiceProvider('League\Container\Test\Asset\ServiceProviderFake');
+
+        $this->assertInstanceOf('League\Container\Test\Asset\Baz', $c->get('test'));
+        $this->assertInstanceOf('stdClass', $c->get('test.instance'));
+    }
+
+    /**
+     * Asserts that an exteption is thrown when attempting to register an invalid
+     * type as a service provider.
+     *
+     * @return void
+     */
+    public function testExceptionIsThrownWhenRegisteringServiceProviderWithInvalidType()
+    {
+        $this->setExpectedException('InvalidArgumentException');
+
+        $c = new Container;
+
+        $c->addServiceProvider(new \stdClass);
+    }
+
+    /**
      * Asserts that container auto resolves dependencies with defined interface
      * alias
      *
