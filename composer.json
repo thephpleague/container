@@ -3,7 +3,10 @@
     "description": "A fast and intuitive dependency injection container.",
     "keywords": [
         "league",
-        "container"
+        "container",
+        "dependency",
+        "injection",
+        "di"
     ],
     "homepage": "https://github.com/thephpleague/container",
     "license": "MIT",
@@ -39,7 +42,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "1.0-dev"
+            "dev-master": "1.3-dev"
         }
     }
 }

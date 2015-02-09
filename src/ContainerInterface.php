@@ -34,8 +34,8 @@ interface ContainerInterface
     /**
      * Add a callable definition to the container
      *
-     * @param  string          $alias
-     * @param  callable        $concrete
+     * @param  string   $alias
+     * @param  callable $concrete
      * @return \League\Container\Definition\DefinitionInterface
      */
     public function invokable($alias, callable $concrete = null);
@@ -83,4 +83,12 @@ interface ContainerInterface
      * @return boolean
      */
     public function isSingleton($alias);
+
+    /**
+     * Determines if a definition is registered via a service provider.
+     *
+     * @param  string $alias
+     * @return boolean
+     */
+    public function isInServiceProvider($alias);
 }

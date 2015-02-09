@@ -13,7 +13,7 @@ abstract class ServiceProvider implements ContainerAwareInterface
 
     /**
      * Use the register method to register items with the container via the
-     * protected $this->container attribute or the `getContainer` method
+     * protected $this->container property or the `getContainer` method
      * from the ContainerAwareTrait.
      *
      * @return void

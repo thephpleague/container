@@ -35,8 +35,9 @@ class CallableDefinition extends AbstractDefinition implements DefinitionInterfa
 
         if (is_array($this->callable) && is_string($this->callable[0])) {
             $registered = (
-                $this->container->isRegistered($this->callable[0]) ||
-                $this->container->isSingleton($this->callable[0]) ||
+                $this->container->isRegistered($this->callable[0])        ||
+                $this->container->isSingleton($this->callable[0])         ||
+                $this->container->isInServiceProvider($this->callable[0]) ||
                 class_exists($this->callable[0])
             );
 

@@ -2,7 +2,7 @@
 
 All Notable changes to `League\Container` will be documented in this file
 
-## 1.3.0 - 2015-01-30
+## Unreleased
 
 ### Added
 - Added `ServiceProvider` functionality to allow cleaner resolving of complex dependencies.

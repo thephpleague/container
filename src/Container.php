@@ -145,7 +145,7 @@ class Container implements ContainerInterface, ArrayAccess
             throw new \InvalidArgumentException(sprintf('[%s] is not registered in the container.', $alias));
         }
 
-        if (array_key_exists($alias, $this->singletons)) {
+        if ($this->isSingleton($alias)) {
             throw new Exception\ServiceNotExtendableException(sprintf(
                 '[%s] is being managed as a singleton and cannot be modified.',
                 $alias
@@ -171,7 +171,7 @@ class Container implements ContainerInterface, ArrayAccess
         }
 
         // is the definition registered via a service provider?
-        if ($this->providedByServiceProvider($alias)) {
+        if ($this->isInServiceProvider($alias)) {
             return $this->get($alias, $args);
         }
 
@@ -206,28 +206,6 @@ class Container implements ContainerInterface, ArrayAccess
         throw new \RuntimeException(
             sprintf('Unable to call callable [%s], does it exist and is it registered with the container?', $alias)
         );
-    }
-
-    /**
-     * Determines if a definition is registered via a service provider.
-     *
-     * @param  string $alias
-     * @return boolean
-     */
-    protected function providedByServiceProvider($alias)
-    {
-        foreach ($this->providers as $provider) {
-            $provider = ($provider instanceof ServiceProvider) ? $provider : new $provider;
-
-            $provider->setContainer($this);
-
-            if ($provider->provides($alias)) {
-                $provider->register();
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**
@@ -271,6 +249,25 @@ class Container implements ContainerInterface, ArrayAccess
             array_key_exists($alias, $this->singletons) ||
             (array_key_exists($alias, $this->items) && $this->items[$alias]['singleton'] === true)
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isInServiceProvider($alias)
+    {
+        foreach ($this->providers as $provider) {
+            $provider = ($provider instanceof ServiceProvider) ? $provider : new $provider;
+
+            $provider->setContainer($this);
+
+            if ($provider->provides($alias)) {
+                $provider->register();
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -514,6 +511,10 @@ class Container implements ContainerInterface, ArrayAccess
      */
     public function offsetExists($key)
     {
-        return $this->isRegistered($key);
+        return (
+            $this->container->isRegistered($arg)        ||
+            $this->container->isSingleton($arg)         ||
+            $this->container->isInServiceProvider($arg) ||
+        );
     }
 }
