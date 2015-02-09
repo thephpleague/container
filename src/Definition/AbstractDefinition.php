@@ -13,11 +13,6 @@ abstract class AbstractDefinition implements ContainerAwareInterface
     use ContainerAwareTrait;
 
     /**
-     * @var \League\Container\ContainerInterface
-     */
-    protected $container;
-
-    /**
      * @var string
      */
     protected $alias;
