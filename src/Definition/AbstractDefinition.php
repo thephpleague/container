@@ -33,7 +33,7 @@ abstract class AbstractDefinition implements ContainerAwareInterface
      * @param string                      $alias
      * @param \League\Container\ContainerInterface $container
      */
-    public function __construct($alias, ContainerInterface $container)
+    public function __construct($alias, ContainerInterface $container = null)
     {
         $this->alias     = $alias;
         $this->container = $container;

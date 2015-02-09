@@ -27,4 +27,11 @@ trait ArgumentResolverTrait
 
         return $resolved;
     }
+
+    /**
+     * Ensure that ContainerAwareTrait is implemented
+     *
+     * @return \League\Container\ContainerInterface
+     */
+    abstract public function getContainer();
 }
