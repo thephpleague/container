@@ -2,10 +2,16 @@
 
 namespace League\Container\Definition;
 
+use League\Container\ArgumentResolverTrait;
+use League\Container\ContainerAwareInterface;
+use League\Container\ContainerAwareTrait;
 use League\Container\ContainerInterface;
 
-abstract class AbstractDefinition
+abstract class AbstractDefinition implements ContainerAwareInterface
 {
+    use ArgumentResolverTrait;
+    use ContainerAwareTrait;
+
     /**
      * @var \League\Container\ContainerInterface
      */
@@ -58,39 +64,5 @@ abstract class AbstractDefinition
         }
 
         return $this;
-    }
-
-    /**
-     * Resolves all of the arguments.  If you do not send an array of arguments
-     * it will use the Definition Arguments.
-     *
-     * @param  array $args
-     * @return array
-     */
-    protected function resolveArguments($args = [])
-    {
-        $args = (empty($args)) ? $this->arguments : $args;
-
-        $resolvedArguments = [];
-
-        foreach ($args as $arg) {
-            $registered = (
-                is_string($arg) && (
-                    $this->container->isRegistered($arg)        ||
-                    $this->container->isSingleton($arg)         ||
-                    $this->container->isInServiceProvider($arg) ||
-                    class_exists($arg)
-                )
-            );
-
-            if ($registered) {
-                $resolvedArguments[] = $this->container->get($arg);
-                continue;
-            }
-
-            $resolvedArguments[] = $arg;
-        }
-
-        return $resolvedArguments;
     }
 }

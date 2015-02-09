@@ -6,6 +6,8 @@ All Notable changes to `League\Container` will be documented in this file
 
 ### Added
 - Added `ServiceProvider` functionality to allow cleaner resolving of complex dependencies.
+- Added `Inflector` functionality to allow for manipulation of resolved objects of a specific type.
+- Improvements to DRY throughout the package.
 
 ### Fixed
 - Setter in `ContainerAwareTrait` now returns self (`$this`).

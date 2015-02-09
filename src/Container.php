@@ -11,9 +11,19 @@ use League\Container\Definition\FactoryInterface;
 class Container implements ContainerInterface, ArrayAccess
 {
     /**
+     * @var array
+     */
+    protected $callables = [];
+
+    /**
      * @var \League\Container\Definition\FactoryInterface
      */
     protected $factory;
+
+    /**
+     * @var array
+     */
+    protected $inflectors = [];
 
     /**
      * @var array
@@ -29,11 +39,6 @@ class Container implements ContainerInterface, ArrayAccess
      * @var array
      */
     protected $singletons = [];
-
-    /**
-     * @var array
-     */
-    protected $callables = [];
 
     /**
      * Constructor
@@ -112,6 +117,21 @@ class Container implements ContainerInterface, ArrayAccess
     /**
      * {@inheritdoc}
      */
+    public function inflector($type, callable $callback = null)
+    {
+        if (is_null($callback)) {
+            $inflector = new Inflector;
+            $this->inflectors[$type] = $inflector;
+
+            return $inflector;
+        }
+
+        $this->inflectors[$type] = $callback;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function invokable($alias, callable $concrete = null)
     {
         if (is_null($concrete)) {
@@ -162,12 +182,12 @@ class Container implements ContainerInterface, ArrayAccess
     {
         // if we have a singleton just return it
         if (array_key_exists($alias, $this->singletons)) {
-            return $this->singletons[$alias];
+            return $this->applyInflectors($this->singletons[$alias]);
         }
 
         // invoke the correct definition
         if (array_key_exists($alias, $this->items) && array_key_exists('definition', $this->items[$alias])) {
-            return $this->resolveDefinition($alias, $args);
+            return $this->applyInflectors($this->resolveDefinition($alias, $args));
         }
 
         // is the definition registered via a service provider?
@@ -182,7 +202,7 @@ class Container implements ContainerInterface, ArrayAccess
 
         $this->items[$alias]['definition'] = $definition;
 
-        return $definition();
+        return $this->applyInflectors($definition());
     }
 
     /**
@@ -466,6 +486,32 @@ class Container implements ContainerInterface, ArrayAccess
                 )
             );
         }, $reflector->getParameters());
+    }
+
+    /**
+     * Apply any active inflectors to the resolved object
+     *
+     * @param  object $object
+     * @return object
+     */
+    protected function applyInflectors($object)
+    {
+        foreach ($this->inflectors as $type => $inflector) {
+            if (! $object instanceof $type) {
+                continue;
+            }
+
+            if ($inflector instanceof Inflector) {
+                $inflector->setContainer($this);
+                $inflector->inflect($object);
+                continue;
+            }
+
+            // must be dealing with a callable as the inflector
+            call_user_func_array($inflector, [$object]);
+        }
+
+        return $object;
     }
 
     /**

@@ -6,7 +6,6 @@ use League\Container\ContainerInterface;
 
 class CallableDefinition extends AbstractDefinition implements DefinitionInterface
 {
-
     /**
      * @var callable
      */
@@ -19,7 +18,7 @@ class CallableDefinition extends AbstractDefinition implements DefinitionInterfa
      * @param string|callable                      $concrete
      * @param \League\Container\ContainerInterface $container
      */
-    public function __construct($alias, $concrete, ContainerInterface $container)
+    public function __construct($alias, $concrete, ContainerInterface $container = null)
     {
         parent::__construct($alias, $container);
 
@@ -31,6 +30,7 @@ class CallableDefinition extends AbstractDefinition implements DefinitionInterfa
      */
     public function __invoke(array $args = [])
     {
+        $args = (empty($args)) ? $this->arguments : $args;
         $resolved = $this->resolveArguments($args);
 
         if (is_array($this->callable) && is_string($this->callable[0])) {

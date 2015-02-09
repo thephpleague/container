@@ -54,6 +54,10 @@ $ vendor/bin/phpunit
 
 Please see [CONTRIBUTING](https://github.com/thephpleague/container/blob/master/CONTRIBUTING.md) for details.
 
+## Security
+
+If you discover any security related issues, please email philipobenito@gmail.com instead of using the issue tracker.
+
 ## Credits
 
 - [Nikita Popov](https://github.com/nikic)

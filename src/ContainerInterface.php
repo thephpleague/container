@@ -32,6 +32,16 @@ interface ContainerInterface
     public function singleton($alias, $concrete = null);
 
     /**
+     * Allows for methods to be invoked on any object that is resolved of the tyoe
+     * provided
+     *
+     * @param  string   $type
+     * @param  callable $callback
+     * @return \League\Container\Inflector|void
+     */
+    public function inflector($type, callable $callback = null);
+
+    /**
      * Add a callable definition to the container
      *
      * @param  string   $alias

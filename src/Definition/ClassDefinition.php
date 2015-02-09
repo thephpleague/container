@@ -6,7 +6,6 @@ use League\Container\ContainerInterface;
 
 class ClassDefinition extends AbstractDefinition implements ClassDefinitionInterface
 {
-
     /**
      * @var string
      */
@@ -19,7 +18,7 @@ class ClassDefinition extends AbstractDefinition implements ClassDefinitionInter
      * @param string                      $concrete
      * @param \League\Container\ContainerInterface $container
      */
-    public function __construct($alias, $concrete, ContainerInterface $container)
+    public function __construct($alias, $concrete, ContainerInterface $container = null)
     {
         parent::__construct($alias, $container);
 
@@ -56,6 +55,7 @@ class ClassDefinition extends AbstractDefinition implements ClassDefinitionInter
      */
     public function __invoke(array $args = [])
     {
+        $args = (empty($args)) ? $this->arguments : $args;
         $resolved = $this->resolveArguments($args);
 
         $reflection = new \ReflectionClass($this->class);
@@ -73,17 +73,9 @@ class ClassDefinition extends AbstractDefinition implements ClassDefinitionInter
     protected function invokeMethods($object)
     {
         foreach ($this->methods as $method) {
-            $reflection = new \ReflectionMethod($object, $method['method']);
+            $args = $this->resolveArguments($method['arguments']);
 
-            $args = [];
-
-            foreach ($method['arguments'] as $arg) {
-                $args[] = ($this->container->isRegistered($arg) || $this->container->isSingleton($arg))
-                        ? $this->container->get($arg)
-                        : $arg;
-            }
-
-            $reflection->invokeArgs($object, $args);
+            call_user_func_array([$object, $method['method']], $args);
         }
 
         return $object;

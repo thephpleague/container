@@ -30,6 +30,59 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     ];
 
     /**
+     * Asserts that an infector is applied when resolving a class
+     *
+     * @return void
+     */
+    public function testInflectorIsAppliedAfterResolution()
+    {
+        $c = new Container;
+
+        $c->add('League\Container\Test\Asset\Bar')
+          ->withArguments(['League\Container\Test\Asset\Baz']);
+
+        $c->add('League\Container\Test\Asset\Baz');
+
+        $c->add('League\Container\Test\Asset\Foo')
+          ->withArgument('League\Container\Test\Asset\Bar')
+          ->withMethodCall('injectBaz', ['League\Container\Test\Asset\Baz']);
+
+        $foo = $c->get('League\Container\Test\Asset\Foo');
+
+        $this->assertInstanceOf('League\Container\Test\Asset\Foo', $foo);
+        $this->assertInstanceOf('League\Container\Test\Asset\Bar', $foo->bar);
+        $this->assertInstanceOf('League\Container\Test\Asset\Baz', $foo->baz);
+
+        $c->inflector('League\Container\Test\Asset\Foo')
+          ->setProperties([
+              'bar' => 'League\Container\Test\Asset\Baz',
+              'baz' => 'League\Container\Test\Asset\Bar'
+          ]);
+
+        $foo = $c->get('League\Container\Test\Asset\Foo');
+
+        $this->assertInstanceOf('League\Container\Test\Asset\Baz', $foo->bar);
+        $this->assertInstanceOf('League\Container\Test\Asset\Bar', $foo->baz);
+
+        $c->inflector('League\Container\Test\Asset\Foo')
+          ->invokeMethods([
+              'injectBaz' => ['League\Container\Test\Asset\Baz']
+          ]);
+
+        $foo = $c->get('League\Container\Test\Asset\Foo');
+
+        $this->assertInstanceOf('League\Container\Test\Asset\Baz', $foo->baz);
+
+        $c->inflector('League\Container\Test\Asset\Foo', function ($foo) use ($c) {
+            $foo->bar = $c->get('League\Container\Test\Asset\Baz');
+        });
+
+        $foo = $c->get('League\Container\Test\Asset\Foo');
+
+        $this->assertInstanceOf('League\Container\Test\Asset\Baz', $foo->bar);
+    }
+
+    /**
      * Asserts that a service provider can be registered and service resolved
      * via it
      *
