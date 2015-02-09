@@ -3,14 +3,11 @@
 namespace League\Container\Definition;
 
 use League\Container\ArgumentResolverTrait;
-use League\Container\ContainerAwareInterface;
-use League\Container\ContainerAwareTrait;
 use League\Container\ContainerInterface;
 
-abstract class AbstractDefinition implements ContainerAwareInterface
+abstract class AbstractDefinition
 {
     use ArgumentResolverTrait;
-    use ContainerAwareTrait;
 
     /**
      * @var string

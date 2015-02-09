@@ -2,10 +2,14 @@
 
 namespace League\Container\Definition;
 
+use League\Container\ContainerAwareInterface;
+use League\Container\ContainerAwareTrait;
 use League\Container\ContainerInterface;
 
-class ClassDefinition extends AbstractDefinition implements ClassDefinitionInterface
+class ClassDefinition extends AbstractDefinition implements ClassDefinitionInterface, ContainerAwareInterface
 {
+    use ContainerAwareTrait;
+
     /**
      * @var string
      */

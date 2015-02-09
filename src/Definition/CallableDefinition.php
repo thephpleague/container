@@ -2,10 +2,14 @@
 
 namespace League\Container\Definition;
 
+use League\Container\ContainerAwareInterface;
+use League\Container\ContainerAwareTrait;
 use League\Container\ContainerInterface;
 
-class CallableDefinition extends AbstractDefinition implements DefinitionInterface
+class CallableDefinition extends AbstractDefinition implements DefinitionInterface, ContainerAwareInterface
 {
+    use ContainerAwareTrait;
+
     /**
      * @var callable
      */
