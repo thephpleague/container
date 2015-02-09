@@ -2,9 +2,11 @@ Getting Started:
     Introduction: '/'
     Installation: '/installation/'
 Usage:
+    Service Providers: '/service-providers/'
     Constructor Injection: '/constructor-injection/'
     Setter Injection: '/setter-injection/'
     Factory Closures: '/factory-closures/'
     Auto Dependency Resolution: '/auto-dependency-resolution/'
+    Inflectors: '/inflectors/'
     Registering Callables: '/registering-callables/'
     Configuration: '/configuration/'
