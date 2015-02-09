@@ -512,9 +512,9 @@ class Container implements ContainerInterface, ArrayAccess
     public function offsetExists($key)
     {
         return (
-            $this->container->isRegistered($arg)        ||
-            $this->container->isSingleton($arg)         ||
-            $this->container->isInServiceProvider($arg) ||
+            $this->isRegistered($key) ||
+            $this->isSingleton($key)  ||
+            $this->isInServiceProvider($key)
         );
     }
 }
