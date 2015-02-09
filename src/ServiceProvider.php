@@ -29,8 +29,8 @@ abstract class ServiceProvider implements ContainerAwareInterface
      */
     public function provides($alias = null)
     {
-        if ((! is_null($alias)) && in_array($alias, $this->provides)) {
-            return true;
+        if (! is_null($alias)) {
+            return (in_array($alias, $this->provides));
         }
 
         return $this->provides;

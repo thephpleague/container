@@ -7,7 +7,8 @@ use League\Container\ServiceProvider;
 class ServiceProviderFake extends ServiceProvider
 {
     protected $provides = [
-        'test'
+        'test',
+        'test.instance'
     ];
 
     public function register()
