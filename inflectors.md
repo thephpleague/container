@@ -18,7 +18,7 @@ $container->register('Some\LoggerAwareClass'); // implements LoggerAwareInterfac
 $container->register('Some\Other\LoggerAwareClass'); // implements LoggerAwareInterface
 
 $container->inflector('LoggerAwareInterface')
-          ->invokeMethod('setLogger', 'Some\Logger'); // Some\Logger will be resolved via the container
+          ->invokeMethod('setLogger', ['Some\Logger']); // Some\Logger will be resolved via the container
 ~~~
 
 Now instead of adding a method call to each class individually we can simply define an inflector to invoke the method for every class of that type.
