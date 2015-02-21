@@ -2,6 +2,11 @@
 
 All Notable changes to `League\Container` will be documented in this file
 
+## 1.3.1 - 2015-02-21
+
+### Fixed
+- Fixed bug where arbitrary values were attempted to be resolved as classes.
+
 ## 1.3.0 - 2015-02-09
 
 ### Added

@@ -72,7 +72,7 @@ class Container implements ContainerInterface, ArrayAccess
 
         // if the concrete is an already instantiated object, we just store it
         // as a singleton
-        if (is_object($concrete) && ! $concrete instanceof \Closure) {
+        if ((is_object($concrete) && ! $concrete instanceof \Closure)) {
             $this->singletons[$alias] = $concrete;
             return null;
         }
@@ -81,12 +81,17 @@ class Container implements ContainerInterface, ArrayAccess
         $factory    = $this->getDefinitionFactory();
         $definition = $factory($alias, $concrete, $this);
 
-        $this->items[$alias] = [
-            'definition' => $definition,
-            'singleton'  => (boolean) $singleton
-        ];
+        if ($definition instanceof DefinitionInterface) {
+            $this->items[$alias] = [
+                'definition' => $definition,
+                'singleton'  => (boolean) $singleton
+            ];
 
-        return $definition;
+            return $definition;
+        }
+
+        // dealing with an arbitrary value so just store as singleton
+        $this->singletons[$alias] = $concrete;
     }
 
     /**
