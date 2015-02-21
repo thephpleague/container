@@ -8,12 +8,16 @@ class ServiceProviderFake extends ServiceProvider
 {
     protected $provides = [
         'test',
-        'test.instance'
+        'test.instance',
+        'test.variable',
     ];
 
     public function register()
     {
-        $this->getContainer()->add('test', 'League\Container\Test\Asset\Baz');
-        $this->getContainer()->add('test.instance', new \stdClass);
+        $container = $this->getContainer();
+
+        $container->add('test', 'League\Container\Test\Asset\Baz');
+        $container->add('test.instance', new \stdClass);
+        $container->add('test.variable', 'value');
     }
 }
