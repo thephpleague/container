@@ -114,6 +114,20 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Asserts that the service providers registers a scalar value.
+     *
+     * @return void
+     */
+    public function testArbitraryValuesAreRegisteredInServiceProvider()
+    {
+        $c = new Container;
+
+        $c->addServiceProvider('League\Container\Test\Asset\ServiceProviderFake');
+
+        $this->assertEquals('value', $c->get('test.variable'));
+    }
+
+    /**
      * Asserts that an exteption is thrown when attempting to register an invalid
      * type as a service provider.
      *
