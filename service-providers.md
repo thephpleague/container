@@ -26,6 +26,7 @@ class SomeServiceProvider extends ServiceProvider
      * @var array
      */
     protected $provides = [
+        'key',
         'Some\Controller',
         'Some\Model',
         'Some\Request'
@@ -38,6 +39,7 @@ class SomeServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->getContainer()['key'] = 'value';
         $this->getContainer()->add('Some\Controller')
              ->withArgument('Some\Request')
              ->withArgument('Some\Model');
