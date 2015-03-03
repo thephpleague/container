@@ -51,7 +51,7 @@ class CallableDefinition extends AbstractDefinition implements DefinitionInterfa
         if ($args) {
             $names = $this->getArgumentNames($this->callable);
 
-            $resolved = array_combine($names, $resolved);
+            $resolved = array_combine(array_splice($names, 0, count($resolved)), $resolved);
 
             return $this->container->call($this->callable, array_merge($resolved, $args));
         }
