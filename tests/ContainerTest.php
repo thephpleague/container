@@ -520,6 +520,18 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Asserts that the alias is checked in service providers as well
+     *
+     * @return void
+     */
+    public function testExtendLooksForAliasInServiceProviders()
+    {
+        $c = new Container;
+        $c->addServiceProvider('League\Container\Test\Asset\ServiceProviderFake');
+        $c->extend('test');
+    }
+
+    /**
      * Asserts that call invokes closure
      *
      * @return void

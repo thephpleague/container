@@ -166,7 +166,7 @@ class Container implements ContainerInterface, ArrayAccess
      */
     public function extend($alias)
     {
-        if (! $this->isRegistered($alias)) {
+        if (! $this->isRegistered($alias) and ! $this->isInServiceProvider($alias)) {
             throw new \InvalidArgumentException(sprintf('[%s] is not registered in the container.', $alias));
         }
 
