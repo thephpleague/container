@@ -281,8 +281,10 @@ class Container implements ContainerInterface, ArrayAccess
      */
     public function isInServiceProvider($alias)
     {
-        foreach ($this->providers as $provider) {
-            $provider = ($provider instanceof ServiceProvider) ? $provider : new $provider;
+        foreach ($this->providers as &$provider) {
+            if (! $provider instanceof ServiceProvider) {
+                $provider = new $provider;
+            }
 
             $provider->setContainer($this);
 
