@@ -17,9 +17,7 @@ trait ArgumentResolverTrait
         foreach ($args as $arg) {
             $resolved[] = (
                 is_string($arg) && (
-                    $this->getContainer()->isRegistered($arg)        ||
-                    $this->getContainer()->isSingleton($arg)         ||
-                    $this->getContainer()->isInServiceProvider($arg) ||
+                    isset($this->getContainer()[$arg]) ||
                     class_exists($arg)
                 )
             ) ? $this->getContainer()->get($arg) : $arg;
