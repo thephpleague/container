@@ -2,6 +2,16 @@
 
 All Notable changes to `League\Container` will be documented in this file
 
+## 1.4.0
+
+### Added
+- Added `isRegisteredCallable` method to public API.
+- Invoking `call` now accepts named arguments at runtime.
+
+### Fixed
+- Container now stores instantiated Service Providers after first instantiation.
+- Extending a definition now looks in Service Providers as well as just Definitions.
+
 ## 1.3.1 - 2015-02-21
 
 ### Fixed
