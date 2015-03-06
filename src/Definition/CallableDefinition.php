@@ -1,22 +1,16 @@
 <?php
-
 namespace League\Container\Definition;
 
 use League\Container\ContainerAwareInterface;
 use League\Container\ContainerAwareTrait;
 use League\Container\ContainerInterface;
-use ReflectionFunction;
-use ReflectionMethod;
-use ReflectionParameter;
 
-class CallableDefinition extends AbstractDefinition implements DefinitionInterface, ContainerAwareInterface
+class CallableDefinition extends AbstractDefinition implements
+    CallableDefinitionInterface,
+    DefinitionInterface,
+    ContainerAwareInterface
 {
     use ContainerAwareTrait;
-
-    /**
-     * @var callable
-     */
-    protected $callable;
 
     /**
      * Constructor
@@ -33,7 +27,11 @@ class CallableDefinition extends AbstractDefinition implements DefinitionInterfa
     }
 
     /**
-     * {@inheritdoc}
+     * Handle instantiation and manipulation of value and return
+     *
+     * @param array $args
+     *
+     * @return mixed
      */
     public function __invoke(array $args = [])
     {
@@ -46,34 +44,10 @@ class CallableDefinition extends AbstractDefinition implements DefinitionInterfa
             $this->callable[0] = ($registered) ? $this->container->get($this->callable[0]) : $this->callable[0];
         }
 
-        $resolved = $this->resolveArguments($this->arguments);
+        $args = (empty($args)) ? $this->arguments : $args;
 
-        if ($args) {
-            $names = $this->getArgumentNames($this->callable);
-
-            $resolved = array_combine(array_splice($names, 0, count($resolved)), $resolved);
-
-            return $this->container->call($this->callable, array_merge($resolved, $args));
-        }
+        $resolved = $this->resolveArguments($args);
 
         return call_user_func_array($this->callable, $resolved);
-    }
-
-    /**
-     * @param callable $callable
-     *
-     * @return array
-     */
-    protected function getArgumentNames(callable $callable)
-    {
-        if (is_array($callable)) {
-            $reflector = new ReflectionMethod($callable[0], $callable[1]);
-        } else {
-            $reflector = new ReflectionFunction($callable);
-        }
-
-        return array_map(function (ReflectionParameter $param) {
-            return $param->getName();
-        }, $reflector->getParameters());
     }
 }

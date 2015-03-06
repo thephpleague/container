@@ -3,9 +3,10 @@
 namespace League\Container;
 
 use ArrayAccess;
-use League\Container\Definition\CallableDefinition;
+use League\Container\Definition\CallableDefinitionInterface;
 use League\Container\Definition\ClassDefinition;
 use League\Container\Definition\DefinitionInterface;
+use League\Container\Definition\Factory;
 use League\Container\Definition\FactoryInterface;
 
 class Container implements ContainerInterface
@@ -48,7 +49,7 @@ class Container implements ContainerInterface
      */
     public function __construct($config = [], FactoryInterface $factory = null)
     {
-        $this->factory = (is_null($factory)) ? new Definition\Factory : $factory;
+        $this->factory = (is_null($factory)) ? new Factory() : $factory;
 
         $this->addItemsFromConfig($config);
 
@@ -125,7 +126,7 @@ class Container implements ContainerInterface
     public function inflector($type, callable $callback = null)
     {
         if (is_null($callback)) {
-            $inflector = new Inflector;
+            $inflector = new Inflector();
             $this->inflectors[$type] = $inflector;
 
             return $inflector;
@@ -245,7 +246,7 @@ class Container implements ContainerInterface
         $definition = $this->items[$alias]['definition'];
         $return     = $definition;
 
-        if ($definition instanceof CallableDefinition || $definition instanceof ClassDefinition) {
+        if ($definition instanceof CallableDefinitionInterface || $definition instanceof ClassDefinition) {
             $return = $definition($args);
         }
 
@@ -308,7 +309,7 @@ class Container implements ContainerInterface
     /**
      * Encapsulate the definition factory to allow for invokation
      *
-     * @return \League\Container\Definition\Factory
+     * @return \League\Container\Definition\FactoryInterface
      */
     protected function getDefinitionFactory()
     {

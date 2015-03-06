@@ -789,4 +789,23 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(123, $c->get('a_key'));
     }
+
+    public function testRegisteredCallableIsPassedArguments()
+    {
+        $c = new Container();
+
+        $c->add('alias', function ($arg1, $arg2, $arg3 = 'default') {
+            $obj = new \stdClass();
+            $obj->first = $arg1;
+            $obj->second = $arg2;
+            $obj->third = $arg3;
+            return $obj;
+        });
+
+        $obj = $c->get('alias', ['value 1', 'second']);
+
+        $this->assertEquals($obj->first, 'value 1');
+        $this->assertEquals($obj->second, 'second');
+        $this->assertEquals($obj->third, 'default');
+    }
 }
