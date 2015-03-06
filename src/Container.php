@@ -3,7 +3,7 @@
 namespace League\Container;
 
 use ArrayAccess;
-use League\Container\Definition\CallableDefinition;
+use League\Container\Definition\CallableDefinitionInterface;
 use League\Container\Definition\ClassDefinition;
 use League\Container\Definition\DefinitionInterface;
 use League\Container\Definition\FactoryInterface;
@@ -245,7 +245,7 @@ class Container implements ContainerInterface
         $definition = $this->items[$alias]['definition'];
         $return     = $definition;
 
-        if ($definition instanceof CallableDefinition || $definition instanceof ClassDefinition) {
+        if ($definition instanceof CallableDefinitionInterface || $definition instanceof ClassDefinition) {
             $return = $definition($args);
         }
 
