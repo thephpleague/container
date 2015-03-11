@@ -2,9 +2,7 @@
 
 namespace League\Container;
 
-use ArrayAccess;
-
-interface ContainerInterface extends ArrayAccess
+interface ContainerInterface
 {
     /**
      * Add a definition to the container
@@ -87,14 +85,6 @@ interface ContainerInterface extends ArrayAccess
      * @return boolean
      */
     public function isRegistered($alias);
-
-    /**
-     * Check if a callable with this alias is registered with the container
-     *
-     * @param  string  $alias
-     * @return boolean
-     */
-    public function isRegisteredCallable($alias);
 
     /**
      * Check if an item is being managed as a singleton

@@ -8,7 +8,7 @@ use League\Container\Definition\ClassDefinition;
 use League\Container\Definition\DefinitionInterface;
 use League\Container\Definition\FactoryInterface;
 
-class Container implements ContainerInterface
+class Container implements ContainerInterface, ArrayAccess
 {
     /**
      * @var array
@@ -263,14 +263,6 @@ class Container implements ContainerInterface
     public function isRegistered($alias)
     {
         return array_key_exists($alias, $this->items);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isRegisteredCallable($alias)
-    {
-        return array_key_exists($alias, $this->callables);
     }
 
     /**
