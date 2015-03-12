@@ -2,13 +2,12 @@
 
 namespace League\Container;
 
-use ArrayAccess;
 use League\Container\Definition\CallableDefinition;
 use League\Container\Definition\ClassDefinition;
 use League\Container\Definition\DefinitionInterface;
 use League\Container\Definition\FactoryInterface;
 
-class Container implements ContainerInterface, ArrayAccess
+class Container implements ContainerInterface
 {
     /**
      * @var array
@@ -519,55 +518,5 @@ class Container implements ContainerInterface, ArrayAccess
         }
 
         return $object;
-    }
-
-    /**
-     * Array Access get
-     *
-     * @param  string $key
-     * @return mixed
-     */
-    public function offsetGet($key)
-    {
-        return $this->get($key);
-    }
-
-    /**
-     * Array Access set
-     *
-     * @param  string $key
-     * @param  mixed  $value
-     * @return void
-     */
-    public function offsetSet($key, $value)
-    {
-        $this->singleton($key, $value);
-    }
-
-    /**
-     * Array Access unset
-     *
-     * @param  string $key
-     * @return void
-     */
-    public function offsetUnset($key)
-    {
-        unset($this->items[$key]);
-        unset($this->singletons[$key]);
-    }
-
-    /**
-     * Array Access isset
-     *
-     * @param  string $key
-     * @return boolean
-     */
-    public function offsetExists($key)
-    {
-        return (
-            $this->isRegistered($key) ||
-            $this->isSingleton($key)  ||
-            $this->isInServiceProvider($key)
-        );
     }
 }
