@@ -2,103 +2,50 @@
 
 namespace League\Container;
 
-interface ContainerInterface
+interface ContainerInterface extends ImmutableContainerInterface
 {
     /**
-     * Add a definition to the container
+     * Add an item to the container.
      *
-     * @param string  $alias
-     * @param mixed   $concrete
-     * @param boolean $singleton
-     * @return \League\Container\Definition\DefinitionInterface|\League\Container\ContainerInterface
+     * @param  string|\League\Container\ServiceProvider $alias
+     * @param  mixed|null                               $concrete
+     * @param  boolean                                  $singleton
+     * @return \League\Container\Definition\DefinitionInterface
      */
     public function add($alias, $concrete = null, $singleton = false);
 
     /**
-     * Adds a service provider to the container
+     * Convenience method to add an item to the container as a singleton.
      *
-     * @param  string|\League\Container\ServiceProvider $provider
-     * @return \League\Container\ContainerInterface
-     */
-    public function addServiceProvider($provider);
-
-    /**
-     * Add a singleton definition to the container
-     *
-     * @param  string $alias
-     * @param  mixed  $concrete
-     * @return \League\Container\Definition\DefinitionInterface|\League\Container\ContainerInterface
+     * @param  string     $alias
+     * @param  mixed|null $concrete
+     * @return \League\Container\Definition\DefinitionInterface
      */
     public function singleton($alias, $concrete = null);
 
     /**
-     * Allows for methods to be invoked on any object that is resolved of the tyoe
-     * provided
+     * Add a service provider to the container.
      *
-     * @param  string   $type
-     * @param  callable $callback
-     * @return \League\Container\Inflector|void
+     * @param  string|\League\Container\ServiceProvider $provider
+     * @param  boolean                                  $boot
+     * @return void
      */
-    public function inflector($type, callable $callback = null);
+    public function addServiceProvider($provider, $boot = false);
 
     /**
-     * Add a callable definition to the container
+     * Returns a definition of an item to be extended.
      *
-     * @param  string   $alias
-     * @param  callable $concrete
+     * @param  string $alias
      * @return \League\Container\Definition\DefinitionInterface
-     */
-    public function invokable($alias, callable $concrete = null);
-
-    /**
-     * Modify the definition of an already defined service
-     *
-     * @param   string $alias
-     * @throws  \InvalidArgumentException if the definition does not exist
-     * @throws  \League\Container\Exception\ServiceNotExtendableException if service cannot be extended
-     * @return  \League\Container\Definition\DefinitionInterface
      */
     public function extend($alias);
 
     /**
-     * Get an item from the container
+     * Allows for manipulation of specific types on resolution.
      *
-     * @param  string $alias
-     * @param  array  $args
-     * @return mixed
+     * @param  string        $type
+     * @param  callable|null $callback
+     * @return \League\Container\Inflector|void
      */
-    public function get($alias, array $args = []);
-
-    /**
-     * Invoke
-     *
-     * @param  string $alias
-     * @param  array  $args
-     * @return mixed
-     */
-    public function call($alias, array $args = []);
-
-    /**
-     * Check if an item is registered with the container
-     *
-     * @param  string  $alias
-     * @return boolean
-     */
-    public function isRegistered($alias);
-
-    /**
-     * Check if an item is being managed as a singleton
-     *
-     * @param  string  $alias
-     * @return boolean
-     */
-    public function isSingleton($alias);
-
-    /**
-     * Determines if a definition is registered via a service provider.
-     *
-     * @param  string $alias
-     * @return boolean
-     */
-    public function isInServiceProvider($alias);
+    public function inflector($type, callable $callback = null);
 }
