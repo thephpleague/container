@@ -60,7 +60,6 @@ If you discover any security related issues, please email philipobenito@gmail.co
 
 ## Credits
 
-- [Nikita Popov](https://github.com/nikic)
 - [Phil Bennett](https://github.com/philipobenito)
 - [All Contributors](https://github.com/thephpleague/container/contributors)
 
