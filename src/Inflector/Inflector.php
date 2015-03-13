@@ -1,6 +1,6 @@
 <?php
 
-namespace League\Container;
+namespace League\Container\Inflector;
 
 class Inflector implements ContainerAwareInterface
 {
