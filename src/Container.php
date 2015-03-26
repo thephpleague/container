@@ -207,7 +207,7 @@ class Container implements ContainerInterface, ArrayAccess
 
         $this->items[$alias]['definition'] = $definition;
 
-        return $this->applyInflectors($definition());
+        return $this->applyInflectors($definition($args));
     }
 
     /**
