@@ -2,7 +2,10 @@
 
 namespace League\Container\ServiceProvider;
 
-abstract class AbstractServiceProvider implements ServiceProviderInterface
+use League\Container\ContainerAwareInterface;
+use League\Container\ContainerAwareTrait;
+
+abstract class AbstractServiceProvider implements ServiceProviderInterface, ContainerAwareInterface
 {
     use ContainerAwareTrait;
 
