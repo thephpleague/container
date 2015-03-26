@@ -789,4 +789,15 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(123, $c->get('a_key'));
     }
+
+    public function testArgsArePassedToNewlyReflectedClasses()
+    {
+        $expected = 'Jimmy Puckett';
+
+        $c = new Container();
+
+        $f = $c->get('League\Container\Test\Asset\FooWithDefaultArg', [$expected]);
+
+        $this->assertEquals($expected, $f->name);
+    }
 }
