@@ -3,11 +3,14 @@
 namespace League\Container\Definition;
 
 use League\Container\ArgumentResolverTrait;
-use League\Container\ContainerInterface;
+use League\Container\ContainerAwareInterface;
+use League\Container\ContainerAwareTrait;
+use League\Container\ImmutableContainerInterface;
 
-abstract class AbstractDefinition
+abstract class AbstractDefinition implements ContainerAwareInterface
 {
     use ArgumentResolverTrait;
+    use ContainerAwareTrait;
 
     /**
      * @var string
@@ -15,24 +18,30 @@ abstract class AbstractDefinition
     protected $alias;
 
     /**
+     * @var mixed
+     */
+    protected $concrete;
+
+    /**
+     * @var \League\Container\ImmutableContainerInterface
+     */
+    protected $container;
+
+    /**
      * @var array
      */
     protected $arguments = [];
 
     /**
-     * @var array
-     */
-    protected $methods = [];
-
-    /**
-     * Constructor
+     * Constructor.
      *
-     * @param string                      $alias
-     * @param \League\Container\ContainerInterface $container
+     * @param string $alias
+     * @param mixed  $concrete
      */
-    public function __construct($alias, ContainerInterface $container = null)
+    public function __construct($alias, $concrete, ImmutableContainerInterface $container)
     {
         $this->alias     = $alias;
+        $this->concrete  = $concrete;
         $this->container = $container;
     }
 
