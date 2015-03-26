@@ -48,4 +48,13 @@ interface ContainerInterface extends ImmutableContainerInterface
      * @return \League\Container\Inflector|void
      */
     public function inflector($type, callable $callback = null);
+
+    /**
+     * Invoke a callable via the container.
+     *
+     * @param  string|callable $callable
+     * @param  array           $args
+     * @return mixed
+     */
+    public function call($callable, array $args = []);
 }
