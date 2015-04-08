@@ -421,7 +421,7 @@ class Container implements ContainerInterface, ArrayAccess
         foreach ($constructor->getParameters() as $param) {
             $dependency = $param->getClass();
 
-            // if the dependency is not a class we attempt to get a dafult value
+            // if the dependency is not a class we attempt to get a default value
             if (is_null($dependency)) {
                 if ($param->isDefaultValueAvailable()) {
                     $definition->withArgument($param->getDefaultValue());
