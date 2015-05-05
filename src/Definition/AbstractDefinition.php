@@ -2,14 +2,12 @@
 
 namespace League\Container\Definition;
 
-use League\Container\ArgumentResolverTrait;
 use League\Container\ContainerAwareInterface;
 use League\Container\ContainerAwareTrait;
 use League\Container\ImmutableContainerInterface;
 
 abstract class AbstractDefinition implements ContainerAwareInterface
 {
-    use ArgumentResolverTrait;
     use ContainerAwareTrait;
 
     /**
@@ -35,8 +33,9 @@ abstract class AbstractDefinition implements ContainerAwareInterface
     /**
      * Constructor.
      *
-     * @param string $alias
-     * @param mixed  $concrete
+     * @param string                                        $alias
+     * @param mixed                                         $concrete
+     * @param \League\Container\ImmutableContainerInterface $container
      */
     public function __construct($alias, $concrete, ImmutableContainerInterface $container)
     {
@@ -65,5 +64,22 @@ abstract class AbstractDefinition implements ContainerAwareInterface
         }
 
         return $this;
+    }
+
+    /**
+     * Resolve an array of arguments to concrete dependencies.
+     *
+     * @param  array $args
+     * @return array
+     */
+    protected function resolveArguments(array $args)
+    {
+        foreach ($args as &$arg) {
+            $arg = (is_string($arg) && ($this->container->has($arg) || class_exists($arg)))
+                 ? $this->container->get($arg)
+                 : $arg;
+        }
+
+        return $args;
     }
 }

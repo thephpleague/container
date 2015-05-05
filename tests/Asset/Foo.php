@@ -6,15 +6,8 @@ class Foo
 {
     public $bar;
 
-    public $baz;
-
-    public function __construct(Bar $bar)
+    public function __construct(Bar $bar = null)
     {
         $this->bar = $bar;
-    }
-
-    public function injectBaz(BazInterface $baz)
-    {
-        $this->baz = $baz;
     }
 }

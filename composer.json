@@ -33,9 +33,6 @@
         }
     },
     "autoload-dev": {
-        "files": [
-            "tests/Asset/functions.php"
-        ],
         "psr-4": {
             "League\\Container\\Test\\": "tests"
         }
