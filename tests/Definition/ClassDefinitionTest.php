@@ -3,6 +3,7 @@
 namespace League\Container\Test\Definition;
 
 use League\Container\Definition\ClassDefinition;
+use League\Container\Test\Asset;
 
 class ClassDefinitionTest extends \PHPUnit_Framework_TestCase
 {
@@ -16,9 +17,108 @@ class ClassDefinitionTest extends \PHPUnit_Framework_TestCase
 
         $definition->withArgument('League\Container\Test\Asset\Bar');
 
+        $definition->withArguments([
+            'League\Container\Test\Asset\Baz',
+            'League\Container\Test\Asset\Bart'
+        ]);
+
         $args = (new \ReflectionClass($definition))->getProperty('arguments');
         $args->setAccessible(true);
 
-        $this->assertSame($args->getValue($definition), ['League\Container\Test\Asset\Bar']);
+        $this->assertSame($args->getValue($definition), [
+            'League\Container\Test\Asset\Bar',
+            'League\Container\Test\Asset\Baz',
+            'League\Container\Test\Asset\Bart'
+        ]);
+    }
+
+    /**
+     * Asserts that the class definition sets expected method calls.
+     */
+    public function testClassDefinitionSetsExpectedMethodCalls()
+    {
+        $container  = $this->getMock('League\Container\ImmutableContainerInterface');
+        $definition = new ClassDefinition('foo', 'League\Container\Test\Asset\Foo', $container);
+
+        $definition->withMethodCall('method1', ['arg1']);
+
+        $definition->withMethodCalls([
+            'method2' => ['arg1'],
+            'method3' => ['arg1']
+        ]);
+
+        $methods = (new \ReflectionClass($definition))->getProperty('methods');
+        $methods->setAccessible(true);
+
+        $this->assertSame($methods->getValue($definition), [
+            ['method' => 'method1', 'arguments' => ['arg1']],
+            ['method' => 'method2', 'arguments' => ['arg1']],
+            ['method' => 'method3', 'arguments' => ['arg1']]
+        ]);
+    }
+
+    /**
+     * Asserts that a definition can build a class and inject class based dependencies.
+     */
+    public function testDefinitionBuildsClassAndResolvesClassAliasedArguments()
+    {
+        $container  = $this->getMock('League\Container\ImmutableContainerInterface');
+
+        $container->expects($this->once())->method('has')->with($this->equalTo('League\Container\Test\Asset\Bar'))->will($this->returnValue(true));
+        $container->expects($this->once())->method('get')->with($this->equalTo('League\Container\Test\Asset\Bar'))->will($this->returnValue(new Asset\Bar));
+
+        $definition = new ClassDefinition('foo', 'League\Container\Test\Asset\Foo', $container);
+
+        $definition->withArgument('League\Container\Test\Asset\Bar');
+
+        $foo = $definition->build();
+
+        $this->assertInstanceOf('League\Container\Test\Asset\Foo', $foo);
+        $this->assertInstanceOf('League\Container\Test\Asset\Bar', $foo->bar);
+    }
+
+    /**
+     * Asserts that a definition can build a class and inject scalar dependencies.
+     */
+    public function testDefinitionBuildsClassAndInjectsScalarDependencies()
+    {
+        $container  = $this->getMock('League\Container\ImmutableContainerInterface');
+
+        $container->expects($this->once())->method('has')->with($this->equalTo('some_string'))->will($this->returnValue(false));
+
+        $definition = new ClassDefinition('foo', 'League\Container\Test\Asset\FooWithScalarDependency', $container);
+
+        $definition->withArgument('some_string')
+                   ->withArgument(['arr_with_key'])
+                   ->withArgument(42)
+                   ->withArgument(false);
+
+        $foo = $definition->build();
+
+        $this->assertInstanceOf('League\Container\Test\Asset\FooWithScalarDependency', $foo);
+        $this->assertSame('some_string', $foo->stringVal);
+        $this->assertSame(['arr_with_key'], $foo->arrayVal);
+        $this->assertSame(42, $foo->integerVal);
+        $this->assertFalse($foo->booleanVal);
+    }
+
+    /**
+     * Asserts that a definition can build a class and invoke methods.
+     */
+    public function testDefinitionBuildsClassAndInvokesMethods()
+    {
+        $container  = $this->getMock('League\Container\ImmutableContainerInterface');
+
+        $container->expects($this->once())->method('has')->with($this->equalTo('League\Container\Test\Asset\Bar'))->will($this->returnValue(true));
+        $container->expects($this->once())->method('get')->with($this->equalTo('League\Container\Test\Asset\Bar'))->will($this->returnValue(new Asset\Bar));
+
+        $definition = new ClassDefinition('foo', 'League\Container\Test\Asset\Foo', $container);
+
+        $definition->withMethodCall('setBar', ['League\Container\Test\Asset\Bar']);
+
+        $foo = $definition->build();
+
+        $this->assertInstanceOf('League\Container\Test\Asset\Foo', $foo);
+        $this->assertInstanceOf('League\Container\Test\Asset\Bar', $foo->bar);
     }
 }

@@ -10,4 +10,9 @@ class Foo
     {
         $this->bar = $bar;
     }
+
+    public function setBar(Bar $bar)
+    {
+        $this->bar = $bar;
+    }
 }

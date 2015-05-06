@@ -6,10 +6,8 @@ use League\Container\ContainerAwareInterface;
 use League\Container\ContainerAwareTrait;
 use League\Container\ImmutableContainerInterface;
 
-abstract class AbstractDefinition implements ContainerAwareInterface
+abstract class AbstractDefinition
 {
-    use ContainerAwareTrait;
-
     /**
      * @var string
      */
