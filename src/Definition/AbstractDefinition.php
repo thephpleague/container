@@ -4,7 +4,6 @@ namespace League\Container\Definition;
 
 use League\Container\Argument\ArgumentResolverInterface;
 use League\Container\Argument\ArgumentResolverTrait;
-use League\Container\ContainerAwareTrait;
 use League\Container\ImmutableContainerAwareTrait;
 
 abstract class AbstractDefinition implements ArgumentResolverInterface
