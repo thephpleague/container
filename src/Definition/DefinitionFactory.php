@@ -19,7 +19,7 @@ class DefinitionFactory implements DefinitionFactoryInterface, ImmutableContaine
         }
 
         if (is_string($concrete) && class_exists($concrete)) {
-            return (new ClassDefinition($alias, $concrete, $this->container))->setContainer($this->container);
+            return (new ClassDefinition($alias, $concrete))->setContainer($this->container);
         }
 
         // if the item is not defineable we just return the value to be stored
