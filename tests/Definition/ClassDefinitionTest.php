@@ -13,7 +13,7 @@ class ClassDefinitionTest extends \PHPUnit_Framework_TestCase
     public function testClassDefinitionSetsExpectedArguments()
     {
         $container  = $this->getMock('League\Container\ImmutableContainerInterface');
-        $definition = new ClassDefinition('foo', 'League\Container\Test\Asset\Foo', $container);
+        $definition = (new ClassDefinition('foo', 'League\Container\Test\Asset\Foo'))->setContainer($container);
 
         $definition->withArgument('League\Container\Test\Asset\Bar');
 
@@ -38,7 +38,7 @@ class ClassDefinitionTest extends \PHPUnit_Framework_TestCase
     public function testClassDefinitionSetsExpectedMethodCalls()
     {
         $container  = $this->getMock('League\Container\ImmutableContainerInterface');
-        $definition = new ClassDefinition('foo', 'League\Container\Test\Asset\Foo', $container);
+        $definition = (new ClassDefinition('foo', 'League\Container\Test\Asset\Foo'))->setContainer($container);
 
         $definition->withMethodCall('method1', ['arg1']);
 
@@ -67,7 +67,7 @@ class ClassDefinitionTest extends \PHPUnit_Framework_TestCase
         $container->expects($this->once())->method('has')->with($this->equalTo('League\Container\Test\Asset\Bar'))->will($this->returnValue(true));
         $container->expects($this->once())->method('get')->with($this->equalTo('League\Container\Test\Asset\Bar'))->will($this->returnValue(new Asset\Bar));
 
-        $definition = new ClassDefinition('foo', 'League\Container\Test\Asset\Foo', $container);
+        $definition = (new ClassDefinition('foo', 'League\Container\Test\Asset\Foo'))->setContainer($container);
 
         $definition->withArgument('League\Container\Test\Asset\Bar');
 
@@ -86,7 +86,7 @@ class ClassDefinitionTest extends \PHPUnit_Framework_TestCase
 
         $container->expects($this->once())->method('has')->with($this->equalTo('some_string'))->will($this->returnValue(false));
 
-        $definition = new ClassDefinition('foo', 'League\Container\Test\Asset\FooWithScalarDependency', $container);
+        $definition = (new ClassDefinition('foo', 'League\Container\Test\Asset\FooWithScalarDependency'))->setContainer($container);
 
         $definition->withArgument('some_string')
                    ->withArgument(['arr_with_key'])
@@ -112,7 +112,7 @@ class ClassDefinitionTest extends \PHPUnit_Framework_TestCase
         $container->expects($this->once())->method('has')->with($this->equalTo('League\Container\Test\Asset\Bar'))->will($this->returnValue(true));
         $container->expects($this->once())->method('get')->with($this->equalTo('League\Container\Test\Asset\Bar'))->will($this->returnValue(new Asset\Bar));
 
-        $definition = new ClassDefinition('foo', 'League\Container\Test\Asset\Foo', $container);
+        $definition = (new ClassDefinition('foo', 'League\Container\Test\Asset\Foo'))->setContainer($container);
 
         $definition->withMethodCall('setBar', ['League\Container\Test\Asset\Bar']);
 

@@ -2,12 +2,16 @@
 
 namespace League\Container\Definition;
 
-use League\Container\ContainerAwareInterface;
+use League\Container\Argument\ArgumentResolverInterface;
+use League\Container\Argument\ArgumentResolverTrait;
 use League\Container\ContainerAwareTrait;
-use League\Container\ImmutableContainerInterface;
+use League\Container\ImmutableContainerAwareTrait;
 
-abstract class AbstractDefinition
+abstract class AbstractDefinition implements ArgumentResolverInterface
 {
+    use ArgumentResolverTrait;
+    use ImmutableContainerAwareTrait;
+
     /**
      * @var string
      */
@@ -19,11 +23,6 @@ abstract class AbstractDefinition
     protected $concrete;
 
     /**
-     * @var \League\Container\ImmutableContainerInterface
-     */
-    protected $container;
-
-    /**
      * @var array
      */
     protected $arguments = [];
@@ -31,15 +30,13 @@ abstract class AbstractDefinition
     /**
      * Constructor.
      *
-     * @param string                                        $alias
-     * @param mixed                                         $concrete
-     * @param \League\Container\ImmutableContainerInterface $container
+     * @param string $alias
+     * @param mixed  $concrete
      */
-    public function __construct($alias, $concrete, ImmutableContainerInterface $container)
+    public function __construct($alias, $concrete)
     {
         $this->alias     = $alias;
         $this->concrete  = $concrete;
-        $this->container = $container;
     }
 
     /**
@@ -62,22 +59,5 @@ abstract class AbstractDefinition
         }
 
         return $this;
-    }
-
-    /**
-     * Resolve an array of arguments to concrete dependencies.
-     *
-     * @param  array $args
-     * @return array
-     */
-    protected function resolveArguments(array $args)
-    {
-        foreach ($args as &$arg) {
-            $arg = (is_string($arg) && ($this->container->has($arg) || class_exists($arg)))
-                 ? $this->container->get($arg)
-                 : $arg;
-        }
-
-        return $args;
     }
 }

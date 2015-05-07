@@ -2,24 +2,12 @@
 
 namespace League\Container\Definition;
 
-use League\Container\ImmutableContainerInterface;
+use League\Container\ImmutableContainerAwareInterface;
+use League\Container\ImmutableContainerAwareTrait;
 
-class DefinitionFactory implements DefinitionFactoryInterface
+class DefinitionFactory implements DefinitionFactoryInterface, ImmutableContainerAwareInterface
 {
-    /**
-     * @var \League\Container\ImmutableContainerInterface
-     */
-    protected $container;
-
-    /**
-     * Constructor
-     *
-     * @param \League\Container\ImmutableContainerInterface $container
-     */
-    public function __construct(ImmutableContainerInterface $container)
-    {
-        $this->container = $container;
-    }
+    use ImmutableContainerAwareTrait;
 
     /**
      * {@inheritdoc}
@@ -27,11 +15,11 @@ class DefinitionFactory implements DefinitionFactoryInterface
     public function getDefinition($alias, $concrete)
     {
         if (is_callable($concrete)) {
-            return new CallableDefinition($alias, $concrete, $this->container);
+            return (new CallableDefinition($alias, $concrete))->setContainer($this->container);
         }
 
         if (is_string($concrete) && class_exists($concrete)) {
-            return new ClassDefinition($alias, $concrete, $this->container);
+            return (new ClassDefinition($alias, $concrete, $this->container))->setContainer($this->container);
         }
 
         // if the item is not defineable we just return the value to be stored

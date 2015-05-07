@@ -17,9 +17,9 @@ class CallableDefinitionTest extends \PHPUnit_Framework_TestCase
         $container->expects($this->once())->method('has')->with($this->equalTo('League\Container\Test\Asset\Bar'))->will($this->returnValue(true));
         $container->expects($this->once())->method('get')->with($this->equalTo('League\Container\Test\Asset\Bar'))->will($this->returnValue(new Asset\Bar));
 
-        $definition = new CallableDefinition('foo', function (Asset\Bar $bar) {
+        $definition = (new CallableDefinition('foo', function (Asset\Bar $bar) {
             return new Asset\Foo($bar);
-        }, $container);
+        }))->setContainer($container);
 
         $definition->withArgument('League\Container\Test\Asset\Bar');
 
@@ -41,7 +41,7 @@ class CallableDefinitionTest extends \PHPUnit_Framework_TestCase
         $container->expects($this->at(2))->method('has')->with($this->equalTo('League\Container\Test\Asset\FooWithNamedConstructor'))->will($this->returnValue(true));
         $container->expects($this->at(3))->method('get')->with($this->equalTo('League\Container\Test\Asset\FooWithNamedConstructor'))->will($this->returnValue(new Asset\FooWithNamedConstructor));
 
-        $definition = new CallableDefinition('foo', ['League\Container\Test\Asset\FooWithNamedConstructor', 'namedConstructor'], $container);
+        $definition = (new CallableDefinition('foo', ['League\Container\Test\Asset\FooWithNamedConstructor', 'namedConstructor']))->setContainer($container);
 
         $definition->withArgument('League\Container\Test\Asset\Bar');
 
@@ -62,7 +62,7 @@ class CallableDefinitionTest extends \PHPUnit_Framework_TestCase
         $container->expects($this->at(1))->method('get')->with($this->equalTo('League\Container\Test\Asset\Bar'))->will($this->returnValue(new Asset\Bar));
         $container->expects($this->at(2))->method('has')->with($this->equalTo('League\Container\Test\Asset\FooWithNamedConstructor'))->will($this->returnValue(false));
 
-        $definition = new CallableDefinition('foo', ['League\Container\Test\Asset\FooWithNamedConstructor', 'staticNamedConstructor'], $container);
+        $definition = (new CallableDefinition('foo', ['League\Container\Test\Asset\FooWithNamedConstructor', 'staticNamedConstructor']))->setContainer($container);
 
         $definition->withArgument('League\Container\Test\Asset\Bar');
 
@@ -82,7 +82,7 @@ class CallableDefinitionTest extends \PHPUnit_Framework_TestCase
         $container->expects($this->once())->method('has')->with($this->equalTo('League\Container\Test\Asset\Bar'))->will($this->returnValue(true));
         $container->expects($this->once())->method('get')->with($this->equalTo('League\Container\Test\Asset\Bar'))->will($this->returnValue(new Asset\Bar));
 
-        $definition = new CallableDefinition('foo', 'League\Container\Test\Asset\FooWithNamedConstructor::staticNamedConstructor', $container);
+        $definition = (new CallableDefinition('foo', 'League\Container\Test\Asset\FooWithNamedConstructor::staticNamedConstructor'))->setContainer($container);
 
         $definition->withArgument('League\Container\Test\Asset\Bar');
 
@@ -102,7 +102,7 @@ class CallableDefinitionTest extends \PHPUnit_Framework_TestCase
         $container->expects($this->once())->method('has')->with($this->equalTo('League\Container\Test\Asset\Bar'))->will($this->returnValue(true));
         $container->expects($this->once())->method('get')->with($this->equalTo('League\Container\Test\Asset\Bar'))->will($this->returnValue(new Asset\Bar));
 
-        $definition = new CallableDefinition('foo', new Asset\FooWithNamedConstructor, $container);
+        $definition = (new CallableDefinition('foo', new Asset\FooWithNamedConstructor))->setContainer($container);
 
         $definition->withArgument('League\Container\Test\Asset\Bar');
 

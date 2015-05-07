@@ -13,7 +13,7 @@ class DefinitionFactoryTest extends \PHPUnit_Framework_TestCase
     public function testFactoryReturnsCorrectDefinitionBasedOnArguments()
     {
         $container = $this->getMock('League\Container\ImmutableContainerInterface');
-        $factory   = new DefinitionFactory($container);
+        $factory   = (new DefinitionFactory)->setContainer($container);
 
         // existing class names
         $this->assertInstanceOf(
