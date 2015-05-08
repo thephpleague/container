@@ -22,4 +22,9 @@ trait ArgumentResolverTrait
 
         return $arguments;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    abstract public function getContainer();
 }
