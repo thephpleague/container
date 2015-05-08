@@ -2,6 +2,7 @@
 
 namespace League\Container\Test\Definition;
 
+use League\Container\Argument\RawArgument;
 use League\Container\Definition\ClassDefinition;
 use League\Container\Test\Asset;
 
@@ -75,6 +76,29 @@ class ClassDefinitionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('League\Container\Test\Asset\Foo', $foo);
         $this->assertInstanceOf('League\Container\Test\Asset\Bar', $foo->bar);
+    }
+
+    /**
+     * Asserts that a definition can build a class and inject scalar dependencies as raw argument.
+     */
+    public function testDefinitionBuildsClassAndInjectsScalarDependenciesAsRawArgument()
+    {
+        $container  = $this->getMock('League\Container\ImmutableContainerInterface');
+
+        $definition = (new ClassDefinition('foo', 'League\Container\Test\Asset\FooWithScalarDependency'))->setContainer($container);
+
+        $definition->withArgument(new RawArgument('some_string'))
+                   ->withArgument(new RawArgument(['arr_with_key']))
+                   ->withArgument(new RawArgument(42))
+                   ->withArgument(new RawArgument(false));
+
+        $foo = $definition->build();
+
+        $this->assertInstanceOf('League\Container\Test\Asset\FooWithScalarDependency', $foo);
+        $this->assertSame('some_string', $foo->stringVal);
+        $this->assertSame(['arr_with_key'], $foo->arrayVal);
+        $this->assertSame(42, $foo->integerVal);
+        $this->assertFalse($foo->booleanVal);
     }
 
     /**
