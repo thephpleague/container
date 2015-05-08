@@ -15,11 +15,11 @@ class DefinitionFactory implements DefinitionFactoryInterface, ImmutableContaine
     public function getDefinition($alias, $concrete)
     {
         if (is_callable($concrete)) {
-            return (new CallableDefinition($alias, $concrete))->setContainer($this->container);
+            return (new CallableDefinition($alias, $concrete))->setContainer($this->getContainer());
         }
 
         if (is_string($concrete) && class_exists($concrete)) {
-            return (new ClassDefinition($alias, $concrete))->setContainer($this->container);
+            return (new ClassDefinition($alias, $concrete))->setContainer($this->getContainer());
         }
 
         // if the item is not defineable we just return the value to be stored

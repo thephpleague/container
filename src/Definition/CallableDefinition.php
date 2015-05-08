@@ -13,8 +13,8 @@ class CallableDefinition extends AbstractDefinition implements DefinitionInterfa
         $resolved = $this->resolveArguments($args);
 
         if (is_array($this->concrete) && is_string($this->concrete[0])) {
-            $this->concrete[0] = ($this->container->has($this->concrete[0]))
-                               ? $this->container->get($this->concrete[0])
+            $this->concrete[0] = ($this->getContainer()->has($this->concrete[0]))
+                               ? $this->getContainer()->get($this->concrete[0])
                                : $this->concrete[0];
         }
 

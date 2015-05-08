@@ -11,7 +11,7 @@ trait ArgumentResolverTrait
     {
         foreach ($arguments as &$arg) {
             $arg = (is_string($arg) && ($this->container->has($arg) || class_exists($arg)))
-                 ? $this->container->get($arg)
+                 ? $this->getContainer()->get($arg)
                  : $arg;
         }
 
