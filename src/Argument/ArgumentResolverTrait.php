@@ -15,7 +15,7 @@ trait ArgumentResolverTrait
                 continue;
             }
 
-            if (is_string($arg) && ($this->container->has($arg) || class_exists($arg))) {
+            if (is_string($arg) && ($this->getContainer()->has($arg) || class_exists($arg))) {
                 $arg = $this->getContainer()->get($arg);
             }
         }
