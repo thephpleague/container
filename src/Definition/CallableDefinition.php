@@ -48,6 +48,6 @@ class CallableDefinition extends AbstractDefinition implements DefinitionInterfa
             $this->callable[0] = ($registered === true) ? $this->container->get($this->callable[0]) : $this->callable[0];
         }
 
-        return call_user_func_array($this->callable, $resolved);
+        $this->container->call($this->callable, $resolved);
     }
 }
