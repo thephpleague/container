@@ -6,7 +6,7 @@ title: Singletons
 
 # Singletons
 
-Container allows you to register a single instance of a class that will be always be returned when a particular key is requested.  This is known as a singleton and can be registered as a class name, factory closure, or an existing object.
+Container allows you to register a single instance of a class that will always be returned when a particular key is requested. This is known as a singleton and can be registered as a class name, factory closure, or an existing object.
 
 ~~~ php
 $container = new League\Container\Container;
@@ -34,7 +34,7 @@ $secondObject = $container->get('Some\Class');
 $firstObject === $secondObject; // true
 ~~~
 
-Note that using the singleton method is identical to using Container's `add` method with an additional, optional third parameter (which defaults to `false`) that marks the key as a singleton.  As such, it is possible to use the same fluid interface to define a singleton as you can when adding non-singleton definitions.
+Note that the singleton method is an alias of calling the `add` method with the third parameter set to true. As such, it is possible to define a singleton using the same fluid interface you can use when adding non-singleton definitions.
 
 ~~~ php
 $container->singleton('Some\Class');
