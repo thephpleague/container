@@ -128,7 +128,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Asserts that an exteption is thrown when attempting to register an invalid
+     * Asserts that an exception is thrown when attempting to register an invalid
      * type as a service provider.
      *
      * @return void

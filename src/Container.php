@@ -298,7 +298,7 @@ class Container implements ContainerInterface, ArrayAccess
     }
 
     /**
-     * Encapsulate the definition factory to allow for invokation
+     * Encapsulate the definition factory to allow for invocation
      *
      * @return \League\Container\Definition\Factory
      */

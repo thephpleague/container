@@ -32,7 +32,7 @@ interface ContainerInterface
     public function singleton($alias, $concrete = null);
 
     /**
-     * Allows for methods to be invoked on any object that is resolved of the tyoe
+     * Allows for methods to be invoked on any object that is resolved of the type
      * provided
      *
      * @param  string   $type
