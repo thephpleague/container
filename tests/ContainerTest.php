@@ -779,7 +779,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
      *
      * @group regression
      */
-    public function testValuesInConfigurationShouldBeRetreivableFromContainerAfterInstantiation()
+    public function testValuesInConfigurationShouldBeRetrievableFromContainerAfterInstantiation()
     {
         $c = new Container([
             'di'    => [
