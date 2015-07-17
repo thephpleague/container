@@ -3,11 +3,9 @@
 namespace League\Container\Test;
 
 use League\Container\Container;
-use League\Container\Definition\Factory;
 use League\Container\Test\Asset\Bar;
 use League\Container\Test\Asset\Baz;
 use League\Container\Test\Asset\BazStatic;
-use League\Container\Test\Asset\Foo;
 
 class ContainerTest extends \PHPUnit_Framework_TestCase
 {
