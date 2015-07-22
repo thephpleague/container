@@ -228,6 +228,20 @@ class Container implements ContainerInterface, ArrayAccess
             return call_user_func_array($alias, $args);
         }
 
+        if (is_array($alias)) {
+            $alias = join(
+                '::',
+                array_map(
+                    function ($var) {
+                        return is_object($var) ? get_class($var) : print_r($var, true);
+                    },
+                    $alias
+                )
+            );
+        } elseif (is_object($alias)) {
+            $alias = get_class($alias);
+        }
+
         throw new \RuntimeException(
             sprintf('Unable to call callable [%s], does it exist and is it registered with the container?', $alias)
         );
