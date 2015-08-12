@@ -445,7 +445,7 @@ class Container implements ContainerInterface, ArrayAccess
      * Get a reflection object for this callable.
      *
      * @param  callable $callable
-     * @return ReflectionFunctionAbstract
+     * @return \ReflectionFunctionAbstract
      */
     protected function reflectCallable(callable $callable)
     {
