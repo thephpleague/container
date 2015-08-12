@@ -14,11 +14,10 @@ interface ImmutableContainerInterface
     public function get($alias, array $args = []);
 
     /**
-     * Returns by default a boolean if the alias is registered with the container.
+     * Returns a boolean to determine if an alias is registered with the container.
      *
      * @param  string  $alias
-     * @param  boolean $verbose
      * @return boolean|array
      */
-    public function has($alias, $verbose = false);
+    public function has($alias);
 }

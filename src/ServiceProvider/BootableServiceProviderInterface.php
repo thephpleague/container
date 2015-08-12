@@ -2,7 +2,7 @@
 
 namespace League\Container\ServiceProvider;
 
-interface BootableServiceProviderInterface
+interface BootableServiceProviderInterface extends ServiceProviderInterface
 {
     /**
      * Method will be invoked on registration of a service provider implementing

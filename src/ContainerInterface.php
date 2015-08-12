@@ -9,28 +9,27 @@ interface ContainerInterface extends ImmutableContainerInterface
      *
      * @param  string|\League\Container\ServiceProvider $alias
      * @param  mixed|null                               $concrete
-     * @param  boolean                                  $singleton
+     * @param  boolean                                  $share
      * @return \League\Container\Definition\DefinitionInterface
      */
-    public function add($alias, $concrete = null, $singleton = false);
+    public function add($alias, $concrete = null, $share = false);
 
     /**
-     * Convenience method to add an item to the container as a singleton.
+     * Convenience method to add an item to the container as a shared item.
      *
      * @param  string     $alias
      * @param  mixed|null $concrete
      * @return \League\Container\Definition\DefinitionInterface
      */
-    public function singleton($alias, $concrete = null);
+    public function share($alias, $concrete = null);
 
     /**
      * Add a service provider to the container.
      *
-     * @param  string|\League\Container\ServiceProvider $provider
-     * @param  boolean                                  $boot
+     * @param  string|\League\Container\ServiceProvider\ServiceProviderInterface $provider
      * @return void
      */
-    public function addServiceProvider($provider, $boot = false);
+    public function addServiceProvider($provider);
 
     /**
      * Returns a definition of an item to be extended.
