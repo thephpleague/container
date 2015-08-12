@@ -53,8 +53,8 @@ class Inflector implements ArgumentResolverInterface
     /**
      * Defines a property to be set on the subject object.
      *
-     * @param string $property
-     * @param mixed  $value
+     * @param  string $property
+     * @param  mixed  $value
      * @return \League\Container\Inflector
      */
     public function setProperty($property, $value)
@@ -67,7 +67,7 @@ class Inflector implements ArgumentResolverInterface
     /**
      * Defines multiple properties to be set on the subject object.
      *
-     * @param array $properties
+     * @param  array $properties
      * @return \League\Container\Inflector
      */
     public function setProperties(array $properties)
