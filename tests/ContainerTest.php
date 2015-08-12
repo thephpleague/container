@@ -128,7 +128,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Asserts that an exteption is thrown when attempting to register an invalid
+     * Asserts that an exception is thrown when attempting to register an invalid
      * type as a service provider.
      *
      * @return void
@@ -779,7 +779,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
      *
      * @group regression
      */
-    public function testValuesInConfigurationShouldBeRetreivableFromContainerAfterInstantiation()
+    public function testValuesInConfigurationShouldBeRetrievableFromContainerAfterInstantiation()
     {
         $c = new Container([
             'di'    => [
