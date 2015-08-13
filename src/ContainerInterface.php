@@ -44,7 +44,7 @@ interface ContainerInterface extends ImmutableContainerInterface
      *
      * @param  string        $type
      * @param  callable|null $callback
-     * @return \League\Container\Inflector|void
+     * @return \League\Container\Inflector\Inflector|void
      */
     public function inflector($type, callable $callback = null);
 
