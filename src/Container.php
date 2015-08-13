@@ -100,7 +100,10 @@ class Container implements ContainerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Returns a boolean to determine if the container has a shared instance of an alias.
+     *
+     * @param  string $alias
+     * @return boolean
      */
     public function hasShared($alias)
     {
