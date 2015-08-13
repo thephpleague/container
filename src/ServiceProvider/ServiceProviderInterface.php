@@ -2,16 +2,18 @@
 
 namespace League\Container\ServiceProvider;
 
+use League\Container\ContainerAwareInterface;
+
 interface ServiceProviderInterface extends ContainerAwareInterface
 {
     /**
      * Returns a boolean if checking whether this provider provides a specific
      * service or returns an array of provided services if no argument passed.
      *
-     * @param  string $alias
+     * @param  string $service
      * @return boolean|array
      */
-    public function provides($alias = null);
+    public function provides($service = null);
 
     /**
      * Use the register method to register items with the container via the
