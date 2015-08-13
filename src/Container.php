@@ -2,7 +2,11 @@
 
 namespace League\Container;
 
-use League\Container\Inflector\Inflector;
+use League\Container\Definition\DefinitionFactory;
+use League\Container\Definition\DefinitionFactoryInterface;
+use League\Container\Definition\DefinitionInterface;
+use League\Container\Inflector\InflectorAggregate;
+use League\Container\Inflector\InflectorAggregateInterface;
 use League\Container\ServiceProvider\ServiceProviderAggregate;
 use League\Container\ServiceProvider\ServiceProviderAggregateInterface;
 
@@ -29,22 +33,36 @@ class Container implements ContainerInterface
     protected $providers;
 
     /**
+     * @var \League\Container\Definition\DefinitionFactoryInterface
+     */
+    protected $definitionFactory;
+
+    /**
      * Constructor.
      *
+     * @param array                                                                    $config
      * @param \League\Container\ServiceProvider\ServiceProviderAggregateInterface|null $providers
      * @param \League\Container\Inflector\InflectorAggregateInterface|null             $inflectors
+     * @param \League\Container\Definition\DefinitionFactoryInterface|null             $definitionFactory
      */
     public function __construct(
-        ServiceProviderAggregateInterface $providers  = null,
-        InflectorAggregateInterface       $inflectors = null
+        array                             $config            = [],
+        ServiceProviderAggregateInterface $providers         = null,
+        InflectorAggregateInterface       $inflectors        = null,
+        DefinitionFactoryInterface        $definitionFactory = null
     ) {
-        $this->providers = (is_null($providers))
-                         ? (new ServiceProviderAggregate)->setContainer($this)
-                         : $providers;
+        // set required dependencies
+        $this->providers         = (is_null($providers))
+                                 ? (new ServiceProviderAggregate)->setContainer($this)
+                                 : $providers;
 
-        $this->inflectors = (is_null($providers))
-                          ? (new InflectorAggregate)->setContainer($this)
-                          : $inflectors;
+        $this->inflectors        = (is_null($providers))
+                                 ? (new InflectorAggregate)->setContainer($this)
+                                 : $inflectors;
+
+        $this->definitionFactory = (is_null($definitionFactory))
+                                 ? (new DefinitionFactory)->setContainer($this)
+                                 : $definitionFactory;
     }
 
     /**
@@ -52,7 +70,21 @@ class Container implements ContainerInterface
      */
     public function get($alias, array $args = [])
     {
+        if ($this->hasShared($alias)) {
+            return $this->shared[$alias];
+        }
 
+        if ($this->providers->provides($alias)) {
+            $this->providers->register($alias);
+        }
+
+        if (array_key_exists($alias, $this->definitions)) {
+            return $this->definitions[$alias]->build($args);
+        }
+
+        throw new \InvalidArgumentException(
+            sprintf('Alias (%s) is not being managed by the container', $alias)
+        );
     }
 
     /**
@@ -64,7 +96,7 @@ class Container implements ContainerInterface
             return true;
         }
 
-        return $this->provider->provides($alias);
+        return $this->providers->provides($alias);
     }
 
     /**
@@ -80,7 +112,18 @@ class Container implements ContainerInterface
      */
     public function add($alias, $concrete = null, $share = false)
     {
+        if (is_null($concrete)) {
+            $concrete = $alias;
+        }
 
+        $definition = $this->definitionFactory->getDefinition($alias, $concrete);
+
+        if ($definition instanceof DefinitionInterface) {
+            return $definition;
+        }
+
+        // dealing with a value that cannot build a definition
+        $this->shared[$alias] = $concrete;
     }
 
     /**
@@ -106,7 +149,17 @@ class Container implements ContainerInterface
      */
     public function extend($alias)
     {
+        if ($this->providers->provides($alias)) {
+            $this->providers->register($alias);
+        }
 
+        if (array_key_exists($alias, $this->definitions)) {
+            return $this->definitions[$alias];
+        }
+
+        throw new \InvalidArgumentException(
+            sprintf('Unable to extend alias (%s) as it is not being managed as a definition', $alias)
+        );
     }
 
     /**
@@ -114,14 +167,7 @@ class Container implements ContainerInterface
      */
     public function inflector($type, callable $callback = null)
     {
-        if (is_null($callback)) {
-            $inflector = new Inflector;
-            $this->inflectors[$type] = $inflector;
-
-            return $inflector;
-        }
-
-        $this->inflectors[$type] = $callback;
+        return $this->inflectors->add($type, $callback);
     }
 
     /**
