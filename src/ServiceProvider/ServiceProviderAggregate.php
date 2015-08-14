@@ -31,7 +31,7 @@ class ServiceProviderAggregate implements ServiceProviderAggregateInterface
             $provider->boot();
         }
 
-        if ($provider instanceof ServiceProviderInterface) {
+        if ($provider instanceof ServiceProviderInterface && is_array($provider->provides())) {
             foreach ($provider->provides() as $service) {
                 $this->providers[$service] = $provider;
             }

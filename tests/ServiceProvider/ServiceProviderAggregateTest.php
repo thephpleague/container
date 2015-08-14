@@ -56,7 +56,7 @@ class ServiceProviderAggregateTest extends \PHPUnit_Framework_TestCase
 
         $provider->expects($this->once())->method('boot');
         $provider->expects($this->once())->method('register');
-        $provider->expects($this->once())->method('provides')->will($this->returnValue(['SomeService', 'AnotherService']));
+        $provider->expects($this->exactly(2))->method('provides')->will($this->returnValue(['SomeService', 'AnotherService']));
 
 
         $aggregate->add($provider);
