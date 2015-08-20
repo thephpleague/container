@@ -19,6 +19,10 @@ class ServiceProviderFake extends AbstractServiceProvider implements BootableSer
 
     public function register()
     {
+        $this->getContainer()->add('SomeService', function ($arg) {
+            return $arg;
+        });
+
         return true;
     }
 }

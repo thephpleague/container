@@ -57,15 +57,15 @@ class Container implements ContainerInterface
         // set required dependencies
         $this->providers         = (is_null($providers))
                                  ? (new ServiceProviderAggregate)->setContainer($this)
-                                 : $providers;
+                                 : $providers->setContainer($this);
 
         $this->inflectors        = (is_null($providers))
                                  ? (new InflectorAggregate)->setContainer($this)
-                                 : $inflectors;
+                                 : $inflectors->setContainer($this);
 
         $this->definitionFactory = (is_null($definitionFactory))
                                  ? (new DefinitionFactory)->setContainer($this)
-                                 : $definitionFactory;
+                                 : $definitionFactory->setContainer($this);
     }
 
     /**
@@ -139,6 +139,8 @@ class Container implements ContainerInterface
         $definition = $this->definitionFactory->getDefinition($alias, $concrete);
 
         if ($definition instanceof DefinitionInterface) {
+            $this->definitions[$alias] = $definition;
+
             return $definition;
         }
 

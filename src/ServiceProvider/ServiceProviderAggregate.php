@@ -2,6 +2,7 @@
 
 namespace League\Container\ServiceProvider;
 
+use League\Container\ContainerAwareInterface;
 use League\Container\ContainerAwareTrait;
 
 class ServiceProviderAggregate implements ServiceProviderAggregateInterface
@@ -25,6 +26,10 @@ class ServiceProviderAggregate implements ServiceProviderAggregateInterface
     {
         if (is_string($provider) && class_exists($provider)) {
             $provider = new $provider;
+        }
+
+        if ($provider instanceof ContainerAwareInterface) {
+            $provider->setContainer($this->getContainer());
         }
 
         if ($provider instanceof BootableServiceProviderInterface) {

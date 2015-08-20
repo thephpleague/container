@@ -55,5 +55,5 @@ interface ContainerInterface extends ImmutableContainerInterface
      * @param  array    $args
      * @return mixed
      */
-    public function call($callable, array $args = []);
+    public function call(callable $callable, array $args = []);
 }
