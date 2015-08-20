@@ -3,7 +3,6 @@
 namespace League\Container\Argument;
 
 use ReflectionFunctionAbstract;
-use ReflectionMethod;
 use ReflectionParameter;
 
 trait ArgumentResolverTrait
