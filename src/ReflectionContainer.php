@@ -2,7 +2,7 @@
 
 namespace League\Container;
 
-use Leagie\Container\ImmutableContainerAwareTrait;
+use League\Container\ImmutableContainerAwareTrait;
 use League\Container\Argument\ArgumentResolverInterface;
 use League\Container\Argument\ArgumentResolverTrait;
 use League\Container\ImmutableContainerAwareInterface;
@@ -33,7 +33,7 @@ class ReflectionContainer implements
         }
 
         return $reflector->newInstanceArgs(
-            $this->reflectArguments($args)
+            $this->reflectArguments($construct, $args)
         );
     }
 

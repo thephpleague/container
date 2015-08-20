@@ -38,7 +38,7 @@ class Container implements ContainerInterface
     protected $shared = [];
 
     /**
-     * @var \League\Container\ImmutableContainerInterface
+     * @var \League\Container\ImmutableContainerInterface[]
      */
     protected $stack = [];
 

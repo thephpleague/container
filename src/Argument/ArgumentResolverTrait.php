@@ -3,6 +3,7 @@
 namespace League\Container\Argument;
 
 use ReflectionFunctionAbstract;
+use ReflectionMethod;
 use ReflectionParameter;
 
 trait ArgumentResolverTrait
@@ -48,10 +49,9 @@ trait ArgumentResolverTrait
             }
 
             throw new Exception\UnresolvableDependencyException(sprintf(
-                'Unable to resolve a value for parameter (%s) in the method (%s) of (%s)',
+                'Unable to resolve a value for parameter (%s) in the function/method (%s)',
                 $name,
-                $method->getName(),
-                $method->getDeclaringClass()->getName()
+                $method->getName()
             ));
         }, $method->getParameters());
 
