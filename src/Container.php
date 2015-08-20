@@ -59,7 +59,7 @@ class Container implements ContainerInterface
                                  ? (new ServiceProviderAggregate)->setContainer($this)
                                  : $providers->setContainer($this);
 
-        $this->inflectors        = (is_null($providers))
+        $this->inflectors        = (is_null($inflectors))
                                  ? (new InflectorAggregate)->setContainer($this)
                                  : $inflectors->setContainer($this);
 
