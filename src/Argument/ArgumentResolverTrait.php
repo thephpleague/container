@@ -2,6 +2,9 @@
 
 namespace League\Container\Argument;
 
+use ReflectionFunctionAbstract;
+use ReflectionParameter;
+
 trait ArgumentResolverTrait
 {
     /**
@@ -21,6 +24,38 @@ trait ArgumentResolverTrait
         }
 
         return $arguments;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reflectArguments(ReflectionFunctionAbstract $method, array $args = [])
+    {
+        $arguments = array_map(function (ReflectionParameter $param) use ($method, $args) {
+            $name  = $param->getName();
+            $class = $param->getClass();
+
+            if (array_key_exists($name, $args)) {
+                return $args[$name];
+            }
+
+            if (! is_null($class)) {
+                return $class->getName();
+            }
+
+            if ($param->isDefaultValueAvailable()) {
+                return $param->getDefaultValue();
+            }
+
+            throw new Exception\UnresolvableDependencyException(sprintf(
+                'Unable to resolve a value for parameter (%s) in the method (%s) of (%s)',
+                $name,
+                $method->getName(),
+                $method->getDeclaringClass()->getName()
+            ));
+        }, $method->getParameters());
+
+        return $this->resolveArguments($arguments);
     }
 
     /**

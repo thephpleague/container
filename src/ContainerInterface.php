@@ -51,8 +51,8 @@ interface ContainerInterface extends ImmutableContainerInterface
     /**
      * Invoke a callable via the container.
      *
-     * @param  string|callable $callable
-     * @param  array           $args
+     * @param  callable $callable
+     * @param  array    $args
      * @return mixed
      */
     public function call($callable, array $args = []);

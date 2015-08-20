@@ -13,14 +13,14 @@ use League\Container\ServiceProvider\ServiceProviderAggregateInterface;
 class Container implements ContainerInterface
 {
     /**
+     * @var \League\Container\Definition\DefinitionFactoryInterface
+     */
+    protected $definitionFactory;
+
+    /**
      * @var \League\Container\Definition\DefinitionInterface[]
      */
     protected $definitions = [];
-
-    /**
-     * @var array
-     */
-    protected $shared = [];
 
     /**
      * @var \League\Container\Inflector\InflectorAggregateInterface
@@ -33,20 +33,23 @@ class Container implements ContainerInterface
     protected $providers;
 
     /**
-     * @var \League\Container\Definition\DefinitionFactoryInterface
+     * @var array
      */
-    protected $definitionFactory;
+    protected $shared = [];
+
+    /**
+     * @var \League\Container\ImmutableContainerInterface
+     */
+    protected $stack = [];
 
     /**
      * Constructor.
      *
-     * @param array                                                                    $config
      * @param \League\Container\ServiceProvider\ServiceProviderAggregateInterface|null $providers
      * @param \League\Container\Inflector\InflectorAggregateInterface|null             $inflectors
      * @param \League\Container\Definition\DefinitionFactoryInterface|null             $definitionFactory
      */
     public function __construct(
-        array                             $config            = [],
         ServiceProviderAggregateInterface $providers         = null,
         InflectorAggregateInterface       $inflectors        = null,
         DefinitionFactoryInterface        $definitionFactory = null
@@ -82,6 +85,10 @@ class Container implements ContainerInterface
             return $this->definitions[$alias]->build($args);
         }
 
+        if ($resolved = $this->getFromStack($alias, $args)) {
+            return $resolved;
+        }
+
         throw new \InvalidArgumentException(
             sprintf('Alias (%s) is not being managed by the container', $alias)
         );
@@ -96,7 +103,17 @@ class Container implements ContainerInterface
             return true;
         }
 
-        return $this->providers->provides($alias);
+        if ($this->providers->provides($alias)) {
+            return true;
+        }
+
+        foreach ($this->stack as $container) {
+            if ($container->has($alias)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -176,8 +193,42 @@ class Container implements ContainerInterface
     /**
      * {@inheritdoc}
      */
-    public function call($callable, array $args = [])
+    public function call(callable $callable, array $args = [])
     {
+        return (new ReflectionContainer)->setContainer($this)->call($callable, $args);
+    }
 
+    /**
+     * Stack a backup container to be checked for services if it
+     * cannot be resolved via this container.
+     *
+     * @param  \League\Container\ImmutableContainerInterface $container
+     * @return \League\Container\Container
+     */
+    public function stack(ImmutableContainerInterface $container)
+    {
+        $this->stack[] = $container;
+
+        return $this;
+    }
+
+    /**
+     * Attempt to get a service from the stack of backup containers.
+     *
+     * @param  string $alias
+     * @param  array  $args
+     * @return mixed
+     */
+    protected function getFromStack($alias, array $args = [])
+    {
+        foreach ($this->stack as $container) {
+            if ($container->has($alias)) {
+                return $container->get($alias, $args);
+            }
+
+            continue;
+        }
+
+        return false;
     }
 }
