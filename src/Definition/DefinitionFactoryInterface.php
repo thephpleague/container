@@ -2,7 +2,9 @@
 
 namespace League\Container\Definition;
 
-interface DefinitionFactoryInterface
+use League\Container\ImmutableContainerAwareInterface;
+
+interface DefinitionFactoryInterface extends ImmutableContainerAwareInterface
 {
     /**
      * Return a definition based on type of concrete.
