@@ -10,7 +10,7 @@
 
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/ad6b4c3e-8f93-4968-8dd3-391d39a4c3c2/big.png)](https://insight.sensiolabs.com/projects/ad6b4c3e-8f93-4968-8dd3-391d39a4c3c2)
 
-> Please be aware that the `master` branch is not the development branch for v2.0.0 due for release Friday 28 August 2015. Any pull requests for version 1.x issues should be against the `1.x` branch.
+> Please be aware that the `master` branch is now the development branch for v2.0.0 due for release Friday 28 August 2015. Any pull requests for version 1.x issues should be against the `1.x` branch.
 
 This package is compliant with [PSR-1], [PSR-2] and [PSR-4]. If you notice compliance oversights,
 please send a patch via pull request.
