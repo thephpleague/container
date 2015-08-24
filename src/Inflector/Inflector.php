@@ -1,11 +1,15 @@
 <?php
 
-namespace League\Container;
+namespace League\Container\Inflector;
 
-class Inflector implements ContainerAwareInterface
+use League\Container\ImmutableContainerAwareTrait;
+use League\Container\Argument\ArgumentResolverInterface;
+use League\Container\Argument\ArgumentResolverTrait;
+
+class Inflector implements ArgumentResolverInterface
 {
     use ArgumentResolverTrait;
-    use ContainerAwareTrait;
+    use ImmutableContainerAwareTrait;
 
     /**
      * @var array
@@ -18,7 +22,7 @@ class Inflector implements ContainerAwareInterface
     protected $properties = [];
 
     /**
-     * Defines a method to be invoked on the subject object
+     * Defines a method to be invoked on the subject object.
      *
      * @param  string $name
      * @param  array  $args
@@ -32,7 +36,7 @@ class Inflector implements ContainerAwareInterface
     }
 
     /**
-     * Defines multiple methods to be invoked on the subject object
+     * Defines multiple methods to be invoked on the subject object.
      *
      * @param  array $methods
      * @return \League\Container\Inflector
@@ -47,10 +51,10 @@ class Inflector implements ContainerAwareInterface
     }
 
     /**
-     * Defines a property to be set on the subject object
+     * Defines a property to be set on the subject object.
      *
-     * @param string $property
-     * @param mixed  $value
+     * @param  string $property
+     * @param  mixed  $value
      * @return \League\Container\Inflector
      */
     public function setProperty($property, $value)
@@ -61,9 +65,9 @@ class Inflector implements ContainerAwareInterface
     }
 
     /**
-     * Defines multiple properties to be set on the subject object
+     * Defines multiple properties to be set on the subject object.
      *
-     * @param array $properties
+     * @param  array $properties
      * @return \League\Container\Inflector
      */
     public function setProperties(array $properties)
@@ -76,7 +80,7 @@ class Inflector implements ContainerAwareInterface
     }
 
     /**
-     * Apply inflections to an object
+     * Apply inflections to an object.
      *
      * @param  object $object
      * @return void
@@ -90,10 +94,10 @@ class Inflector implements ContainerAwareInterface
             $object->{$property} = $value;
         }
 
-        foreach ($this->methods as $name => $args) {
+        foreach ($this->methods as $method => $args) {
             $args = $this->resolveArguments($args);
 
-            call_user_func_array([$object, $name], $args);
+            call_user_func_array([$object, $method], $args);
         }
     }
 }

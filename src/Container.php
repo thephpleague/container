@@ -2,182 +2,70 @@
 
 namespace League\Container;
 
-use ArrayAccess;
-use League\Container\Definition\CallableDefinition;
-use League\Container\Definition\ClassDefinition;
+use League\Container\Definition\DefinitionFactory;
+use League\Container\Definition\DefinitionFactoryInterface;
 use League\Container\Definition\DefinitionInterface;
-use League\Container\Definition\FactoryInterface;
+use League\Container\Inflector\InflectorAggregate;
+use League\Container\Inflector\InflectorAggregateInterface;
+use League\Container\ServiceProvider\ServiceProviderAggregate;
+use League\Container\ServiceProvider\ServiceProviderAggregateInterface;
 
-class Container implements ContainerInterface, ArrayAccess
+class Container implements ContainerInterface
 {
     /**
-     * @var array
+     * @var \League\Container\Definition\DefinitionFactoryInterface
      */
-    protected $callables = [];
+    protected $definitionFactory;
 
     /**
-     * @var \League\Container\Definition\FactoryInterface
+     * @var \League\Container\Definition\DefinitionInterface[]
      */
-    protected $factory;
+    protected $definitions = [];
 
     /**
-     * @var array
+     * @var \League\Container\Inflector\InflectorAggregateInterface
      */
-    protected $inflectors = [];
+    protected $inflectors;
 
     /**
-     * @var array
+     * @var \League\Container\ServiceProvider\ServiceProviderAggregateInterface
      */
-    protected $items = [];
-
-    /**
-     * @var array - \League\Container\ServiceProvider[]
-     */
-    protected $providers = [];
+    protected $providers;
 
     /**
      * @var array
      */
-    protected $singletons = [];
+    protected $shared = [];
 
     /**
-     * Constructor
+     * @var \League\Container\ImmutableContainerInterface[]
+     */
+    protected $stack = [];
+
+    /**
+     * Constructor.
      *
-     * @param array|ArrayAccess                             $config
-     * @param \League\Container\Definition\FactoryInterface $factory
+     * @param \League\Container\ServiceProvider\ServiceProviderAggregateInterface|null $providers
+     * @param \League\Container\Inflector\InflectorAggregateInterface|null             $inflectors
+     * @param \League\Container\Definition\DefinitionFactoryInterface|null             $definitionFactory
      */
-    public function __construct($config = [], FactoryInterface $factory = null)
-    {
-        $this->factory = (is_null($factory)) ? new Definition\Factory : $factory;
+    public function __construct(
+        ServiceProviderAggregateInterface $providers         = null,
+        InflectorAggregateInterface       $inflectors        = null,
+        DefinitionFactoryInterface        $definitionFactory = null
+    ) {
+        // set required dependencies
+        $this->providers         = (is_null($providers))
+                                 ? (new ServiceProviderAggregate)->setContainer($this)
+                                 : $providers->setContainer($this);
 
-        $this->addItemsFromConfig($config);
+        $this->inflectors        = (is_null($inflectors))
+                                 ? (new InflectorAggregate)->setContainer($this)
+                                 : $inflectors->setContainer($this);
 
-        $this->add('League\Container\ContainerInterface', $this);
-        $this->add('League\Container\Container', $this);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function add($alias, $concrete = null, $singleton = false)
-    {
-        if (is_null($concrete)) {
-            $concrete = $alias;
-        }
-
-        // are we dealing with a service provider?
-        if ($concrete instanceof ServiceProvider) {
-            return $this->addServiceProvider($concrete);
-        }
-
-        // if the concrete is an already instantiated object, we just store it
-        // as a singleton
-        if ((is_object($concrete) && ! $concrete instanceof \Closure)) {
-            $this->singletons[$alias] = $concrete;
-            return null;
-        }
-
-        // we need to build a definition
-        $factory    = $this->getDefinitionFactory();
-        $definition = $factory($alias, $concrete, $this);
-
-        if ($definition instanceof DefinitionInterface) {
-            $this->items[$alias] = [
-                'definition' => $definition,
-                'singleton'  => (boolean) $singleton
-            ];
-
-            return $definition;
-        }
-
-        // dealing with an arbitrary value so just store as singleton
-        $this->singletons[$alias] = $concrete;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function addServiceProvider($provider)
-    {
-        if ((! is_string($provider)) && (! $provider instanceof ServiceProvider)) {
-            throw new \InvalidArgumentException(
-                'When registering a service provider, you must provide either and instance of ' .
-                '[\League\Container\ServiceProvider] or a fully qualified class name'
-            );
-        }
-
-        $this->providers[] = $provider;
-
-        return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function singleton($alias, $concrete = null)
-    {
-        return $this->add($alias, $concrete, true);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function inflector($type, callable $callback = null)
-    {
-        if (is_null($callback)) {
-            $inflector = new Inflector;
-            $this->inflectors[$type] = $inflector;
-
-            return $inflector;
-        }
-
-        $this->inflectors[$type] = $callback;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function invokable($alias, callable $concrete = null)
-    {
-        if (is_null($concrete)) {
-            $concrete = $alias;
-        }
-
-        if (is_string($concrete) && strpos($concrete, '::') !== false) {
-            $concrete = explode('::', $concrete);
-        }
-
-        if (! is_callable($concrete)) {
-            throw new \InvalidArgumentException(
-                sprintf('Cannot register callable attached to alias [%s]', $alias)
-            );
-        }
-
-        $factory = $this->getDefinitionFactory();
-        $definition = $factory($alias, $concrete, $this, true);
-
-        $this->callables[$alias] = $definition;
-
-        return $definition;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function extend($alias)
-    {
-        if (! $this->isRegistered($alias) && ! $this->isInServiceProvider($alias)) {
-            throw new \InvalidArgumentException(sprintf('[%s] is not registered in the container.', $alias));
-        }
-
-        if ($this->isSingleton($alias)) {
-            throw new Exception\ServiceNotExtendableException(sprintf(
-                '[%s] is being managed as a singleton and cannot be modified.',
-                $alias
-            ));
-        }
-
-        return $this->items[$alias]['definition'];
+        $this->definitionFactory = (is_null($definitionFactory))
+                                 ? (new DefinitionFactory)->setContainer($this)
+                                 : $definitionFactory->setContainer($this);
     }
 
     /**
@@ -185,111 +73,42 @@ class Container implements ContainerInterface, ArrayAccess
      */
     public function get($alias, array $args = [])
     {
-        // if we have a singleton just return it
-        if (array_key_exists($alias, $this->singletons)) {
-            return $this->applyInflectors($this->singletons[$alias]);
+        if ($this->hasShared($alias)) {
+            return $this->shared[$alias];
         }
 
-        // invoke the correct definition
-        if (array_key_exists($alias, $this->items) && array_key_exists('definition', $this->items[$alias])) {
-            return $this->applyInflectors($this->resolveDefinition($alias, $args));
+        if ($this->providers->provides($alias)) {
+            $this->providers->register($alias);
         }
 
-        // is the definition registered via a service provider?
-        if ($this->isInServiceProvider($alias)) {
-            return $this->get($alias, $args);
+        if (array_key_exists($alias, $this->definitions)) {
+            return $this->definitions[$alias]->build($args);
         }
 
-        // if we've got this far, we can assume we need to reflect on a class
-        // and automatically resolve it's dependencies, we also cache the
-        // result if a caching adapter is available
-        $definition = $this->reflect($alias);
-
-        $this->items[$alias]['definition'] = $definition;
-
-        return $this->applyInflectors($definition());
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function call($alias, array $args = [])
-    {
-        if (is_string($alias) && array_key_exists($alias, $this->callables)) {
-            $definition = $this->callables[$alias];
-
-            return $definition($args);
+        if ($resolved = $this->getFromStack($alias, $args)) {
+            return $resolved;
         }
 
-        if (is_callable($alias)) {
-            $callable = $this->reflectCallable($alias);
-            $args     = $this->resolveCallableArguments($callable, $args);
-
-            return call_user_func_array($alias, $args);
-        }
-
-        throw new \RuntimeException(
-            sprintf('Unable to call callable [%s], does it exist and is it registered with the container?', $alias)
-        );
-    }
-
-    /**
-     * Resolve a container definition
-     *
-     * @param  string $alias
-     * @param  array  $args
-     * @return mixed
-     */
-    protected function resolveDefinition($alias, array $args)
-    {
-        $definition = $this->items[$alias]['definition'];
-        $return     = $definition;
-
-        if ($definition instanceof CallableDefinition || $definition instanceof ClassDefinition) {
-            $return = $definition($args);
-        }
-
-        // store as a singleton if needed
-        if (isset($this->items[$alias]['singleton']) && $this->items[$alias]['singleton'] === true) {
-            $this->singletons[$alias] = $return;
-        }
-
-        return $return;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isRegistered($alias)
-    {
-        return array_key_exists($alias, $this->items);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isSingleton($alias)
-    {
-        return (
-            array_key_exists($alias, $this->singletons) ||
-            (array_key_exists($alias, $this->items) && $this->items[$alias]['singleton'] === true)
+        throw new \InvalidArgumentException(
+            sprintf('Alias (%s) is not being managed by the container', $alias)
         );
     }
 
     /**
      * {@inheritdoc}
      */
-    public function isInServiceProvider($alias)
+    public function has($alias)
     {
-        foreach ($this->providers as &$provider) {
-            if (! $provider instanceof ServiceProvider) {
-                $provider = new $provider;
-            }
+        if (array_key_exists($alias, $this->definitions) || $this->hasShared($alias)) {
+            return true;
+        }
 
-            $provider->setContainer($this);
+        if ($this->providers->provides($alias)) {
+            return true;
+        }
 
-            if ($provider->provides($alias)) {
-                $provider->register();
+        foreach ($this->stack as $container) {
+            if ($container->has($alias)) {
                 return true;
             }
         }
@@ -298,276 +117,120 @@ class Container implements ContainerInterface, ArrayAccess
     }
 
     /**
-     * Encapsulate the definition factory to allow for invocation
+     * Returns a boolean to determine if the container has a shared instance of an alias.
      *
-     * @return \League\Container\Definition\Factory
-     */
-    protected function getDefinitionFactory()
-    {
-        return $this->factory;
-    }
-
-    /**
-     * Populate the container with items from config
-     *
-     * @param $config array|ArrayAccess
-     * @return void
-     */
-    protected function addItemsFromConfig($config)
-    {
-        if (! is_array($config) && ! $config instanceof \ArrayAccess) {
-            throw new \InvalidArgumentException(
-                'You can only load definitions from an array or an object that implements ArrayAccess.'
-            );
-        }
-
-        if (empty($config)) {
-            return null;
-        }
-
-        if (! isset($config['di']) || ! is_array($config['di'])) {
-            throw new \RuntimeException(
-                'Could not process configuration, either the top level key [di] is missing or the configuration is not an array.'
-            );
-        }
-
-        $definitions = $config['di'];
-
-        array_walk($definitions, [$this, 'createDefinitionFromConfig']);
-    }
-
-    /**
-     * Create a definition from a config entry
-     *
-     * @param  mixed  $options
      * @param  string $alias
-     * @return void
+     * @return boolean
      */
-    protected function createDefinitionFromConfig($options, $alias)
+    public function hasShared($alias)
     {
-        $concrete  = $this->resolveConcreteClassFromConfig($options);
-        $singleton = false;
-        $arguments = [];
-        $methods   = [];
+        return (array_key_exists($alias, $this->shared));
+    }
 
-        if (is_array($options)) {
-            $singleton = (! empty($options['singleton']));
-            $arguments = (array_key_exists('arguments', $options)) ? (array) $options['arguments'] : [];
-            $methods   = (array_key_exists('methods', $options)) ? (array) $options['methods'] : [];
+    /**
+     * {@inheritdoc}
+     */
+    public function add($alias, $concrete = null, $share = false)
+    {
+        if (is_null($concrete)) {
+            $concrete = $alias;
         }
 
-        // define in the container, with constructor arguments and method calls
-        $definition = $this->add($alias, $concrete, $singleton);
+        $definition = $this->definitionFactory->getDefinition($alias, $concrete);
 
         if ($definition instanceof DefinitionInterface) {
-            $definition->withArguments($arguments);
-        }
+            $this->definitions[$alias] = $definition;
 
-        if ($definition instanceof ClassDefinition) {
-            $definition->withMethodCalls($methods);
-        }
-    }
-
-    /**
-     * Resolves the concrete class
-     *
-     * @param mixed $concrete
-     * @return mixed
-     */
-    protected function resolveConcreteClassFromConfig($concrete)
-    {
-        if (is_array($concrete)) {
-            if (array_key_exists('definition', $concrete)) {
-                $concrete = $concrete['definition'];
-            } elseif (array_key_exists('class', $concrete)) {
-                $concrete = $concrete['class'];
-            }
-        }
-
-        // if the concrete doesn't have a class associated with it then it
-        // must be either a Closure or arbitrary type so we just bind that
-        return $concrete;
-    }
-
-    /**
-     * Reflect on a class, establish it's dependencies and build a definition
-     * from that information
-     *
-     * @param  string $class
-     * @throws Exception\ReflectionException
-     * @throws Exception\UnresolvableDependencyException
-     * @return \League\Container\Definition\ClassDefinition
-     */
-    protected function reflect($class)
-    {
-        // try to reflect on the class so we can build a definition
-        try {
-            $reflection  = new \ReflectionClass($class);
-            $constructor = $reflection->getConstructor();
-        } catch (\ReflectionException $e) {
-            throw new Exception\ReflectionException(
-                sprintf('Unable to reflect on the class [%s], does the class exist and is it properly autoloaded?', $class)
-            );
-        }
-
-        $factory = $this->getDefinitionFactory();
-        $definition = $factory($class, $class, $this);
-
-        if (is_null($constructor)) {
             return $definition;
         }
 
-        // loop through dependencies and get aliases/values
-        foreach ($constructor->getParameters() as $param) {
-            $dependency = $param->getClass();
-
-            // if the dependency is not a class we attempt to get a default value
-            if (is_null($dependency)) {
-                if ($param->isDefaultValueAvailable()) {
-                    $definition->withArgument($param->getDefaultValue());
-                    continue;
-                }
-
-                throw new Exception\UnresolvableDependencyException(
-                    sprintf('Unable to resolve a non-class dependency of [%s] for [%s]', $param, $class)
-                );
-            }
-
-            // if the dependency is a class, just register it's name as an
-            // argument with the definition
-            $definition->withArgument($dependency->getName());
-        }
-
-        return $definition;
+        // dealing with a value that cannot build a definition
+        $this->shared[$alias] = $concrete;
     }
 
     /**
-     * Get a reflection object for this callable.
-     *
-     * @param  callable $callable
-     * @return \ReflectionFunctionAbstract
+     * {@inheritdoc}
      */
-    protected function reflectCallable(callable $callable)
+    public function share($alias, $concrete = null)
     {
-        if (is_string($callable) && strpos($callable, '::') !== false) {
-            $callable = explode('::', $callable);
-        }
-
-        if (is_array($callable)) {
-            return new \ReflectionMethod($callable[0], $callable[1]);
-        } else {
-            return new \ReflectionFunction($callable);
-        }
+        return $this->add($alias, $concrete, true);
     }
 
     /**
-     * Resolves arguments for a callable
-     *
-     * @param  \ReflectionFunctionAbstract $reflector
-     * @param  array $args
-     * @return array
+     * {@inheritdoc}
      */
-    protected function resolveCallableArguments(\ReflectionFunctionAbstract $reflector, $args = [])
+    public function addServiceProvider($provider)
     {
-        return array_map(function (\ReflectionParameter $parameter) use ($args) {
-            $name  = $parameter->name;
-            $class = $parameter->getClass();
+        $this->providers->add($provider);
 
-            if (isset($args[$name])) {
-                return $args[$name];
-            }
-
-            if ($class) {
-                return $this->get($class->name);
-            }
-
-            if ($parameter->isDefaultValueAvailable()) {
-                return $parameter->getDefaultValue();
-            }
-
-            throw new \RuntimeException(
-                sprintf(
-                    'Cannot resolve argument [%s], it should be provided within an array of arguments passed to ' .
-                    '[%s::call], have a default value or be type hinted',
-                    $name, get_class($this)
-                )
-            );
-        }, $reflector->getParameters());
+        return $this;
     }
 
     /**
-     * Apply any active inflectors to the resolved object
-     *
-     * @param  object $object
-     * @return object
+     * {@inheritdoc}
      */
-    protected function applyInflectors($object)
+    public function extend($alias)
     {
-        foreach ($this->inflectors as $type => $inflector) {
-            if (! $object instanceof $type) {
-                continue;
-            }
-
-            if ($inflector instanceof Inflector) {
-                $inflector->setContainer($this);
-                $inflector->inflect($object);
-                continue;
-            }
-
-            // must be dealing with a callable as the inflector
-            call_user_func_array($inflector, [$object]);
+        if ($this->providers->provides($alias)) {
+            $this->providers->register($alias);
         }
 
-        return $object;
+        if (array_key_exists($alias, $this->definitions)) {
+            return $this->definitions[$alias];
+        }
+
+        throw new \InvalidArgumentException(
+            sprintf('Unable to extend alias (%s) as it is not being managed as a definition', $alias)
+        );
     }
 
     /**
-     * Array Access get
+     * {@inheritdoc}
+     */
+    public function inflector($type, callable $callback = null)
+    {
+        return $this->inflectors->add($type, $callback);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function call(callable $callable, array $args = [])
+    {
+        return (new ReflectionContainer)->setContainer($this)->call($callable, $args);
+    }
+
+    /**
+     * Stack a backup container to be checked for services if it
+     * cannot be resolved via this container.
      *
-     * @param  string $key
+     * @param  \League\Container\ImmutableContainerInterface $container
+     * @return \League\Container\Container
+     */
+    public function stack(ImmutableContainerInterface $container)
+    {
+        $this->stack[] = $container;
+
+        return $this;
+    }
+
+    /**
+     * Attempt to get a service from the stack of backup containers.
+     *
+     * @param  string $alias
+     * @param  array  $args
      * @return mixed
      */
-    public function offsetGet($key)
+    protected function getFromStack($alias, array $args = [])
     {
-        return $this->get($key);
-    }
+        foreach ($this->stack as $container) {
+            if ($container->has($alias)) {
+                return $container->get($alias, $args);
+            }
 
-    /**
-     * Array Access set
-     *
-     * @param  string $key
-     * @param  mixed  $value
-     * @return void
-     */
-    public function offsetSet($key, $value)
-    {
-        $this->singleton($key, $value);
-    }
+            continue;
+        }
 
-    /**
-     * Array Access unset
-     *
-     * @param  string $key
-     * @return void
-     */
-    public function offsetUnset($key)
-    {
-        unset($this->items[$key]);
-        unset($this->singletons[$key]);
-    }
-
-    /**
-     * Array Access isset
-     *
-     * @param  string $key
-     * @return boolean
-     */
-    public function offsetExists($key)
-    {
-        return (
-            $this->isRegistered($key) ||
-            $this->isSingleton($key)  ||
-            $this->isInServiceProvider($key)
-        );
+        return false;
     }
 }

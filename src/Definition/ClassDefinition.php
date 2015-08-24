@@ -2,32 +2,12 @@
 
 namespace League\Container\Definition;
 
-use League\Container\ContainerAwareInterface;
-use League\Container\ContainerAwareTrait;
-use League\Container\ContainerInterface;
-
-class ClassDefinition extends AbstractDefinition implements ClassDefinitionInterface, ContainerAwareInterface
+class ClassDefinition extends AbstractDefinition implements ClassDefinitionInterface
 {
-    use ContainerAwareTrait;
-
     /**
-     * @var string
+     * @var array
      */
-    protected $class;
-
-    /**
-     * Constructor
-     *
-     * @param string                      $alias
-     * @param string                      $concrete
-     * @param \League\Container\ContainerInterface $container
-     */
-    public function __construct($alias, $concrete, ContainerInterface $container = null)
-    {
-        parent::__construct($alias, $container);
-
-        $this->class = $concrete;
-    }
+    protected $methods = [];
 
     /**
      * {@inheritdoc}
@@ -57,31 +37,29 @@ class ClassDefinition extends AbstractDefinition implements ClassDefinitionInter
     /**
      * {@inheritdoc}
      */
-    public function __invoke(array $args = [])
+    public function build(array $args = [])
     {
-        $args = (empty($args)) ? $this->arguments : $args;
-        $resolved = $this->resolveArguments($args);
+        $args       = (empty($args)) ? $this->arguments : $args;
+        $resolved   = $this->resolveArguments($args);
+        $reflection = new \ReflectionClass($this->concrete);
+        $instance   = $reflection->newInstanceArgs($resolved);
 
-        $reflection = new \ReflectionClass($this->class);
-        $object = $reflection->newInstanceArgs($resolved);
-
-        return $this->invokeMethods($object);
+        return $this->invokeMethods($instance);
     }
 
     /**
-     * Invoke methods on resolved object
+     * Invoke methods on resolved instance.
      *
-     * @param  object $object
+     * @param  object $instance
      * @return object
      */
-    protected function invokeMethods($object)
+    protected function invokeMethods($instance)
     {
         foreach ($this->methods as $method) {
             $args = $this->resolveArguments($method['arguments']);
-
-            call_user_func_array([$object, $method['method']], $args);
+            call_user_func_array([$instance, $method['method']], $args);
         }
 
-        return $object;
+        return $instance;
     }
 }
