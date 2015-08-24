@@ -9,7 +9,7 @@ interface ClassDefinitionInterface extends DefinitionInterface
      *
      * @param  string $method
      * @param  array  $args
-     * @return \League\Container\Definition\ClassDefinitionInterface
+     * @return $this
      */
     public function withMethodCall($method, array $args = []);
 
@@ -17,7 +17,7 @@ interface ClassDefinitionInterface extends DefinitionInterface
      * Add multiple methods to be invoked
      *
      * @param  array $methods
-     * @return \League\Container\Definition\ClassDefinitionInterface
+     * @return $this
      */
     public function withMethodCalls(array $methods = []);
 }

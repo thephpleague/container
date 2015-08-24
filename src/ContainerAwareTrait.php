@@ -13,7 +13,7 @@ trait ContainerAwareTrait
      * Set a container.
      *
      * @param  \League\Container\ContainerInterface $container
-     * @return mixed
+     * @return $this
      */
     public function setContainer(ContainerInterface $container)
     {

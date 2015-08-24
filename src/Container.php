@@ -205,7 +205,7 @@ class Container implements ContainerInterface
      * cannot be resolved via this container.
      *
      * @param  \League\Container\ImmutableContainerInterface $container
-     * @return \League\Container\Container
+     * @return $this
      */
     public function stack(ImmutableContainerInterface $container)
     {

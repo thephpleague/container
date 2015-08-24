@@ -13,7 +13,7 @@ trait ImmutableContainerAwareTrait
      * Set a container.
      *
      * @param  \League\Container\ImmutableContainerInterface $container
-     * @return mixed
+     * @return $this
      */
     public function setContainer(ImmutableContainerInterface $container)
     {
