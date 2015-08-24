@@ -16,7 +16,7 @@ interface DefinitionInterface
      * Add an argument to be injected.
      *
      * @param  mixed $arg
-     * @return \League\Container\Definition\DefinitionInterface
+     * @return $this
      */
     public function withArgument($arg);
 
@@ -24,7 +24,7 @@ interface DefinitionInterface
      * Add multiple arguments to be injected.
      *
      * @param  array $args
-     * @return \League\Container\Definition\DefinitionInterface
+     * @return $this
      */
     public function withArguments(array $args);
 }

@@ -26,7 +26,7 @@ class Inflector implements ArgumentResolverInterface
      *
      * @param  string $name
      * @param  array  $args
-     * @return \League\Container\Inflector
+     * @return $this
      */
     public function invokeMethod($name, array $args)
     {
@@ -39,7 +39,7 @@ class Inflector implements ArgumentResolverInterface
      * Defines multiple methods to be invoked on the subject object.
      *
      * @param  array $methods
-     * @return \League\Container\Inflector
+     * @return $this
      */
     public function invokeMethods(array $methods)
     {
@@ -55,7 +55,7 @@ class Inflector implements ArgumentResolverInterface
      *
      * @param  string $property
      * @param  mixed  $value
-     * @return \League\Container\Inflector
+     * @return $this
      */
     public function setProperty($property, $value)
     {
@@ -68,7 +68,7 @@ class Inflector implements ArgumentResolverInterface
      * Defines multiple properties to be set on the subject object.
      *
      * @param  array $properties
-     * @return \League\Container\Inflector
+     * @return $this
      */
     public function setProperties(array $properties)
     {
