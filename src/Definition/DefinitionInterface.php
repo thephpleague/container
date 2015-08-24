@@ -5,7 +5,7 @@ namespace League\Container\Definition;
 interface DefinitionInterface
 {
     /**
-     * Handle instansiation and manipulation of value and return.
+     * Handle instantiation and manipulation of value and return.
      *
      * @param  array $args
      * @return mixed
