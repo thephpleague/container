@@ -679,6 +679,38 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Asserts that exception is thrown if call of array callable fails
+     *
+     * @return void
+     */
+    public function testCallThrowsRuntimeExceptionIfArrayArgumentResolutionFails()
+    {
+        $this->setExpectedException('RuntimeException', '[League\Container\Test\Asset\Baz::notExistingMethod]');
+
+        $o = new Baz;
+        $c = new Container;
+        $c->call([$o, 'notExistingMethod']);
+
+        $this->assertFalse(true);
+    }
+
+    /**
+     * Asserts that exception is thrown if argument is not a callable object
+     *
+     * @return void
+     */
+    public function testCallThrowsRuntimeExceptionIfArgumentIsNotCallableObject()
+    {
+        $this->setExpectedException('RuntimeException', '[League\Container\Test\Asset\Baz]');
+
+        $o = new Baz;
+        $c = new Container;
+        $c->call($o);
+
+        $this->assertFalse(true);
+    }
+
+    /**
      * Asserts that array type hint is ignore when auto resolving arguments
      *
      * @return void
