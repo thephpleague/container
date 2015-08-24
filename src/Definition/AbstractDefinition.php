@@ -6,7 +6,7 @@ use League\Container\Argument\ArgumentResolverInterface;
 use League\Container\Argument\ArgumentResolverTrait;
 use League\Container\ImmutableContainerAwareTrait;
 
-abstract class AbstractDefinition implements ArgumentResolverInterface
+abstract class AbstractDefinition implements ArgumentResolverInterface, DefinitionInterface
 {
     use ArgumentResolverTrait;
     use ImmutableContainerAwareTrait;

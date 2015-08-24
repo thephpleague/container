@@ -2,7 +2,7 @@
 
 namespace League\Container\Definition;
 
-class CallableDefinition extends AbstractDefinition implements DefinitionInterface
+class CallableDefinition extends AbstractDefinition
 {
     /**
      * {@inheritdoc}
