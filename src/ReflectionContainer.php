@@ -2,11 +2,8 @@
 
 namespace League\Container;
 
-use League\Container\ImmutableContainerAwareTrait;
 use League\Container\Argument\ArgumentResolverInterface;
 use League\Container\Argument\ArgumentResolverTrait;
-use League\Container\ImmutableContainerAwareInterface;
-use League\Container\ImmutableContainerInterface;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionFunction;
