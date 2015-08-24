@@ -2,10 +2,9 @@
 
 namespace League\Container\Definition;
 
-use League\Container\ImmutableContainerAwareInterface;
 use League\Container\ImmutableContainerAwareTrait;
 
-class DefinitionFactory implements DefinitionFactoryInterface, ImmutableContainerAwareInterface
+class DefinitionFactory implements DefinitionFactoryInterface
 {
     use ImmutableContainerAwareTrait;
 
