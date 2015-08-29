@@ -28,6 +28,10 @@ class ReflectionContainer implements
             return new $alias;
         }
 
+        if ($construct === null) {
+            return new $alias;
+        }
+
         return $reflector->newInstanceArgs(
             $this->reflectArguments($construct, $args)
         );
