@@ -3,6 +3,7 @@
 namespace League\Container\Argument;
 
 use InvalidArgumentException;
+use League\Container\ContainerInterface;
 use ReflectionFunctionAbstract;
 use ReflectionParameter;
 
@@ -59,7 +60,7 @@ trait ArgumentResolverTrait
     }
 
     /**
-     * {@inheritdoc}
+     * @return ContainerInterface
      */
     abstract public function getContainer();
 }
