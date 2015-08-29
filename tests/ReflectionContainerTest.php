@@ -25,4 +25,16 @@ class ReflectionContainerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse($container->has('Foo\Bar\Baz'));
     }
+
+    /**
+     * Asserts that ReflectionContainer instantiates a class that does not have a constructor.
+     */
+    public function testGetInstantiatesClassWithoutConstructor()
+    {
+        $classWithoutConstructor = 'League\Container\Test\Asset\Bar';
+
+        $container = new ReflectionContainer();
+
+        $this->assertInstanceOf($classWithoutConstructor, $container->get($classWithoutConstructor));
+    }
 }
