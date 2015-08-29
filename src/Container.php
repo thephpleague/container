@@ -107,13 +107,7 @@ class Container implements ContainerInterface
             return true;
         }
 
-        foreach ($this->stack as $container) {
-            if ($container->has($alias)) {
-                return true;
-            }
-        }
-
-        return false;
+        return $this->hasInStack($alias);
     }
 
     /**
@@ -212,6 +206,23 @@ class Container implements ContainerInterface
         $this->stack[] = $container;
 
         return $this;
+    }
+
+    /**
+     * Returns true if service is registered in one of the backup containers.
+     *
+     * @param  string $alias
+     * @return bool
+     */
+    protected function hasInStack($alias)
+    {
+        foreach ($this->stack as $container) {
+            if ($container->has($alias)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
