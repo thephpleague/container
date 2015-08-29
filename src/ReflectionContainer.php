@@ -11,7 +11,6 @@ use ReflectionMethod;
 
 class ReflectionContainer implements
     ArgumentResolverInterface,
-    ImmutableContainerAwareInterface,
     ImmutableContainerInterface
 {
     use ArgumentResolverTrait;
