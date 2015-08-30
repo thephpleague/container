@@ -3,6 +3,7 @@
 namespace League\Container\Argument;
 
 use InvalidArgumentException;
+use League\Container\ReflectionContainer;
 use ReflectionFunctionAbstract;
 use ReflectionParameter;
 
@@ -19,8 +20,17 @@ trait ArgumentResolverTrait
                 continue;
             }
 
-            if (is_string($arg) && ($this->getContainer()->has($arg) || class_exists($arg))) {
-                $arg = $this->getContainer()->get($arg);
+            if (!is_string($arg)) {
+                 continue;
+            }
+
+            $container = $this->getContainer();
+            if (!$container && $this instanceof ReflectionContainer) {
+                $container = $this;
+            }
+
+            if ($container && $container->has($arg)) {
+                $arg = $container->get($arg);
             }
         }
 
