@@ -76,7 +76,7 @@ class Container implements ContainerInterface
     public function get($alias, array $args = [])
     {
         if ($this->hasShared($alias)) {
-            return $this->shared[$alias];
+            return $this->inflectors->inflect($this->shared[$alias]);
         }
 
         if ($this->providers->provides($alias)) {
@@ -84,11 +84,13 @@ class Container implements ContainerInterface
         }
 
         if (array_key_exists($alias, $this->definitions)) {
-            return $this->definitions[$alias]->build($args);
+            return $this->inflectors->inflect(
+                $this->definitions[$alias]->build($args)
+            );
         }
 
         if ($resolved = $this->getFromDelegate($alias, $args)) {
-            return $resolved;
+            return $this->inflectors->inflect($resolved);
         }
 
         throw new NotFoundException(
