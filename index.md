@@ -22,9 +22,16 @@ title: Introduction
 
 Container is a small but powerful dependency injection container that allows you to decouple components in your application in order to write clean and testable code.
 
-The container can automatically resolve dependencies of objects resolved through it.
-
 [Container on Packagist](https://packagist.org/packages/league/container)
+
+## Key Features
+
+- Interoperability. Container is an implementation of the [container-interop](https://github.com/container-interop/container-interop) project.
+- Speed. Because Container is small, it is also very fast.
+- Service Providers allow you to package code or configuration for packages that you reuse regularly.
+- Inflectors allow you to manipulate objects resolved through the container based on the type.
+- Delegate containers allow you to register back up containers to resolve services when they are not provided by this container.
+- Extensible. Container is modular so if you need to change or extend functionality it is very easy to do so.
 
 ## Questions?
 
