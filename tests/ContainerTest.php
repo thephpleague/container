@@ -121,6 +121,22 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Asserts that asking container for an item that has a shared definition returns true.
+     */
+    public function testHasReturnsTrueForSharedDefinition()
+    {
+        $alias = 'foo';
+
+        $container = new Container;
+
+        $container->share($alias, function () {
+            return new \stdClass;
+        });
+
+        $this->assertTrue($container->has($alias));
+    }
+
+    /**
      * @param array $items
      * @return \PHPUnit_Framework_MockObject_MockObject|ImmutableContainerInterface
      */
