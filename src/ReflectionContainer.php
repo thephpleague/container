@@ -11,7 +11,6 @@ use ReflectionMethod;
 
 class ReflectionContainer implements
     ArgumentResolverInterface,
-    ImmutableContainerAwareInterface,
     ImmutableContainerInterface
 {
     use ArgumentResolverTrait;
@@ -26,6 +25,10 @@ class ReflectionContainer implements
             $reflector = new ReflectionClass($alias);
             $construct = $reflector->getConstructor();
         } catch (ReflectionException $e) {
+            return new $alias;
+        }
+
+        if ($construct === null) {
             return new $alias;
         }
 
