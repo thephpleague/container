@@ -10,8 +10,6 @@
 
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/ad6b4c3e-8f93-4968-8dd3-391d39a4c3c2/big.png)](https://insight.sensiolabs.com/projects/ad6b4c3e-8f93-4968-8dd3-391d39a4c3c2)
 
-> Please be aware that the `master` branch is now the development branch for v2.0.0 due for release Friday 28 August 2015. Any pull requests for version 1.x issues should be against the `1.x` branch.
-
 This package is compliant with [PSR-1], [PSR-2] and [PSR-4]. If you notice compliance oversights,
 please send a patch via pull request.
 
@@ -34,6 +32,7 @@ The following versions of PHP are supported by this version.
 * PHP 5.4
 * PHP 5.5
 * PHP 5.6
+* PHP 7.0
 * HHVM
 
 ## Documentation
@@ -41,10 +40,6 @@ The following versions of PHP are supported by this version.
 Container has [full documentation](http://container.thephpleague.com), powered by [Jekyll](http://jekyllrb.com/).
 
 Contribute to this documentation in the [gh-pages branch](https://github.com/thephpleague/container/tree/gh-pages/).
-
-## Todo
-
-- Improve callable functionality and allow runtime arguments on `call`
 
 ## Testing
 
