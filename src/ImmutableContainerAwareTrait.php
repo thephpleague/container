@@ -7,7 +7,7 @@ use Interop\Container\ContainerInterface as InteropContainerInterface;
 trait ImmutableContainerAwareTrait
 {
     /**
-     * @var \League\Container\ImmutableContainerInterface
+     * @var \Interop\Container\ContainerInterface
      */
     protected $container;
 
