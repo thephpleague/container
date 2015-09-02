@@ -28,12 +28,8 @@ class ReflectionContainer implements
             );
         }
 
-        try {
-            $reflector = new ReflectionClass($alias);
-            $construct = $reflector->getConstructor();
-        } catch (ReflectionException $e) {
-            return new $alias;
-        }
+        $reflector = new ReflectionClass($alias);
+        $construct = $reflector->getConstructor();
 
         if ($construct === null) {
             return new $alias;
