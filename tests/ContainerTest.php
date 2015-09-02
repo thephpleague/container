@@ -103,6 +103,24 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Asserts that fetching a shared item always returns the same item.
+     */
+    public function testGetSharedItemReturnsTheSameItem()
+    {
+        $alias = 'foo';
+
+        $container = new Container;
+
+        $container->share($alias, function () {
+            return new \stdClass;
+        });
+
+        $item = $container->get($alias);
+
+        $this->assertSame($item, $container->get($alias));
+    }
+
+    /**
      * @param array $items
      * @return \PHPUnit_Framework_MockObject_MockObject|ImmutableContainerInterface
      */
