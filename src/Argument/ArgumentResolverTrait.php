@@ -21,17 +21,17 @@ trait ArgumentResolverTrait
                 continue;
             }
 
-            if (!is_string($arg)) {
+            if (! is_string($arg)) {
                  continue;
             }
 
             $container = $this->getContainer();
 
-            if (! $container && $this instanceof ReflectionContainer) {
+            if (is_null($container) && $this instanceof ReflectionContainer) {
                 $container = $this;
             }
 
-            if ($container && $container->has($arg)) {
+            if (! is_null($container) && $container->has($arg)) {
                 $arg = $container->get($arg);
             }
         }
