@@ -3,7 +3,7 @@
 namespace League\Container\Argument;
 
 use InvalidArgumentException;
-use League\Container\ReflectionContainer;
+use Interop\Container\ContainerInterface as InteropContainerInterface;
 use ReflectionFunctionAbstract;
 use ReflectionParameter;
 
@@ -26,7 +26,7 @@ trait ArgumentResolverTrait
 
             $container = $this->getContainer();
 
-            if (is_null($container) && $this instanceof ReflectionContainer) {
+            if (is_null($container) && $this instanceof InteropContainerInterface) {
                 $container = $this;
             }
 

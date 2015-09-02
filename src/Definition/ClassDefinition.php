@@ -2,6 +2,8 @@
 
 namespace League\Container\Definition;
 
+use ReflectionClass;
+
 class ClassDefinition extends AbstractDefinition implements ClassDefinitionInterface
 {
     /**
@@ -41,7 +43,7 @@ class ClassDefinition extends AbstractDefinition implements ClassDefinitionInter
     {
         $args       = (empty($args)) ? $this->arguments : $args;
         $resolved   = $this->resolveArguments($args);
-        $reflection = new \ReflectionClass($this->concrete);
+        $reflection = new ReflectionClass($this->concrete);
         $instance   = $reflection->newInstanceArgs($resolved);
 
         return $this->invokeMethods($instance);

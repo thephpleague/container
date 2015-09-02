@@ -2,14 +2,16 @@
 
 namespace League\Container;
 
+use Interop\Container\ContainerInterface as InteropContainerInterface;
+
 interface ImmutableContainerAwareInterface
 {
     /**
      * Set a container
      *
-     * @param \League\Container\ImmutableContainerInterface $container
+     * @param \Interop\Container\ContainerInterface $container
      */
-    public function setContainer(ImmutableContainerInterface $container);
+    public function setContainer(InteropContainerInterface $container);
 
     /**
      * Get the container

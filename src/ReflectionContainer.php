@@ -4,6 +4,7 @@ namespace League\Container;
 
 use League\Container\Argument\ArgumentResolverInterface;
 use League\Container\Argument\ArgumentResolverTrait;
+use League\Container\Exception\NotFoundException;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionFunction;
@@ -21,6 +22,12 @@ class ReflectionContainer implements
      */
     public function get($alias, array $args = [])
     {
+        if (! $this->has($alias)) {
+            throw new NotFoundException(
+                sprintf('Alias (%s) is not an existing class and therefore cannot be resolved', $alias)
+            );
+        }
+
         try {
             $reflector = new ReflectionClass($alias);
             $construct = $reflector->getConstructor();

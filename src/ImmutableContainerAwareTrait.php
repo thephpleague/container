@@ -2,6 +2,8 @@
 
 namespace League\Container;
 
+use Interop\Container\ContainerInterface as InteropContainerInterface;
+
 trait ImmutableContainerAwareTrait
 {
     /**
@@ -12,10 +14,10 @@ trait ImmutableContainerAwareTrait
     /**
      * Set a container.
      *
-     * @param  \League\Container\ImmutableContainerInterface $container
+     * @param  \Interop\Container\ContainerInterface $container
      * @return $this
      */
-    public function setContainer(ImmutableContainerInterface $container)
+    public function setContainer(InteropContainerInterface $container)
     {
         $this->container = $container;
 

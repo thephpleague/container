@@ -2,9 +2,11 @@
 
 namespace League\Container;
 
+use Interop\Container\ContainerInterface as InteropContainerInterface;
 use League\Container\Definition\DefinitionFactory;
 use League\Container\Definition\DefinitionFactoryInterface;
 use League\Container\Definition\DefinitionInterface;
+use League\Container\Exception\NotFoundException;
 use League\Container\Inflector\InflectorAggregate;
 use League\Container\Inflector\InflectorAggregateInterface;
 use League\Container\ServiceProvider\ServiceProviderAggregate;
@@ -89,7 +91,7 @@ class Container implements ContainerInterface
             return $resolved;
         }
 
-        throw new \InvalidArgumentException(
+        throw new NotFoundException(
             sprintf('Alias (%s) is not being managed by the container', $alias)
         );
     }
@@ -173,7 +175,7 @@ class Container implements ContainerInterface
             return $this->definitions[$alias];
         }
 
-        throw new \InvalidArgumentException(
+        throw new NotFoundException(
             sprintf('Unable to extend alias (%s) as it is not being managed as a definition', $alias)
         );
     }
@@ -198,10 +200,10 @@ class Container implements ContainerInterface
      * Stack a backup container to be checked for services if it
      * cannot be resolved via this container.
      *
-     * @param  \League\Container\ImmutableContainerInterface $container
+     * @param  \Interop\Container\ContainerInterface $container
      * @return $this
      */
-    public function stack(ImmutableContainerInterface $container)
+    public function stack(InteropContainerInterface $container)
     {
         $this->stack[] = $container;
 

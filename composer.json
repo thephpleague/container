@@ -6,7 +6,9 @@
         "container",
         "dependency",
         "injection",
-        "di"
+        "di",
+        "service",
+        "provider"
     ],
     "homepage": "https://github.com/thephpleague/container",
     "license": "MIT",
@@ -14,15 +16,19 @@
         {
             "name": "Phil Bennett",
             "email": "philipobenito@gmail.com",
-            "homepage": "http://philipobenito.github.io",
+            "homepage": "http://www.philipobenito.com",
             "role": "Developer"
         }
     ],
     "require": {
-        "php" : ">=5.4.0"
+        "php": ">=5.4.0",
+        "container-interop/container-interop": "^1.1"
     },
     "require-dev": {
         "phpunit/phpunit" : "4.*"
+    },
+    "provide": {
+        "container-interop/container-interop-implementation": "^1.1"
     },
     "replace": {
         "orno/di": "~2.0"
