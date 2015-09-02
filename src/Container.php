@@ -25,6 +25,11 @@ class Container implements ContainerInterface
     protected $definitions = [];
 
     /**
+     * @var \League\Container\Definition\DefinitionInterface[]
+     */
+    protected $sharedDefinitions = [];
+
+    /**
      * @var \League\Container\Inflector\InflectorAggregateInterface
      */
     protected $inflectors;
@@ -79,6 +84,12 @@ class Container implements ContainerInterface
             return $this->inflectors->inflect($this->shared[$alias]);
         }
 
+        if ($this->hasSharedDefinition($alias)) {
+            $shared = $this->inflectors->inflect($this->sharedDefinitions[$alias]->build());
+            $this->shared[$alias] = $shared;
+            return $shared;
+        }
+
         if ($this->providers->provides($alias)) {
             $this->providers->register($alias);
         }
@@ -126,6 +137,17 @@ class Container implements ContainerInterface
     }
 
     /**
+     * Returns true if a definition is shared.
+     *
+     * @param string $alias
+     * @return boolean
+     */
+    protected function hasSharedDefinition($alias)
+    {
+        return (array_key_exists($alias, $this->sharedDefinitions));
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function add($alias, $concrete = null, $share = false)
@@ -137,7 +159,11 @@ class Container implements ContainerInterface
         $definition = $this->definitionFactory->getDefinition($alias, $concrete);
 
         if ($definition instanceof DefinitionInterface) {
-            $this->definitions[$alias] = $definition;
+            if ($share === false) {
+                $this->definitions[$alias] = $definition;
+            } else {
+                $this->sharedDefinitions[$alias] = $definition;
+            }
 
             return $definition;
         }
