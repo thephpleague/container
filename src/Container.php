@@ -80,7 +80,7 @@ class Container implements ContainerInterface
      */
     public function get($alias, array $args = [])
     {
-        if ($this->hasShared($alias)) {
+        if ($this->hasShared($alias, true)) {
             return $this->inflectors->inflect($this->shared[$alias]);
         }
 
@@ -114,10 +114,7 @@ class Container implements ContainerInterface
      */
     public function has($alias)
     {
-        if (array_key_exists($alias, $this->definitions)
-            || array_key_exists($alias, $this->sharedDefinitions)
-            || $this->hasShared($alias)
-        ) {
+        if (array_key_exists($alias, $this->definitions) || $this->hasShared($alias)) {
             return true;
         }
 
@@ -131,12 +128,15 @@ class Container implements ContainerInterface
     /**
      * Returns a boolean to determine if the container has a shared instance of an alias.
      *
-     * @param  string $alias
+     * @param  string  $alias
+     * @param  boolean $resolved
      * @return boolean
      */
-    public function hasShared($alias)
+    public function hasShared($alias, $resolved = false)
     {
-        return (array_key_exists($alias, $this->shared));
+        $shared = ($resolved === false) ? array_merge($this->shared, $this->sharedDefinitions) : $this->shared;
+
+        return (array_key_exists($alias, $shared));
     }
 
     /**
