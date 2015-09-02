@@ -2,6 +2,28 @@
 
 All Notable changes to `League\Container` will be documented in this file
 
+## 2.0.0
+
+### Added
+- Now implementation of the container-interop project.
+- `BootableServiceProviderInterface` for eagerly loaded service providers.
+- Delegate container functionality.
+- `RawArgument` to ensure scalars are not resolved from the container but seen as an argument.
+
+### Altered
+- Refactor of definition functionality.
+- `Container::share` replaces `singleton` functionality to improve understanding.
+- Auto wiring is now disabled by default.
+- Auto wiring abstracted to be a delegate container `ReflectionContainer` handling all reflection based functionality.
+- Inflection functionality abstracted to an aggregate.
+- Service provider functionality abstracted to an aggregate.
+- Much bloat removed.
+- `Container::call` now proxies to `ReflectionContainer::call` and handles argument resolution in a much more efficient way.
+
+### Removed
+- Ability to register invokables, this functionality added a layer of complexity too large for the problem it solved.
+- Container no longer accepts a configuration array, this functionality will now be provided by an external service provider package.
+
 ## 1.4.0
 
 ### Added
