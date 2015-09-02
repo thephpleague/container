@@ -7,9 +7,9 @@ interface ContainerInterface extends ImmutableContainerInterface
     /**
      * Add an item to the container.
      *
-     * @param  string|\League\Container\ServiceProvider\ServiceProviderInterface $alias
-     * @param  mixed|null                                                        $concrete
-     * @param  boolean                                                           $share
+     * @param  string     $alias
+     * @param  mixed|null $concrete
+     * @param  boolean    $share
      * @return \League\Container\Definition\DefinitionInterface
      */
     public function add($alias, $concrete = null, $share = false);

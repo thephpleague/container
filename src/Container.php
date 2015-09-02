@@ -212,9 +212,9 @@ class Container implements ContainerInterface
      * Returns true if service is registered in one of the backup containers.
      *
      * @param  string $alias
-     * @return bool
+     * @return boolean
      */
-    protected function hasInStack($alias)
+    public function hasInStack($alias)
     {
         foreach ($this->stack as $container) {
             if ($container->has($alias)) {
