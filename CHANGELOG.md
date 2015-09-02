@@ -2,6 +2,11 @@
 
 All Notable changes to `League\Container` will be documented in this file
 
+## 2.0.1
+
+### Fixed
+- Bug where shared definitions were not stored as shared.
+
 ## 2.0.0
 
 ### Added
