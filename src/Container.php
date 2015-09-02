@@ -40,9 +40,9 @@ class Container implements ContainerInterface
     protected $shared = [];
 
     /**
-     * @var \League\Container\ImmutableContainerInterface[]
+     * @var \Interop\Container\ContainerInterface[]
      */
-    protected $stack = [];
+    protected $delegates = [];
 
     /**
      * Constructor.
@@ -87,7 +87,7 @@ class Container implements ContainerInterface
             return $this->definitions[$alias]->build($args);
         }
 
-        if ($resolved = $this->getFromStack($alias, $args)) {
+        if ($resolved = $this->getFromDelegate($alias, $args)) {
             return $resolved;
         }
 
@@ -109,7 +109,7 @@ class Container implements ContainerInterface
             return true;
         }
 
-        return $this->hasInStack($alias);
+        return $this->hasInDelegate($alias);
     }
 
     /**
@@ -197,28 +197,28 @@ class Container implements ContainerInterface
     }
 
     /**
-     * Stack a backup container to be checked for services if it
+     * Delegate a backup container to be checked for services if it
      * cannot be resolved via this container.
      *
      * @param  \Interop\Container\ContainerInterface $container
      * @return $this
      */
-    public function stack(InteropContainerInterface $container)
+    public function delegate(InteropContainerInterface $container)
     {
-        $this->stack[] = $container;
+        $this->delegates[] = $container;
 
         return $this;
     }
 
     /**
-     * Returns true if service is registered in one of the backup containers.
+     * Returns true if service is registered in one of the delegated backup containers.
      *
      * @param  string $alias
      * @return boolean
      */
-    public function hasInStack($alias)
+    public function hasInDelegate($alias)
     {
-        foreach ($this->stack as $container) {
+        foreach ($this->delegates as $container) {
             if ($container->has($alias)) {
                 return true;
             }
@@ -228,15 +228,15 @@ class Container implements ContainerInterface
     }
 
     /**
-     * Attempt to get a service from the stack of backup containers.
+     * Attempt to get a service from the stack of delegated backup containers.
      *
      * @param  string $alias
      * @param  array  $args
      * @return mixed
      */
-    protected function getFromStack($alias, array $args = [])
+    protected function getFromDelegate($alias, array $args = [])
     {
-        foreach ($this->stack as $container) {
+        foreach ($this->delegates as $container) {
             if ($container->has($alias)) {
                 return $container->get($alias, $args);
             }

@@ -76,8 +76,8 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
 
         $container = new Container;
 
-        $container->stack($this->getImmutableContainerMock());
-        $container->stack($this->getImmutableContainerMock([
+        $container->delegate($this->getImmutableContainerMock());
+        $container->delegate($this->getImmutableContainerMock([
             $alias => 'bar',
         ]));
 
@@ -94,9 +94,9 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
 
         $container = new Container;
 
-        $container->stack($this->getImmutableContainerMock());
-        $container->stack($this->getImmutableContainerMock([
-            $alias => $item,
+        $container->delegate($this->getImmutableContainerMock());
+        $container->delegate($this->getImmutableContainerMock([
+            $alias => $item
         ]));
 
         $this->assertSame($item, $container->get($alias));

@@ -62,10 +62,11 @@ class ReflectionContainer implements
         }
 
         if (is_array($callable)) {
-            $reflection  = new ReflectionMethod($callable[0], $callable[1]);
-            $callable[0] = ($this->getContainer()->has($callable[0]))
-                         ? $this->getContainer()->get($callable[0])
-                         : new $callable[0];
+            $reflection = new ReflectionMethod($callable[0], $callable[1]);
+
+            if ($reflection->isStatic()) {
+                $callable[0] = null;
+            }
 
             return $reflection->invokeArgs($callable[0], $this->reflectArguments($reflection, $args));
         }

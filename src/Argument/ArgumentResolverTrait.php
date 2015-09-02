@@ -3,7 +3,8 @@
 namespace League\Container\Argument;
 
 use InvalidArgumentException;
-use Interop\Container\ContainerInterface as InteropContainerInterface;
+use League\Container\Exception\NotFoundException;
+use League\Container\ReflectionContainer;
 use ReflectionFunctionAbstract;
 use ReflectionParameter;
 
@@ -26,12 +27,13 @@ trait ArgumentResolverTrait
 
             $container = $this->getContainer();
 
-            if (is_null($container) && $this instanceof InteropContainerInterface) {
+            if (is_null($container) && $this instanceof ReflectionContainer) {
                 $container = $this;
             }
 
             if (! is_null($container) && $container->has($arg)) {
                 $arg = $container->get($arg);
+                continue;
             }
         }
 
@@ -59,7 +61,7 @@ trait ArgumentResolverTrait
                 return $param->getDefaultValue();
             }
 
-            throw new InvalidArgumentException(sprintf(
+            throw new NotFoundException(sprintf(
                 'Unable to resolve a value for parameter (%s) in the function/method (%s)',
                 $name,
                 $method->getName()

@@ -4,6 +4,7 @@ namespace League\Container\Test;
 
 use League\Container\ImmutableContainerInterface;
 use League\Container\ReflectionContainer;
+use League\Container\Test\Asset;
 
 class ReflectionContainerTest extends \PHPUnit_Framework_TestCase
 {
@@ -12,7 +13,7 @@ class ReflectionContainerTest extends \PHPUnit_Framework_TestCase
      */
     public function testHasReturnsTrueIfClassExists()
     {
-        $container = new ReflectionContainer();
+        $container = new ReflectionContainer;
 
         $this->assertTrue($container->has('League\Container\Test\Asset\Bar'));
     }
@@ -22,7 +23,7 @@ class ReflectionContainerTest extends \PHPUnit_Framework_TestCase
      */
     public function testHasReturnsFalseIfClassDoesNotExist()
     {
-        $container = new ReflectionContainer();
+        $container = new ReflectionContainer;
 
         $this->assertFalse($container->has('Foo\Bar\Baz'));
     }
@@ -34,7 +35,7 @@ class ReflectionContainerTest extends \PHPUnit_Framework_TestCase
     {
         $classWithoutConstructor = 'League\Container\Test\Asset\Bar';
 
-        $container = new ReflectionContainer();
+        $container = new ReflectionContainer;
 
         $this->assertInstanceOf($classWithoutConstructor, $container->get($classWithoutConstructor));
     }
@@ -47,7 +48,7 @@ class ReflectionContainerTest extends \PHPUnit_Framework_TestCase
         $classWithConstructor = 'League\Container\Test\Asset\Foo';
         $dependencyClass = 'League\Container\Test\Asset\Bar';
 
-        $container = new ReflectionContainer();
+        $container = new ReflectionContainer;
 
         $item = $container->get($classWithConstructor);
 
@@ -65,7 +66,7 @@ class ReflectionContainerTest extends \PHPUnit_Framework_TestCase
         $dependencyClass = 'League\Container\Test\Asset\Bar';
         $dependency = new $dependencyClass;
 
-        $container = new ReflectionContainer();
+        $container = new ReflectionContainer;
 
         $container->setContainer($this->getImmutableContainerMock([
             $dependencyClass => $dependency,
@@ -87,14 +88,81 @@ class ReflectionContainerTest extends \PHPUnit_Framework_TestCase
         $dependencyClass = 'League\Container\Test\Asset\Bar';
         $dependency = new $dependencyClass;
 
-        $container = new ReflectionContainer();
+        $container = new ReflectionContainer;
 
         $item = $container->get($classWithConstructor, [
-            'bar' => $dependency,
+            'bar' => $dependency
         ]);
 
         $this->assertInstanceOf($classWithConstructor, $item);
         $this->assertSame($dependency, $item->bar);
+    }
+
+    /**
+     * Asserts that an exception is thrown when attmpting to get a class that does not exist.
+     */
+    public function testThrowsWhenGettingNonExistentClass()
+    {
+        $this->setExpectedException('League\Container\Exception\NotFoundException');
+
+        $container = new ReflectionContainer;
+
+        $container->get('Whoooo');
+    }
+
+    /**
+     * Asserts that call reflects on a closure and injects arguments.
+     */
+    public function testCallReflectsOnClosureArguments()
+    {
+        $container = new ReflectionContainer;
+
+        $foo = $container->call(function (Asset\Foo $foo) {
+            return $foo;
+        });
+
+        $this->assertInstanceOf('League\Container\Test\Asset\Foo', $foo);
+        $this->assertInstanceOf('League\Container\Test\Asset\Bar', $foo->bar);
+    }
+
+    /**
+     * Asserts that call reflects on an instance method and injects arguments.
+     */
+    public function testCallReflectsOnInstanceMethodArguments()
+    {
+        $container = new ReflectionContainer;
+
+        $foo = new Asset\Foo;
+
+        $container->call([$foo, 'setBar']);
+
+        $this->assertInstanceOf('League\Container\Test\Asset\Foo', $foo);
+        $this->assertInstanceOf('League\Container\Test\Asset\Bar', $foo->bar);
+    }
+
+    /**
+     * Asserts that call reflects on a static method and injects arguments.
+     */
+    public function testCallReflectsOnStaticMethodArguments()
+    {
+        $container = new ReflectionContainer;
+
+        $container->call('League\Container\Test\Asset\Foo::staticSetBar');
+
+        $this->assertInstanceOf('League\Container\Test\Asset\Bar', Asset\Foo::$staticBar);
+        $this->assertEquals('hello world', Asset\Foo::$staticHello);
+    }
+
+    /**
+     * Asserts that exception is thrown when an argument cannot be resolved.
+     */
+    public function testThrowsWhenArgumentCannotBeResolved()
+    {
+        $this->setExpectedException('League\Container\Exception\NotFoundException');
+
+        $container = new ReflectionContainer;
+
+        $container->call([new Asset\Bar, 'setSomething']);
     }
 
     /**
@@ -110,8 +178,7 @@ class ReflectionContainerTest extends \PHPUnit_Framework_TestCase
             ->method('has')
             ->willReturnCallback(function ($alias) use ($items) {
                 return array_key_exists($alias, $items);
-            })
-        ;
+            });
 
         $container
             ->expects($this->any())
@@ -120,8 +187,7 @@ class ReflectionContainerTest extends \PHPUnit_Framework_TestCase
                 if (array_key_exists($alias, $items)) {
                     return $items[$alias];
                 }
-            })
-        ;
+            });
 
         return $container;
     }
