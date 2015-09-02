@@ -2,7 +2,6 @@
 
 namespace League\Container\Argument;
 
-use InvalidArgumentException;
 use League\Container\Exception\NotFoundException;
 use League\Container\ReflectionContainer;
 use ReflectionFunctionAbstract;
