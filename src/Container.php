@@ -84,7 +84,7 @@ class Container implements ContainerInterface
             return $this->inflectors->inflect($this->shared[$alias]);
         }
 
-        if ($this->hasSharedDefinition($alias)) {
+        if (array_key_exists($alias, $this->sharedDefinitions)) {
             $shared = $this->inflectors->inflect($this->sharedDefinitions[$alias]->build());
             $this->shared[$alias] = $shared;
             return $shared;
@@ -114,7 +114,10 @@ class Container implements ContainerInterface
      */
     public function has($alias)
     {
-        if (array_key_exists($alias, $this->definitions) || $this->hasShared($alias)) {
+        if (array_key_exists($alias, $this->definitions)
+            || array_key_exists($alias, $this->sharedDefinitions)
+            || $this->hasShared($alias)
+        ) {
             return true;
         }
 
@@ -134,17 +137,6 @@ class Container implements ContainerInterface
     public function hasShared($alias)
     {
         return (array_key_exists($alias, $this->shared));
-    }
-
-    /**
-     * Returns true if a definition is shared.
-     *
-     * @param string $alias
-     * @return boolean
-     */
-    protected function hasSharedDefinition($alias)
-    {
-        return (array_key_exists($alias, $this->sharedDefinitions));
     }
 
     /**
