@@ -3,7 +3,6 @@
 namespace League\Container\Argument;
 
 use InvalidArgumentException;
-use League\Container\ContainerInterface;
 use League\Container\ReflectionContainer;
 use ReflectionFunctionAbstract;
 use ReflectionParameter;
