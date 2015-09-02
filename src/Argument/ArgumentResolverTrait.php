@@ -3,6 +3,7 @@
 namespace League\Container\Argument;
 
 use InvalidArgumentException;
+use League\Container\ContainerInterface;
 use League\Container\ReflectionContainer;
 use ReflectionFunctionAbstract;
 use ReflectionParameter;
@@ -25,7 +26,8 @@ trait ArgumentResolverTrait
             }
 
             $container = $this->getContainer();
-            if (!$container && $this instanceof ReflectionContainer) {
+
+            if (! $container && $this instanceof ReflectionContainer) {
                 $container = $this;
             }
 
@@ -69,7 +71,7 @@ trait ArgumentResolverTrait
     }
 
     /**
-     * {@inheritdoc}
+     * @return ContainerInterface
      */
     abstract public function getContainer();
 }
