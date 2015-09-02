@@ -11,6 +11,10 @@ The most performant way to use Container is to use factory closures/anonymous fu
 Consider an object `Foo` that depends on another object `Bar`. The following will return an instance of `Foo` containing a member `bar` that contains an instance of `Bar`.
 
 ~~~ php
+<?php
+
+namespace Acme;
+
 class Foo
 {
     public $bar;
@@ -20,18 +24,31 @@ class Foo
         $this->bar = $bar;
     }
 }
+~~~
+
+~~~ php
+<?php
+
+namespace Acme;
 
 class Bar
 {
     // ..
 }
+~~~
+
+~~~ php
+<?php
 
 $container = new League\Container\Container;
 
 $container->add('foo', function() {
-    $bar = new Bar;
-    return new Foo($bar);
+    $bar = new Acme\Bar;
+    return new Acme\Foo($bar);
 });
 
 $foo = $container->get('foo');
+
+var_dump($foo instanceof Acme\Foo); // true
+var_dump($foo->bar instanceof Acme\Bar); // true
 ~~~
