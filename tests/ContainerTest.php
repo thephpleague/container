@@ -3,6 +3,7 @@
 namespace League\Container\Test;
 
 use League\Container\Container;
+use League\Container\ImmutableContainerInterface;
 
 class ContainerTest extends \PHPUnit_Framework_TestCase
 {
@@ -64,5 +65,69 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $container = new Container;
 
         $container->get('nothing');
+    }
+
+    /**
+     * Asserts that container iterates over stacked containers to determine if alias is registered in one of them.
+     */
+    public function testHasChecksWithStack()
+    {
+        $alias = 'foo';
+
+        $container = new Container;
+
+        $container->stack($this->getImmutableContainerMock());
+        $container->stack($this->getImmutableContainerMock([
+            $alias => 'bar',
+        ]));
+
+        $this->assertTrue($container->has($alias));
+    }
+
+    /**
+     * Asserts that container iterates over stacked containers to fetch item from stack.
+     */
+    public function testGetReturnsFromStack()
+    {
+        $alias = 'foo';
+        $item = 'bar';
+
+        $container = new Container;
+
+        $container->stack($this->getImmutableContainerMock());
+        $container->stack($this->getImmutableContainerMock([
+            $alias => $item,
+        ]));
+
+        $this->assertSame($item, $container->get($alias));
+    }
+
+    /**
+     * @param array $items
+     * @return \PHPUnit_Framework_MockObject_MockObject|ImmutableContainerInterface
+     */
+    private function getImmutableContainerMock(array $items = [])
+    {
+        $container = $this->getMockBuilder('League\Container\ImmutableContainerInterface')->getMock();
+
+        $container
+            ->expects($this->any())
+            ->method('has')
+            ->willReturnCallback(function ($alias) use ($items) {
+                return array_key_exists($alias, $items);
+            })
+        ;
+
+        $container
+            ->expects($this->any())
+            ->method('get')
+            ->willReturnCallback(function ($alias) use ($items) {
+                if (array_key_exists($alias, $items)) {
+                    return $items[$alias];
+                }
+            })
+        ;
+
+        return $container;
     }
 }
