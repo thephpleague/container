@@ -4,6 +4,7 @@ namespace League\Container\Test;
 
 use League\Container\Container;
 use League\Container\ImmutableContainerInterface;
+use League\Container\Test\Asset\ServiceProviderFake;
 
 class ContainerTest extends \PHPUnit_Framework_TestCase
 {
@@ -134,6 +135,20 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         });
 
         $this->assertTrue($container->has($alias));
+    }
+
+    /**
+     * Asserts that a shared service provided by a service provider can be fetched.
+     */
+    public function testGetReturnsSharedItemFromServiceProvider()
+    {
+        $alias = 'foo';
+        $item = new \stdClass;
+
+        $container = new Container;
+        $container->addServiceProvider(new Asset\SharedServiceProviderFake($alias, $item));
+
+        $this->assertSame($item, $container->get($alias));
     }
 
     /**
