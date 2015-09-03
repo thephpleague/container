@@ -2,6 +2,11 @@
 
 All Notable changes to `League\Container` will be documented in this file
 
+## 2.0.2
+
+### Fixed
+- Bug introduced in 2.0.1 where shared definitions registered via a service provider would never be returned as shared.
+
 ## 2.0.1
 
 ### Fixed
