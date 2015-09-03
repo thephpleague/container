@@ -25,6 +25,11 @@ class Container implements ContainerInterface
     protected $definitions = [];
 
     /**
+     * @var \League\Container\Definition\DefinitionInterface[]
+     */
+    protected $sharedDefinitions = [];
+
+    /**
      * @var \League\Container\Inflector\InflectorAggregateInterface
      */
     protected $inflectors;
@@ -75,20 +80,29 @@ class Container implements ContainerInterface
      */
     public function get($alias, array $args = [])
     {
-        if ($this->hasShared($alias)) {
-            return $this->shared[$alias];
+        if ($this->hasShared($alias, true)) {
+            return $this->inflectors->inflect($this->shared[$alias]);
+        }
+
+        if (array_key_exists($alias, $this->sharedDefinitions)) {
+            $shared = $this->inflectors->inflect($this->sharedDefinitions[$alias]->build());
+            $this->shared[$alias] = $shared;
+            return $shared;
+        }
+
+        if (array_key_exists($alias, $this->definitions)) {
+            return $this->inflectors->inflect(
+                $this->definitions[$alias]->build($args)
+            );
         }
 
         if ($this->providers->provides($alias)) {
             $this->providers->register($alias);
-        }
-
-        if (array_key_exists($alias, $this->definitions)) {
-            return $this->definitions[$alias]->build($args);
+            return $this->get($alias, $args);
         }
 
         if ($resolved = $this->getFromDelegate($alias, $args)) {
-            return $resolved;
+            return $this->inflectors->inflect($resolved);
         }
 
         throw new NotFoundException(
@@ -115,12 +129,15 @@ class Container implements ContainerInterface
     /**
      * Returns a boolean to determine if the container has a shared instance of an alias.
      *
-     * @param  string $alias
+     * @param  string  $alias
+     * @param  boolean $resolved
      * @return boolean
      */
-    public function hasShared($alias)
+    public function hasShared($alias, $resolved = false)
     {
-        return (array_key_exists($alias, $this->shared));
+        $shared = ($resolved === false) ? array_merge($this->shared, $this->sharedDefinitions) : $this->shared;
+
+        return (array_key_exists($alias, $shared));
     }
 
     /**
@@ -135,7 +152,11 @@ class Container implements ContainerInterface
         $definition = $this->definitionFactory->getDefinition($alias, $concrete);
 
         if ($definition instanceof DefinitionInterface) {
-            $this->definitions[$alias] = $definition;
+            if ($share === false) {
+                $this->definitions[$alias] = $definition;
+            } else {
+                $this->sharedDefinitions[$alias] = $definition;
+            }
 
             return $definition;
         }
