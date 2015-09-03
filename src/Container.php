@@ -90,15 +90,15 @@ class Container implements ContainerInterface
             return $shared;
         }
 
-        if ($this->providers->provides($alias)) {
-            $this->providers->register($alias);
-            return $this->get($alias, $args);
-        }
-
         if (array_key_exists($alias, $this->definitions)) {
             return $this->inflectors->inflect(
                 $this->definitions[$alias]->build($args)
             );
+        }
+
+        if ($this->providers->provides($alias)) {
+            $this->providers->register($alias);
+            return $this->get($alias, $args);
         }
 
         if ($resolved = $this->getFromDelegate($alias, $args)) {
