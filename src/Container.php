@@ -228,6 +228,10 @@ class Container implements ContainerInterface
     {
         $this->delegates[] = $container;
 
+        if ($container instanceof ImmutableContainerAwareInterface) {
+            $container->setContainer($this);
+        }
+
         return $this;
     }
 
