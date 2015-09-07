@@ -2,6 +2,12 @@
 
 All Notable changes to `League\Container` will be documented in this file
 
+## 2.0.3
+
+### Fixed
+- Bug where delegating container was not passed to delegate when needed.
+- Bug where `Container::extend` would not return a shared definition to extend.
+
 ## 2.0.2
 
 ### Fixed
