@@ -4,6 +4,7 @@ namespace League\Container\Test;
 
 use League\Container\Container;
 use League\Container\ImmutableContainerInterface;
+use League\Container\ReflectionContainer;
 use League\Container\Test\Asset\ServiceProviderFake;
 
 class ContainerTest extends \PHPUnit_Framework_TestCase
@@ -149,6 +150,27 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $container->addServiceProvider(new Asset\SharedServiceProviderFake($alias, $item));
 
         $this->assertSame($item, $container->get($alias));
+    }
+
+    /**
+     * Asserts that the container to which is delegated can resolve items from the delegating container.
+     */
+    public function testDelegateSharesContainer()
+    {
+        $container = new Container;
+
+        $container->delegate(new ReflectionContainer);
+
+        $container->share('League\Container\Test\Asset\Bar', function () {
+            $bar = new Asset\Bar();
+            $bar->setSomething('bar');
+            return $bar;
+        });
+
+        $bar = $container->get('League\Container\Test\Asset\Bar');
+        $foo = $container->get('League\Container\Test\Asset\Foo');
+
+        $this->assertSame($foo->bar, $bar);
     }
 
     /**
