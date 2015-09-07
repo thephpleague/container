@@ -196,6 +196,10 @@ class Container implements ContainerInterface
             return $this->definitions[$alias];
         }
 
+        if (array_key_exists($alias, $this->sharedDefinitions)) {
+            return $this->sharedDefinitions[$alias];
+        }
+
         throw new NotFoundException(
             sprintf('Unable to extend alias (%s) as it is not being managed as a definition', $alias)
         );

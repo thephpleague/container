@@ -174,6 +174,39 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Asserts that the extend method returns a definition.
+     */
+    public function testExtendReturnsDefinitions()
+    {
+        $sp = $this->getMock('League\Container\ServiceProvider\ServiceProviderAggregateInterface');
+
+        $sp->expects($this->at(0))->method('setContainer')->will($this->returnSelf());
+        $sp->expects($this->at(1))->method('provides')->with($this->equalTo('stdClass'))->will($this->returnValue(true));
+        $sp->expects($this->at(2))->method('register')->with($this->equalTo('stdClass'));
+        $sp->expects($this->at(3))->method('provides')->with($this->equalTo('closure'))->will($this->returnValue(false));
+
+        $container = new Container($sp);
+
+        $container->add('stdClass');
+        $container->share('closure', function () {});
+
+        $this->assertInstanceOf('League\Container\Definition\ClassDefinition', $container->extend('stdClass'));
+        $this->assertInstanceOf('League\Container\Definition\CallableDefinition', $container->extend('closure'));
+    }
+
+    /**
+     * Asserts that an exception is thrown when the extend method cannot find a definition to extend.
+     */
+    public function testExtendThrowsWhenCannotFindDefinition()
+    {
+        $this->setExpectedException('League\Container\Exception\NotFoundException');
+
+        $container = new Container;
+
+        $container->extend('something');
+    }
+
+    /**
      * @param array $items
      * @return \PHPUnit_Framework_MockObject_MockObject|ImmutableContainerInterface
      */
