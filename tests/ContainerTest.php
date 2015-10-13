@@ -174,6 +174,38 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Asserts that the container to which is delegated will first resolve items from the delegating container.
+     */
+    public function testDelegatedContainerFetchesFromDelegatingContainerFirst()
+    {
+        $delegate = new Container;
+
+        $delegate->share('League\Container\Test\Asset\Foo', function () use ($delegate) {
+            $bar = $delegate->get('League\Container\Test\Asset\Bar');
+
+            return new Asset\Foo($bar);
+        });
+
+        $delegate->share('League\Container\Test\Asset\Bar', function () {
+            return new Asset\Bar();
+        });
+
+        $container = new Container;
+
+        $container->delegate($delegate);
+
+        $bar = new Asset\Bar();
+
+        $container->share('League\Container\Test\Asset\Bar', function () use ($bar) {
+            return $bar;
+        });
+
+        $foo = $container->get('League\Container\Test\Asset\Foo');
+
+        $this->assertSame($foo->bar, $bar);
+    }
+
+    /**
      * Asserts that the extend method returns a definition.
      */
     public function testExtendReturnsDefinitions()
