@@ -123,6 +123,21 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Asserts that fetching a shared item can resolve it using auto wiring.
+     */
+    public function testGetSharedItemResolvesItUsingAutoWiring()
+    {
+        $container = new Container;
+        $container->delegate(new ReflectionContainer);
+
+        $container->share('League\Container\Test\Asset\Foo');
+
+        $foo = $container->get('League\Container\Test\Asset\Foo');
+
+        $this->assertInstanceOf('League\Container\Test\Asset\Bar', $foo->bar);
+    }
+
+    /**
      * Asserts that asking container for an item that has a shared definition returns true.
      */
     public function testHasReturnsTrueForSharedDefinition()
