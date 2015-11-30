@@ -34,7 +34,7 @@ $container->add('service', 'Acme\Service\SomeService');
 $service1 = $container->get('service');
 $service2 = $container->get('service');
 
-var_dump($service instanceof Acme\Service\SomeService); // true
+var_dump($service1 instanceof Acme\Service\SomeService); // true
 var_dump($service1 === $service2); // false
 ~~~
 
@@ -51,7 +51,7 @@ $container->add('Acme\Service\SomeService');
 $service1 = $container->get('Acme\Service\SomeService');
 $service2 = $container->get('Acme\Service\SomeService');
 
-var_dump($service instanceof Acme\Service\SomeService); // true
+var_dump($service1 instanceof Acme\Service\SomeService); // true
 var_dump($service1 === $service2); // false
 ~~~
 
@@ -70,7 +70,7 @@ $container->share('Acme\Service\SomeService');
 $service1 = $container->get('Acme\Service\SomeService');
 $service2 = $container->get('Acme\Service\SomeService');
 
-var_dump($service instanceof Acme\Service\SomeService); // true
+var_dump($service1 instanceof Acme\Service\SomeService); // true
 var_dump($service1 === $service2); // true
 ~~~
 
@@ -87,6 +87,6 @@ $container->add('service', new Acme\Service\SomeService);
 $service1 = $container->get('Acme\Service\SomeService');
 $service2 = $container->get('Acme\Service\SomeService');
 
-var_dump($service instanceof Acme\Service\SomeService); // true
+var_dump($service1 instanceof Acme\Service\SomeService); // true
 var_dump($service1 === $service2); // true
 ~~~
