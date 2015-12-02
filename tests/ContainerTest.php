@@ -207,6 +207,39 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Assert that items in container can be grouped by tags.
+     */
+    public function testTagged()
+    {
+        $container = new Container();
+
+        $container->add('stdClass', function() {
+            return new \stdClass();
+        });
+        $container->add('container', $container);
+        $container->add('testCase', $this);
+
+        $container->tag('test-tag', ['stdClass', 'container', 'testCase']);
+
+        $tagged = $container->tagged('test-tag');
+
+        $this->assertInternalType('array', $tagged, 'Container::tagged must return an array');
+        $this->assertEquals(3, count($tagged));
+
+        $keys = array_keys($tagged);
+
+        $this->assertEquals('stdClass', $keys[0]);
+        $this->assertEquals('container', $keys[1]);
+        $this->assertEquals('testCase', $keys[2]);
+
+        $this->assertInstanceOf('stdClass', $tagged['stdClass']);
+        $this->assertInstanceOf(get_class($container), $tagged['container']);
+        $this->assertInstanceOf(get_class($this), $tagged['testCase']);
+
+
+    }
+
+    /**
      * @param array $items
      * @return \PHPUnit_Framework_MockObject_MockObject|ImmutableContainerInterface
      */

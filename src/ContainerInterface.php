@@ -56,4 +56,21 @@ interface ContainerInterface extends ImmutableContainerInterface
      * @return mixed
      */
     public function call(callable $callable, array $args = []);
+
+    /**
+     * Group items by tag.
+     *
+     * @param string $tag
+     * @param mixed|string|array$aliases
+     * @return void
+     */
+    public function tag($tag, $aliases);
+
+    /**
+     * Get items grouped by tag.
+     *
+     * @param string $tag
+     * @return array
+     */
+    public function tagged($tag);
 }

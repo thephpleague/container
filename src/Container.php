@@ -50,6 +50,11 @@ class Container implements ContainerInterface
     protected $delegates = [];
 
     /**
+     * @var array
+     */
+    protected $tags = [];
+
+    /**
      * Constructor.
      *
      * @param \League\Container\ServiceProvider\ServiceProviderAggregateInterface|null $providers
@@ -108,6 +113,32 @@ class Container implements ContainerInterface
         throw new NotFoundException(
             sprintf('Alias (%s) is not being managed by the container', $alias)
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function tag($tag, $aliases)
+    {
+        foreach ((array) $aliases as $alias) {
+            $this->tags[$tag][] = $alias;
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function tagged($tag, array $args = [])
+    {
+        $result = [];
+
+        if (isset($this->tags[$tag])) {
+            foreach ($this->tags[$tag] as $alias) {
+                $result[$alias] = $this->get($alias, $args);
+            }
+        }
+
+        return $result;
     }
 
     /**
