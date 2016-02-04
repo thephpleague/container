@@ -34,6 +34,11 @@ trait ArgumentResolverTrait
                 $arg = $container->get($arg);
                 continue;
             }
+            
+            if (strpos($arg, '@') === 0) { // Ignore withMethodCall() "@arg" arguments
+                $arg = ltrim($arg, '@');
+            }
+            
         }
 
         return $arguments;
