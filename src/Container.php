@@ -80,25 +80,15 @@ class Container implements ContainerInterface
      */
     public function get($alias, array $args = [])
     {
-        if ($this->hasShared($alias, true)) {
-            return $this->inflectors->inflect($this->shared[$alias]);
-        }
+        $service = $this->getFromThisContainer($alias, $args);
 
-        if (array_key_exists($alias, $this->sharedDefinitions)) {
-            $shared = $this->inflectors->inflect($this->sharedDefinitions[$alias]->build());
-            $this->shared[$alias] = $shared;
-            return $shared;
-        }
-
-        if (array_key_exists($alias, $this->definitions)) {
-            return $this->inflectors->inflect(
-                $this->definitions[$alias]->build($args)
-            );
-        }
-
-        if ($this->providers->provides($alias)) {
+        if (!$service && $this->providers->provides($alias)) {
             $this->providers->register($alias);
-            return $this->get($alias, $args);
+            $service = $this->getFromThisContainer($alias, $args);
+        }
+
+        if ($service) {
+            return $service;
         }
 
         if ($resolved = $this->getFromDelegate($alias, $args)) {
@@ -271,6 +261,32 @@ class Container implements ContainerInterface
             }
 
             continue;
+        }
+
+        return false;
+    }
+
+    /**
+     * Get a service that has been registered in this container.
+     *
+     * @return mixed Entry|false.
+     */
+    protected function getFromThisContainer($alias, array $args = [])
+    {
+        if ($this->hasShared($alias, true)) {
+            return $this->inflectors->inflect($this->shared[$alias]);
+        }
+
+        if (array_key_exists($alias, $this->sharedDefinitions)) {
+            $shared = $this->inflectors->inflect($this->sharedDefinitions[$alias]->build());
+            $this->shared[$alias] = $shared;
+            return $shared;
+        }
+
+        if (array_key_exists($alias, $this->definitions)) {
+            return $this->inflectors->inflect(
+                $this->definitions[$alias]->build($args)
+            );
         }
 
         return false;
