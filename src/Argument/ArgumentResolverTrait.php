@@ -32,9 +32,11 @@ trait ArgumentResolverTrait
 
             if (! is_null($container) && $container->has($arg)) {
                 $arg = $container->get($arg);
+
                 if ($arg instanceof RawArgumentInterface) {
                     $arg = $arg->getValue();
                 }
+
                 continue;
             }
         }

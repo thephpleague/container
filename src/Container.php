@@ -82,12 +82,12 @@ class Container implements ContainerInterface
     {
         $service = $this->getFromThisContainer($alias, $args);
 
-        if (!$service && $this->providers->provides($alias)) {
+        if ($service === false && $this->providers->provides($alias)) {
             $this->providers->register($alias);
             $service = $this->getFromThisContainer($alias, $args);
         }
 
-        if ($service) {
+        if ($service !== false) {
             return $service;
         }
 
@@ -269,7 +269,9 @@ class Container implements ContainerInterface
     /**
      * Get a service that has been registered in this container.
      *
-     * @return mixed Entry|false.
+     * @param  string $alias
+     * @param  array $args
+     * @return mixed
      */
     protected function getFromThisContainer($alias, array $args = [])
     {

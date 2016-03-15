@@ -115,6 +115,7 @@ class ClassDefinitionTest extends \PHPUnit_Framework_TestCase
             ['false', true],
             ['null', true],
         ]));
+
         $container->method('get')->will($this->returnValueMap([
             ['string', new RawArgument('some_string')],
             ['array', new RawArgument(['arr_with_key'])],

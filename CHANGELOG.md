@@ -2,6 +2,14 @@
 
 All Notable changes to `League\Container` will be documented in this file
 
+## 2.1.0
+
+### Added
+- Allow resolving of `RawArgument` objects as first class dependencies.
+
+### Changed
+- Unnecessary recursion removed from `Container::get`.
+
 ## 2.0.3
 
 ### Fixed
