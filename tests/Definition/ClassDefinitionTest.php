@@ -102,6 +102,46 @@ class ClassDefinitionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Asserts that a definition can build a class and inject scalar dependencies as raw argument.
+     */
+    public function testDefinitionBuildsClassAndInjectsScalarDependenciesAsRawArgumentFromContainer()
+    {
+        $container  = $this->getMock('League\Container\ImmutableContainerInterface');
+
+        $container->method('has')->will($this->returnValueMap([
+            ['string', true],
+            ['array', true],
+            ['answer', true],
+            ['false', true],
+            ['null', true],
+        ]));
+        $container->method('get')->will($this->returnValueMap([
+            ['string', new RawArgument('some_string')],
+            ['array', new RawArgument(['arr_with_key'])],
+            ['answer', new RawArgument(42)],
+            ['false', new RawArgument(false)],
+            ['null', new RawArgument(null)],
+        ]));
+
+        $definition = (new ClassDefinition('foo', 'League\Container\Test\Asset\FooWithScalarResolvedDependency'))->setContainer($container);
+
+        $definition->withArgument('string')
+                   ->withArgument('array')
+                   ->withArgument('answer')
+                   ->withArgument('false')
+                   ->withArgument('null');
+
+        $foo = $definition->build();
+
+        $this->assertInstanceOf('League\Container\Test\Asset\FooWithScalarResolvedDependency', $foo);
+        $this->assertSame('some_string', $foo->stringVal);
+        $this->assertSame(['arr_with_key'], $foo->arrayVal);
+        $this->assertSame(42, $foo->integerVal);
+        $this->assertFalse($foo->booleanVal);
+        $this->assertSame(null, $foo->nullVal);
+    }
+
+    /**
      * Asserts that a definition can build a class and inject scalar dependencies.
      */
     public function testDefinitionBuildsClassAndInjectsScalarDependencies()
