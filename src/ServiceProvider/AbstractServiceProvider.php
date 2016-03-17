@@ -24,4 +24,12 @@ abstract class AbstractServiceProvider implements ServiceProviderInterface
 
         return $this->provides;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function signature()
+    {
+        return get_class($this);
+    }
 }

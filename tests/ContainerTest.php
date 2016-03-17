@@ -153,6 +153,51 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Asserts that the same service provider class cannot be used to
+     * register two different sets of services.
+     */
+    public function testSameServiceProviderClassCannotBeUsedTwice()
+    {
+        $alias = 'foo';
+        $item = new \stdClass;
+
+        $alias2 = 'bar';
+        $item2 = new \stdClass;
+
+        $container = new Container;
+        $container->addServiceProvider(new Asset\SharedServiceProviderFake($alias, $item));
+        $container->addServiceProvider(new Asset\SharedServiceProviderFake($alias2, $item2));
+
+        $this->assertSame($item, $container->get($alias));
+
+        $this->setExpectedException('League\Container\Exception\NotFoundException');
+
+        $container->get($alias2);
+    }
+
+    /**
+     * Asserts that the same service provider class cannot be used to
+     * register two different sets of services.
+     */
+    public function testSameServiceProviderClassCanBeUsedTwiceWithDifferentSignatures()
+    {
+        $alias = 'foo';
+        $item = new \stdClass;
+        $signature1 = 'foo';
+
+        $alias2 = 'bar';
+        $item2 = new \stdClass;
+        $signature2 = 'bar';
+
+        $container = new Container;
+        $container->addServiceProvider(new Asset\SharedServiceProviderFake($alias, $item, $signature1));
+        $container->addServiceProvider(new Asset\SharedServiceProviderFake($alias2, $item2, $signature2));
+
+        $this->assertSame($item, $container->get($alias));
+        $this->assertSame($item2, $container->get($alias2));
+    }
+
+    /**
      * Asserts that the container to which is delegated can resolve items from the delegating container.
      */
     public function testDelegateSharesContainer()

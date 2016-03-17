@@ -17,15 +17,21 @@ class SharedServiceProviderFake extends AbstractServiceProvider
     private $item;
 
     /**
+     * @var string
+     */
+    private $signature;
+
+    /**
      * @param string $alias
      * @param mixed $item
      */
-    public function __construct($alias, $item)
+    public function __construct($alias, $item, $signature = false)
     {
         $this->alias = $alias;
         $this->item = $item;
 
         $this->provides[] = $alias;
+        $this->signature = $signature ?: get_class($this);
     }
 
     public function register()
@@ -35,5 +41,10 @@ class SharedServiceProviderFake extends AbstractServiceProvider
         });
 
         return true;
+    }
+
+    public function signature()
+    {
+        return $this->signature;
     }
 }
