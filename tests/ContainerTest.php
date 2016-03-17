@@ -176,8 +176,9 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Asserts that the same service provider class cannot be used to
-     * register two different sets of services.
+     * Asserts that the same service provider class can be used to
+     * register two different sets of services when it provides its
+     * own unique signature.
      */
     public function testSameServiceProviderClassCanBeUsedTwiceWithDifferentSignatures()
     {
@@ -190,8 +191,8 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $signature2 = 'bar';
 
         $container = new Container;
-        $container->addServiceProvider(new Asset\SharedServiceProviderFake($alias, $item, $signature1));
-        $container->addServiceProvider(new Asset\SharedServiceProviderFake($alias2, $item2, $signature2));
+        $container->addServiceProvider(new Asset\SharedServiceProviderWithSignatureFake($alias, $item, $signature1));
+        $container->addServiceProvider(new Asset\SharedServiceProviderWithSignatureFake($alias2, $item2, $signature2));
 
         $this->assertSame($item, $container->get($alias));
         $this->assertSame($item2, $container->get($alias2));
