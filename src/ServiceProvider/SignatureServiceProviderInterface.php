@@ -2,8 +2,6 @@
 
 namespace League\Container\ServiceProvider;
 
-use League\Container\ContainerAwareInterface;
-
 interface SignatureServiceProviderInterface
 {
     /**
