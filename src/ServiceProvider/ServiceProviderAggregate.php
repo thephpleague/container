@@ -69,11 +69,11 @@ class ServiceProviderAggregate implements ServiceProviderAggregateInterface
             );
         }
 
-        $provider = $this->providers[$service];
-
+        $provider  = $this->providers[$service];
         $signature = get_class($provider);
-        if ($provider instanceof ServiceProviderSignatureInterface) {
-            $signature = $provider->signature();
+
+        if ($provider instanceof SignatureServiceProviderInterface) {
+            $signature = $provider->getSignature();
         }
 
         // ensure that the provider hasn't already been invoked by any other service request

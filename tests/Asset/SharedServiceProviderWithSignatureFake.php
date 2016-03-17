@@ -2,25 +2,20 @@
 
 namespace League\Container\Test\Asset;
 
-use League\Container\ServiceProvider\AbstractServiceProvider;
-use League\Container\ServiceProvider\ServiceProviderSignatureInterface;
+use League\Container\ServiceProvider\AbstractSignatureServiceProvider;
+use League\Container\ServiceProvider\SignatureServiceProviderInterface;
 
-class SharedServiceProviderWithSignatureFake extends AbstractServiceProvider implements ServiceProviderSignatureInterface
+class SharedServiceProviderWithSignatureFake extends AbstractSignatureServiceProvider implements SignatureServiceProviderInterface
 {
     /**
      * @var string
      */
-    private $alias;
+    protected $alias;
 
     /**
      * @var mixed
      */
-    private $item;
-
-    /**
-     * @var string
-     */
-    private $signature;
+    protected $item;
 
     /**
      * @param string $alias
@@ -32,7 +27,8 @@ class SharedServiceProviderWithSignatureFake extends AbstractServiceProvider imp
         $this->item = $item;
 
         $this->provides[] = $alias;
-        $this->signature = $signature;
+
+        $this->withSignature($signature);
     }
 
     public function register()
@@ -42,10 +38,5 @@ class SharedServiceProviderWithSignatureFake extends AbstractServiceProvider imp
         });
 
         return true;
-    }
-
-    public function signature()
-    {
-        return $this->signature;
     }
 }

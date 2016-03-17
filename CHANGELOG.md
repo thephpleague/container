@@ -2,6 +2,11 @@
 
 All Notable changes to `League\Container` will be documented in this file
 
+## 2.2.0
+
+### Changed
+- Service providers can now be added multiple times by giving them a signature.
+
 ## 2.1.0
 
 ### Added
