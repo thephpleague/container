@@ -25,8 +25,8 @@ interface ServiceProviderAggregateInterface extends ContainerAwareInterface
     /**
      * Invokes the register method of a provider that provides a specific service.
      *
-     * @param  string $provider
+     * @param  string $service
      * @return void
      */
-    public function register($provider);
+    public function register($service);
 }
