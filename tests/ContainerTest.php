@@ -5,7 +5,6 @@ namespace League\Container\Test;
 use League\Container\Container;
 use League\Container\ImmutableContainerInterface;
 use League\Container\ReflectionContainer;
-use League\Container\Test\Asset\ServiceProviderFake;
 
 class ContainerTest extends \PHPUnit_Framework_TestCase
 {
