@@ -166,6 +166,16 @@ class ReflectionContainerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Tests the support for __invokable/callable classes for the ReflectionContainer::call method.
+     */
+    public function testInvokableClass()
+    {
+        $container = new ReflectionContainer;
+
+        $container->call(new Asset\FooWithNamedConstructor, [new Asset\Bar()]);
+    }
+
+    /**
      * @param array $items
      * @return \PHPUnit_Framework_MockObject_MockObject|ImmutableContainerInterface
      */
