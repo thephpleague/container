@@ -71,6 +71,12 @@ class ReflectionContainer implements
             return $reflection->invokeArgs($callable[0], $this->reflectArguments($reflection, $args));
         }
 
+        if (is_object($callable)) {
+            $reflection = new ReflectionMethod($callable, '__invoke');
+
+            return $reflection->invokeArgs($callable, $this->reflectArguments($reflection, $args));
+        }
+
         $reflection = new ReflectionFunction($callable);
 
         return $reflection->invokeArgs($this->reflectArguments($reflection, $args));
