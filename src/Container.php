@@ -280,7 +280,7 @@ class Container implements ContainerInterface
         }
 
         if (array_key_exists($alias, $this->sharedDefinitions)) {
-            $shared = $this->inflectors->inflect($this->sharedDefinitions[$alias]->build());
+            $shared = $this->inflectors->inflect($this->sharedDefinitions[$alias]->build($args));
             $this->shared[$alias] = $shared;
             return $shared;
         }
