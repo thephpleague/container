@@ -23,6 +23,6 @@ class DefinitionFactory implements DefinitionFactoryInterface
 
         // if the item is not defineable we just return the value to be stored
         // in the container as an arbitrary value/instance
-        return $concrete;
+        return new ConcreteDefinition($alias, $concrete);
     }
 }

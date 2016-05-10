@@ -59,15 +59,15 @@ class DefinitionFactoryTest extends \PHPUnit_Framework_TestCase
 
         // neither
         $str = 'some_string';
-        $this->assertSame($str, $factory->getDefinition('foo', $str, $container));
+        $this->assertSame($str, $factory->getDefinition('foo', $str, $container)->build());
 
         $arr = ['some_array'];
-        $this->assertSame($arr, $factory->getDefinition('foo', $arr, $container));
+        $this->assertSame($arr, $factory->getDefinition('foo', $arr, $container)->build());
 
         $i = 42;
-        $this->assertSame($i, $factory->getDefinition('foo', $i, $container));
+        $this->assertSame($i, $factory->getDefinition('foo', $i, $container)->build());
 
         $bool = false;
-        $this->assertSame($bool, $factory->getDefinition('foo', $bool, $container));
+        $this->assertSame($bool, $factory->getDefinition('foo', $bool, $container)->build());
     }
 }

@@ -279,4 +279,20 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
 
         return $container;
     }
+
+    /**
+     * asserts that definitions are overridden by subsequent add method.
+     */
+    public function testOverrideAlias()
+    {
+        $container = new Container;
+
+        $container->add('test', function() { return 'bad'; });
+        $container->add('test', function() { return 'good'; });
+        $this->assertEquals('good', $container->get('test'));
+
+        $container->add('test', 'bad');
+        $container->add('test', function() { return 'good'; });
+        $this->assertEquals('good', $container->get('test'));
+    }
 }
