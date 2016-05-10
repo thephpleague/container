@@ -3,6 +3,7 @@
 namespace League\Container\Test;
 
 use League\Container\Container;
+use League\Container\Definition\DefinitionInterface;
 use League\Container\ImmutableContainerInterface;
 use League\Container\ReflectionContainer;
 
@@ -294,5 +295,15 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $container->add('test', 'bad');
         $container->add('test', function() { return 'good'; });
         $this->assertEquals('good', $container->get('test'));
+    }
+
+    /**
+     * asserts that add returns an instance of DefinitionInterface.
+     */
+    public function testConcreteValueReturnsDefinitionInterfaceObject()
+    {
+        $container = new Container;
+
+        $this->assertTrue($container->add('test', 'good') instanceof DefinitionInterface);
     }
 }
