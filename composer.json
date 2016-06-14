@@ -21,7 +21,7 @@
         }
     ],
     "require": {
-        "php": ">=5.4.0",
+        "php": "^5.4.0 || ^7.0",
         "container-interop/container-interop": "^1.1"
     },
     "require-dev": {
