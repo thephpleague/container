@@ -76,7 +76,7 @@ trait ArgumentResolverTrait
     }
 
     /**
-     * @return ContainerInterface
+     * @return \League\Container\ContainerInterface
      */
     abstract public function getContainer();
 }
