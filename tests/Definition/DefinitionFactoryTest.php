@@ -18,56 +18,56 @@ class DefinitionFactoryTest extends \PHPUnit_Framework_TestCase
         // existing class names
         $this->assertInstanceOf(
             'League\Container\Definition\ClassDefinition',
-            $factory->getDefinition('foo', 'League\Container\Test\Asset\Foo', $container)
+            $factory->getDefinition('foo', 'League\Container\Test\Asset\Foo')
         );
 
         $this->assertInstanceOf(
             'League\Container\Definition\ClassDefinition',
-            $factory->getDefinition('foo', 'League\Container\Test\Asset\Bar', $container)
+            $factory->getDefinition('foo', 'League\Container\Test\Asset\Bar')
         );
 
         // callables
         $this->assertInstanceOf(
             'League\Container\Definition\CallableDefinition',
-            $factory->getDefinition('foo', function () {}, $container)
+            $factory->getDefinition('foo', function () {})
         );
 
         $this->assertInstanceOf(
             'League\Container\Definition\CallableDefinition',
-            $factory->getDefinition('foo', [new Asset\FooWithNamedConstructor, 'namedConstructor'], $container)
+            $factory->getDefinition('foo', [new Asset\FooWithNamedConstructor, 'namedConstructor'])
         );
 
         $this->assertInstanceOf(
             'League\Container\Definition\CallableDefinition',
-            $factory->getDefinition('foo', ['League\Container\Test\Asset\FooWithNamedConstructor', 'namedConstructor'], $container)
+            $factory->getDefinition('foo', ['League\Container\Test\Asset\FooWithNamedConstructor', 'namedConstructor'])
         );
 
         $this->assertInstanceOf(
             'League\Container\Definition\CallableDefinition',
-            $factory->getDefinition('foo', ['League\Container\Test\Asset\FooWithNamedConstructor', 'staticNamedConstructor'], $container)
+            $factory->getDefinition('foo', ['League\Container\Test\Asset\FooWithNamedConstructor', 'staticNamedConstructor'])
         );
 
         $this->assertInstanceOf(
             'League\Container\Definition\CallableDefinition',
-            $factory->getDefinition('foo', 'League\Container\Test\Asset\FooWithNamedConstructor::staticNamedConstructor', $container)
+            $factory->getDefinition('foo', 'League\Container\Test\Asset\FooWithNamedConstructor::staticNamedConstructor')
         );
 
         $this->assertInstanceOf(
             'League\Container\Definition\CallableDefinition',
-            $factory->getDefinition('foo', new Asset\FooWithNamedConstructor, $container)
+            $factory->getDefinition('foo', new Asset\FooWithNamedConstructor)
         );
 
         // neither
         $str = 'some_string';
-        $this->assertSame($str, $factory->getDefinition('foo', $str, $container));
+        $this->assertSame($str, $factory->getDefinition('foo', $str));
 
         $arr = ['some_array'];
-        $this->assertSame($arr, $factory->getDefinition('foo', $arr, $container));
+        $this->assertSame($arr, $factory->getDefinition('foo', $arr));
 
         $i = 42;
-        $this->assertSame($i, $factory->getDefinition('foo', $i, $container));
+        $this->assertSame($i, $factory->getDefinition('foo', $i));
 
         $bool = false;
-        $this->assertSame($bool, $factory->getDefinition('foo', $bool, $container));
+        $this->assertSame($bool, $factory->getDefinition('foo', $bool));
     }
 }
