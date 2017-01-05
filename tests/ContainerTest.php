@@ -2,6 +2,7 @@
 
 namespace League\Container\Test;
 
+use League\Container\Argument\RawArgument;
 use League\Container\Container;
 use League\Container\ImmutableContainerInterface;
 use League\Container\ReflectionContainer;
@@ -39,6 +40,20 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($container->has('test'));
 
         $this->assertSame($container->get('test'), $class);
+    }
+
+    /**
+     * Asserts that the container can set and get a concrete value wrapped in a RawArgument.
+     */
+    public function testSetsAndGetsRawArgument()
+    {
+        $container = new Container;
+
+        $container->add('test', new RawArgument('some_string'));
+
+        $this->assertTrue($container->has('test'));
+
+        $this->assertEquals('some_string', $container->get('test'));
     }
 
     /**
