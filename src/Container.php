@@ -6,11 +6,13 @@ use Interop\Container\ContainerInterface as InteropContainerInterface;
 use League\Container\Definition\DefinitionFactory;
 use League\Container\Definition\DefinitionFactoryInterface;
 use League\Container\Definition\DefinitionInterface;
+use League\Container\Exception\ProtectedException;
 use League\Container\Exception\NotFoundException;
 use League\Container\Inflector\InflectorAggregate;
 use League\Container\Inflector\InflectorAggregateInterface;
 use League\Container\ServiceProvider\ServiceProviderAggregate;
 use League\Container\ServiceProvider\ServiceProviderAggregateInterface;
+use League\Container\ServiceProvider\ServiceProviderInterface;
 
 class Container implements ContainerInterface
 {
@@ -48,6 +50,11 @@ class Container implements ContainerInterface
      * @var \Interop\Container\ContainerInterface[]
      */
     protected $delegates = [];
+
+    /**
+     * @var bool
+     */
+    protected $isProtected = false;
 
     /**
      * Constructor.
@@ -135,6 +142,10 @@ class Container implements ContainerInterface
      */
     public function add($alias, $concrete = null, $share = false)
     {
+        if ($this->isProtected()) {
+            throw new ProtectedException('Container has been protected, adding services is not allowed.');
+        }
+
         if (is_null($concrete)) {
             $concrete = $alias;
         }
@@ -168,6 +179,10 @@ class Container implements ContainerInterface
      */
     public function addServiceProvider($provider)
     {
+        if ($this->isProtected()) {
+            throw new ProtectedException('Container has been protected, adding service providers is not allowed');
+        }
+
         $this->providers->add($provider);
 
         return $this;
@@ -178,6 +193,10 @@ class Container implements ContainerInterface
      */
     public function extend($alias)
     {
+        if ($this->isProtected()) {
+            throw new ProtectedException('Container has been protected, extending services is not allowed');
+        }
+        
         if ($this->providers->provides($alias)) {
             $this->providers->register($alias);
         }
@@ -200,6 +219,10 @@ class Container implements ContainerInterface
      */
     public function inflector($type, callable $callback = null)
     {
+        if ($this->isProtected()) {
+            throw new ProtectedException('Container has been protected, adding inflectors is not allowed');
+        }
+
         return $this->inflectors->add($type, $callback);
     }
 
@@ -212,6 +235,52 @@ class Container implements ContainerInterface
     }
 
     /**
+     * Marks the container as protected.
+     *
+     * Prevents overriding services and delegating to other containers once the container is marked as protected.
+     */
+    public function protect()
+    {
+        if ($this->isProtected()) {
+            return;
+        }
+
+        if ($this->providers instanceof ServiceProviderAggregate) {
+            $reflection = new \ReflectionProperty(ServiceProviderAggregate::class, 'providers');
+            $reflection->setAccessible(true);
+
+            /* @var ServiceProviderInterface[] $providers */
+            $providers = array_unique($reflection->getValue($this->providers));
+
+            foreach ($providers as $provider) {
+                $provider->register();
+            }
+        }
+
+        $this->isProtected = true;
+    }
+
+    /**
+     * Marks the container as unprotected.
+     *
+     * Allows overriding services and delegating to other containers (this is the default).
+     */
+    public function unprotect()
+    {
+        $this->isProtected = false;
+    }
+
+    /**
+     * Returns true if the container is protected.
+     *
+     * @return bool
+     */
+    public function isProtected()
+    {
+        return $this->isProtected;
+    }
+
+    /**
      * Delegate a backup container to be checked for services if it
      * cannot be resolved via this container.
      *
@@ -220,6 +289,10 @@ class Container implements ContainerInterface
      */
     public function delegate(InteropContainerInterface $container)
     {
+        if ($this->isProtected()) {
+            throw new ProtectedException('Container has been protected, delegating to additional containers is not allowed');
+        }
+
         $this->delegates[] = $container;
 
         if ($container instanceof ImmutableContainerAwareInterface) {

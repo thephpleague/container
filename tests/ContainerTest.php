@@ -252,6 +252,148 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Asserts that container is not protected by default.
+     */
+    public function testIsNotProtectedByDefault()
+    {
+        $container = new Container;
+
+        $this->assertFalse($container->isProtected());
+
+        $alias = 'foo';
+
+        $service = new \stdClass();
+        $differentService = new \stdClass();
+
+        $container->share($alias, $service);
+        $container->share($alias, $differentService);
+
+        $this->assertSame($differentService, $container->get($alias));
+    }
+
+    /**
+     * Asserts that an exception is thrown when an attempt is made to add services to a protected container.
+     */
+    public function testCanBeProtectedAgainstAddingServices()
+    {
+        $this->setExpectedException('League\Container\Exception\ProtectedException');
+
+        $container = new Container;
+
+        $container->protect();
+
+        $container->share('foo', new \stdClass());
+    }
+
+    /**
+     * Asserts that an exception is thrown when an attempt is made to extend a service of a protected container.
+     */
+    public function testCanBeProtectedAgainstExtendingServices()
+    {
+        $this->setExpectedException('League\Container\Exception\ProtectedException');
+
+        $container = new Container;
+
+        $alias = 'foo';
+        
+        $container->share($alias, new \stdClass());
+        $container->protect();
+
+        $container->extend($alias);
+    }
+
+    /**
+     * Asserts that an exception is thrown when an attempt is made to delegate from a protected container to another
+     * container.
+     */
+    public function testCanBeProtectedAgainstDelegatingToAdditionalContainers()
+    {
+        $this->setExpectedException('League\Container\Exception\ProtectedException');
+
+        $container = new Container;
+
+        $container->protect();
+
+        $container->delegate(new ReflectionContainer);
+    }
+
+    /**
+     * Asserts that an exception is thrown when an attempt is made to add an inflector to a protected container.
+     */
+    public function testCanBeProtectedAgainstAddingInflectors()
+    {
+        $this->setExpectedException('League\Container\Exception\ProtectedException');
+
+        $container = new Container;
+
+        $container->protect();
+
+        $container->inflector('stdClass');
+    }
+
+    /**
+     * Asserts that an exception is thrown when an attempt is made to add a service provider to a protected container.
+     */
+    public function testCanBeProtectedAgainstAddingServiceProviders()
+    {
+        $this->setExpectedException('League\Container\Exception\ProtectedException');
+
+        $container = new Container;
+
+        $container->protect();
+
+        $container->addServiceProvider(new Asset\ServiceProviderFake);
+    }
+
+    /**
+     * Asserts that protection can be enabled and disabled.
+     */
+    public function testProtectionCanBeEnabledAndDisabled()
+    {
+        $container = new Container;
+
+        $container->protect();
+
+        $this->assertTrue($container->isProtected());
+
+        $container->unprotect();
+
+        $this->assertFalse($container->isProtected());
+    }
+
+    /**
+     * Asserts that a service can be fetched from a service provider of a protected container.
+     */
+    public function testProtectRegistersServiceProviders()
+    {
+        $container = new Container;
+
+        $alias = 'foo';
+        $service = new \stdClass();
+
+        $container->addServiceProvider(new Asset\SharedServiceProviderFake($alias, $service));
+        $container->protect();
+
+        $this->assertSame($service, $container->get($alias));
+    }
+
+    /**
+     * Asserts that the container does not attempt to register service providers again when already protected.
+     */
+    public function testProtectDoesNotAttemptToRegisterServiceProvidersIfAlreadyProtected()
+    {
+        $container = new Container;
+
+        $alias = 'foo';
+        $service = new \stdClass();
+
+        $container->addServiceProvider(new Asset\SharedServiceProviderFake($alias, $service));
+        $container->protect();
+
+        $container->protect();
+    }
+
+    /**
      * @param array $items
      * @return \PHPUnit_Framework_MockObject_MockObject|ImmutableContainerInterface
      */
