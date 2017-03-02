@@ -38,23 +38,6 @@ var_dump($service1 instanceof Acme\Service\SomeService); // true
 var_dump($service1 === $service2); // false
 ~~~
 
-~~~ php
-<?php
-
-$container = new League\Container\Container;
-
-// register the service as a prototype against the fully qualified classname
-$container->add('Acme\Service\SomeService');
-
-// now to retrieve this service we can just retrieve the classname
-// each time we `get` the service it will be a new instance
-$service1 = $container->get('Acme\Service\SomeService');
-$service2 = $container->get('Acme\Service\SomeService');
-
-var_dump($service1 instanceof Acme\Service\SomeService); // true
-var_dump($service1 === $service2); // false
-~~~
-
 There may be occasions where you wish the service to be the same instance each time you retrieve it. There are two ways to achieve this, declare it as shared, or register a ready built instance of an object.
 
 ~~~ php
