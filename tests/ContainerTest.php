@@ -42,6 +42,26 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Asserts that shared instance can get arguments
+     */
+    public function testSharedInstaceWithArguments()
+    {
+        $container = new Container;
+
+        $container->add(
+            'test',
+            function ($arg) {
+                return $arg;
+            },
+            true
+        );
+
+        $this->assertTrue($container->has('test'));
+
+        $this->assertEquals($container->get('test', ['hello']), 'hello');
+    }
+
+    /**
      * Asserts that the container sets and gets via a service provider.
      */
     public function testSetsAndGetsViaServiceProvider()
