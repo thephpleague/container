@@ -4,7 +4,6 @@ namespace League\Container\Test\Inflector;
 
 use League\Container\Argument\RawArgument;
 use League\Container\Inflector\InflectorAggregate;
-use League\Container\Test\Asset;
 
 class InflectorAggregateTest extends \PHPUnit_Framework_TestCase
 {

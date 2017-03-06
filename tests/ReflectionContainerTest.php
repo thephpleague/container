@@ -99,7 +99,7 @@ class ReflectionContainerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Asserts that an exception is thrown when attmpting to get a class that does not exist.
+     * Asserts that an exception is thrown when attempting to get a class that does not exist.
      */
     public function testThrowsWhenGettingNonExistentClass()
     {
