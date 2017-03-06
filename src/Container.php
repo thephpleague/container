@@ -80,24 +80,19 @@ class Container implements ContainerInterface
      */
     public function get($alias, array $args = [])
     {
-        $service = $this->getFromThisContainer($alias, $args);
+        try {
+            return $this->getFromThisContainer($alias, $args);
+        } catch (NotFoundException $exception) {
+            if ($this->providers->provides($alias)) {
+                $this->providers->register($alias);
 
-        if ($service === false && $this->providers->provides($alias)) {
-            $this->providers->register($alias);
-            $service = $this->getFromThisContainer($alias, $args);
-        }
+                return $this->getFromThisContainer($alias, $args);
+            }
 
-        if ($service !== false) {
-            return $service;
-        }
+            $resolved = $this->getFromDelegate($alias, $args);
 
-        if ($resolved = $this->getFromDelegate($alias, $args)) {
             return $this->inflectors->inflect($resolved);
         }
-
-        throw new NotFoundException(
-            sprintf('Alias (%s) is not being managed by the container', $alias)
-        );
     }
 
     /**
@@ -267,7 +262,10 @@ class Container implements ContainerInterface
             continue;
         }
 
-        return false;
+        throw new NotFoundException(
+            sprintf('Alias (%s) is not being managed by the container', $alias)
+        );
+
     }
 
     /**
@@ -295,6 +293,8 @@ class Container implements ContainerInterface
             );
         }
 
-        return false;
+        throw new NotFoundException(
+            sprintf('Alias (%s) is not being managed by the container', $alias)
+        );
     }
 }

@@ -23,8 +23,10 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($container->get('test', ['hello']), 'hello');
         $this->assertEquals($container->get('test', ['world']), 'world');
+        $this->assertEquals($container->get('test', [true]), true);
+        $this->assertEquals($container->get('test', [false]), false);
     }
-
+    
     /**
      * Asserts that the container sets and gets an instance as shared.
      */
