@@ -2,6 +2,21 @@
 
 All Notable changes to `League\Container` will be documented in this file
 
+## 2.3.0
+
+### Added
+- Now implementation of the PSR-11.
+
+### Changed
+- Can now wrap shared objects as `RawArgument`.
+- Ability to override shared items.
+
+### Fixed
+- Booleans now recognised as accepted values.
+- Various docblock fixes.
+- Unused imports removed.
+- Unreachable arguments no longer passed.
+
 ## 2.2.0
 
 ### Changed
