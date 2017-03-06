@@ -135,6 +135,10 @@ class Container implements ContainerInterface
      */
     public function add($alias, $concrete = null, $share = false)
     {
+        unset($this->shared[$alias]);
+        unset($this->definitions[$alias]);
+        unset($this->sharedDefinitions[$alias]);
+
         if (is_null($concrete)) {
             $concrete = $alias;
         }

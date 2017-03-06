@@ -251,6 +251,102 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $container->extend('something');
     }
 
+    public function testReregisteringSharedItemWillRemoveAPreviouslyResolvedSharedItem()
+    {
+        // Arrange
+        $container = new Container();
+        $container->share('key', function () {
+            return 'bar';
+        });
+        $container->get('key');
+        $container->share('key', function () {
+            return 'baz';
+        });
+
+        // Act
+        $baz = $container->get('key');
+
+        // Assert
+        $this->assertEquals('baz', $baz);
+    }
+
+    public function testReregisteringWillRemoveAPreviouslyResolvedSharedItem()
+    {
+        // Arrange
+        $container = new Container();
+        $container->share('key', function () {
+            return 'bar';
+        });
+        $container->get('key');
+        $container->add('key', function () {
+            return 'baz';
+        });
+
+        // Act
+        $baz = $container->get('key');
+
+        // Assert
+        $this->assertEquals('baz', $baz);
+    }
+
+    public function testRegisteringShareItemAfterRegisteringNonShareItemWithSameKeyWillMakeItShared()
+    {
+        // Arrange
+        $nonShared = 0;
+        $shared = 0;
+
+        $container = new Container();
+        $container->add('key', function () use (&$nonShared) {
+            $nonShared++;
+            return 'non-shared';
+        });
+        $container->share('key', function () use (&$shared) {
+            $shared++;
+            return 'shared';
+        });
+
+        // Act
+        $result1 = $container->get('key');
+        $result2 = $container->get('key');
+
+        // Assert
+        $this->assertEquals('shared', $result1);
+        $this->assertEquals('shared', $result2);
+        $this->assertEquals(0, $nonShared);
+        $this->assertEquals(1, $shared);
+    }
+
+    public function testRegisteringNonSharedItemAfterRegisteringSharedItemWithSameKeyWillMakeItNonShared()
+    {
+        // Arrange
+        $nonShared = 0;
+        $shared = 0;
+
+        $container = new Container();
+        $container->share('key', function () use (&$shared) {
+            $shared++;
+            return 'shared';
+        });
+        $result1 = $container->get('key');
+        $result2 = $container->get('key');
+        $container->add('key', function () use (&$nonShared) {
+            $nonShared++;
+            return 'non-shared';
+        });
+
+        // Act
+        $result3 = $container->get('key');
+        $result4 = $container->get('key');
+
+        // Assert
+        $this->assertEquals('shared', $result1);
+        $this->assertEquals('shared', $result2);
+        $this->assertEquals('non-shared', $result3);
+        $this->assertEquals('non-shared', $result4);
+        $this->assertEquals(2, $nonShared);
+        $this->assertEquals(1, $shared);
+    }
+
     /**
      * @param array $items
      * @return \PHPUnit_Framework_MockObject_MockObject|ImmutableContainerInterface
