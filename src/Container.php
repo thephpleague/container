@@ -3,6 +3,7 @@
 namespace League\Container;
 
 use Interop\Container\ContainerInterface as InteropContainerInterface;
+use League\Container\Argument\RawArgumentInterface;
 use League\Container\Definition\DefinitionFactory;
 use League\Container\Definition\DefinitionFactoryInterface;
 use League\Container\Definition\DefinitionInterface;
@@ -278,7 +279,11 @@ class Container implements ContainerInterface
     protected function getFromThisContainer($alias, array $args = [])
     {
         if ($this->hasShared($alias, true)) {
-            return $this->inflectors->inflect($this->shared[$alias]);
+            $shared = $this->inflectors->inflect($this->shared[$alias]);
+            if ($shared instanceof RawArgumentInterface) {
+                return $shared->getValue();
+            }
+            return $shared;
         }
 
         if (array_key_exists($alias, $this->sharedDefinitions)) {
