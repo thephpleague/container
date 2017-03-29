@@ -21,14 +21,13 @@
         }
     ],
     "require": {
-        "php": "^5.4.0 || ^7.0",
+        "php": "^7.0",
         "container-interop/container-interop": "^1.2"
     },
     "require-dev": {
-        "phpunit/phpunit" : "4.*"
+        "phpunit/phpunit" : "^6.0"
     },
     "provide": {
-        "container-interop/container-interop-implementation": "^1.2",
         "psr/container-implementation": "^1.0"
     },
     "replace": {
@@ -37,11 +36,6 @@
     "autoload": {
         "psr-4": {
             "League\\Container\\": "src"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "League\\Container\\Test\\": "tests"
         }
     },
     "extra": {
