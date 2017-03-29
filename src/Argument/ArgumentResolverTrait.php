@@ -1,9 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace League\Container\Argument;
 
 use League\Container\Exception\NotFoundException;
 use League\Container\ReflectionContainer;
+use Psr\Container\ContainerInterface;
 use ReflectionFunctionAbstract;
 use ReflectionParameter;
 
@@ -12,7 +13,7 @@ trait ArgumentResolverTrait
     /**
      * {@inheritdoc}
      */
-    public function resolveArguments(array $arguments)
+    public function resolveArguments(array $arguments): array
     {
         foreach ($arguments as &$arg) {
             if ($arg instanceof RawArgumentInterface) {
@@ -26,11 +27,11 @@ trait ArgumentResolverTrait
 
             $container = $this->getContainer();
 
-            if (is_null($container) && $this instanceof ReflectionContainer) {
+            if ($this instanceof ReflectionContainer) {
                 $container = $this;
             }
 
-            if (! is_null($container) && $container->has($arg)) {
+            if ($container->has($arg)) {
                 $arg = $container->get($arg);
 
                 if ($arg instanceof RawArgumentInterface) {
@@ -47,7 +48,7 @@ trait ArgumentResolverTrait
     /**
      * {@inheritdoc}
      */
-    public function reflectArguments(ReflectionFunctionAbstract $method, array $args = [])
+    public function reflectArguments(ReflectionFunctionAbstract $method, array $args = []): array
     {
         $arguments = array_map(function (ReflectionParameter $param) use ($method, $args) {
             $name  = $param->getName();
@@ -76,7 +77,7 @@ trait ArgumentResolverTrait
     }
 
     /**
-     * @return \League\Container\ContainerInterface
+     * @return \Psr\Container\ContainerInterface
      */
-    abstract public function getContainer();
+    abstract public function getContainer(): ContainerInterface;
 }
