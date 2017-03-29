@@ -10,6 +10,8 @@
 
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/ad6b4c3e-8f93-4968-8dd3-391d39a4c3c2/big.png)](https://insight.sensiolabs.com/projects/ad6b4c3e-8f93-4968-8dd3-391d39a4c3c2)
 
+**Warning! `3.x` branch is in active development and is in no way ready for production!**
+
 This package is compliant with [PSR-1], [PSR-2] and [PSR-4]. If you notice compliance oversights,
 please send a patch via pull request.
 
