@@ -1,20 +1,24 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace League\Container;
+
+use Psr\Container\ContainerInterface;
 
 interface ContainerAwareInterface
 {
     /**
      * Set a container
      *
-     * @param \League\Container\ContainerInterface $container
+     * @param \Psr\Container\ContainerInterface $container
+     *
+     * @return self
      */
     public function setContainer(ContainerInterface $container);
 
     /**
      * Get the container
      *
-     * @return \League\Container\ContainerInterface
+     * @return \Psr\Container\ContainerInterface
      */
-    public function getContainer();
+    public function getContainer(): ContainerInterface;
 }

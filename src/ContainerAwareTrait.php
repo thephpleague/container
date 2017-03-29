@@ -1,19 +1,23 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace League\Container;
+
+use League\Container\Exception\ContainerException;
+use Psr\Container\ContainerInterface;
 
 trait ContainerAwareTrait
 {
     /**
-     * @var \League\Container\ContainerInterface
+     * @var \Psr\Container\ContainerInterface
      */
     protected $container;
 
     /**
      * Set a container.
      *
-     * @param  \League\Container\ContainerInterface $container
-     * @return $this
+     * @param \Psr\Container\ContainerInterface $container
+     *
+     * @return self
      */
     public function setContainer(ContainerInterface $container)
     {
@@ -27,8 +31,12 @@ trait ContainerAwareTrait
      *
      * @return \League\Container\ContainerInterface
      */
-    public function getContainer()
+    public function getContainer(): ContainerInterface
     {
-        return $this->container;
+        if ($this->container instanceof ContainerInterface) {
+            return $this->container;
+        }
+
+        throw new ContainerException('No container implementation has been set.');
     }
 }
