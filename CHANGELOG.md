@@ -2,6 +2,13 @@
 
 All Notable changes to `League\Container` will be documented in this file
 
+## Unreleased
+
+### Changed
+- Updated minimum PHP requirements to 7.0.
+- Now depend directly on PSR-11 interfaces, including providing PSR-11 exceptions.
+- Refactored inflector logic to accept type on construction and use generator to iterate.
+
 ## 2.3.0
 
 ### Added
