@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace League\Container\ServiceProvider;
 
@@ -14,14 +14,33 @@ abstract class AbstractServiceProvider implements ServiceProviderInterface
     protected $provides = [];
 
     /**
+     * @var string
+     */
+    protected $signature;
+
+    /**
      * {@inheritdoc}
      */
-    public function provides($alias = null)
+    public function provides(string $alias): bool
     {
-        if (! is_null($alias)) {
-            return (in_array($alias, $this->provides));
-        }
+        return (in_array($alias, $this->provides));
+    }
 
-        return $this->provides;
+    /**
+     * {@inheritdoc}
+     */
+    public function withSignature(string $signature): ServiceProviderInterface
+    {
+        $this->signature = $signature;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSignature(): string
+    {
+        return (is_null($this->signature)) ? get_class($this) : $this->signature;
     }
 }

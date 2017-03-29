@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace League\Container\ServiceProvider;
 
@@ -10,10 +10,11 @@ interface ServiceProviderInterface extends ContainerAwareInterface
      * Returns a boolean if checking whether this provider provides a specific
      * service or returns an array of provided services if no argument passed.
      *
-     * @param  string $service
-     * @return boolean|array
+     * @param string $service
+     *
+     * @return boolean
      */
-    public function provides($service = null);
+    public function provides(string $service): bool;
 
     /**
      * Use the register method to register items with the container via the
@@ -23,4 +24,23 @@ interface ServiceProviderInterface extends ContainerAwareInterface
      * @return void
      */
     public function register();
+
+    /**
+     * Set a custom signature for the service provider. This enables
+     * registering the same service provider multiple times.
+     *
+     * @param string $signature
+     *
+     * @return self
+     */
+    public function withSignature(string $signature): ServiceProviderInterface;
+
+    /**
+     * The signature of the service provider uniquely identifies it, so
+     * that we can quickly determine if it has already been registered.
+     * Defaults to get_class($provider).
+     *
+     * @return string
+     */
+    public function getSignature(): string;
 }

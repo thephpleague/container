@@ -4,10 +4,15 @@ All Notable changes to `League\Container` will be documented in this file
 
 ## Unreleased
 
+### Added
+- Service providers can now be pulled from the container if they are registered.
+
 ### Changed
 - Updated minimum PHP requirements to 7.0.
 - Now depend directly on PSR-11 interfaces, including providing PSR-11 exceptions.
 - Refactored inflector logic to accept type on construction and use generator to iterate.
+- Refactored service provider logic with better separation and performance.
+- Merged service provider signature logic in to one interface and abstract.
 
 ## 2.3.0
 
