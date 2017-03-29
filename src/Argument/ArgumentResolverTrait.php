@@ -2,7 +2,7 @@
 
 namespace League\Container\Argument;
 
-use League\Container\Exception\NotFoundException;
+use League\Container\Exception\{ContainerException, NotFoundException};
 use League\Container\ReflectionContainer;
 use Psr\Container\ContainerInterface;
 use ReflectionFunctionAbstract;
@@ -25,13 +25,18 @@ trait ArgumentResolverTrait
                  continue;
             }
 
-            $container = $this->getContainer();
+            $container = null;
 
-            if ($this instanceof ReflectionContainer) {
-                $container = $this;
+            try {
+                $container = $this->getContainer();
+            } catch (ContainerException $e) {
+                if ($this instanceof ReflectionContainer) {
+                    $container = $this;
+                }
             }
 
-            if ($container->has($arg)) {
+
+            if (! is_null($container) && $container->has($arg)) {
                 $arg = $container->get($arg);
 
                 if ($arg instanceof RawArgumentInterface) {

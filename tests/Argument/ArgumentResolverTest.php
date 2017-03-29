@@ -110,7 +110,6 @@ class ArgumentResolverTest extends TestCase
     {
         $this->expectException(NotFoundExceptionInterface::class);
 
-
         $method = $this->getMockBuilder(ReflectionFunctionAbstract::class)->getMock();
         $param  = $this->getMockBuilder(ReflectionParameter::class)->disableOriginalConstructor()->getMock();
 

@@ -1,37 +1,35 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace League\Container;
 
-use League\Container\Argument\ArgumentResolverInterface;
-use League\Container\Argument\ArgumentResolverTrait;
+use League\Container\Argument\{ArgumentResolverInterface, ArgumentResolverTrait};
 use League\Container\Exception\NotFoundException;
+use Psr\Container\ContainerInterface;
 use ReflectionClass;
 use ReflectionFunction;
 use ReflectionMethod;
 
-class ReflectionContainer implements
-    ArgumentResolverInterface,
-    ImmutableContainerInterface
+class ReflectionContainer implements ArgumentResolverInterface, ContainerInterface
 {
     use ArgumentResolverTrait;
-    use ImmutableContainerAwareTrait;
+    use ContainerAwareTrait;
 
     /**
      * {@inheritdoc}
      */
-    public function get($alias, array $args = [])
+    public function get($id, array $args = [])
     {
-        if (! $this->has($alias)) {
+        if (! $this->has($id)) {
             throw new NotFoundException(
-                sprintf('Alias (%s) is not an existing class and therefore cannot be resolved', $alias)
+                sprintf('Alias (%s) is not an existing class and therefore cannot be resolved', $id)
             );
         }
 
-        $reflector = new ReflectionClass($alias);
+        $reflector = new ReflectionClass($id);
         $construct = $reflector->getConstructor();
 
         if ($construct === null) {
-            return new $alias;
+            return new $id;
         }
 
         return $reflector->newInstanceArgs(
@@ -42,16 +40,17 @@ class ReflectionContainer implements
     /**
      * {@inheritdoc}
      */
-    public function has($alias)
+    public function has($id): bool
     {
-        return class_exists($alias);
+        return class_exists($id);
     }
 
     /**
      * Invoke a callable via the container.
      *
-     * @param  callable $callable
-     * @param  array    $args
+     * @param callable $callable
+     * @param array    $args
+     *
      * @return mixed
      */
     public function call(callable $callable, array $args = [])

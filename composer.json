@@ -38,6 +38,11 @@
             "League\\Container\\": "src"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "League\\Container\\Test\\": "tests"
+        }
+    },
     "extra": {
         "branch-alias": {
             "dev-3.x": "3.x-dev",
