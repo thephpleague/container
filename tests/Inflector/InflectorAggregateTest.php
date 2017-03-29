@@ -1,64 +1,58 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace League\Container\Test\Inflector;
 
-use League\Container\Argument\RawArgument;
-use League\Container\Inflector\InflectorAggregate;
+use League\Container\ContaineAwareInterface;
+use League\Container\Inflector\{InflectorAggregate, Inflector};
+use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerInterface;
 
-class InflectorAggregateTest extends \PHPUnit_Framework_TestCase
+class InflectorAggregateTest extends TestCase
 {
     /**
-     * Asserts that the aggregate adds an inflector without a callback.
+     * Asserts that the aggregate can add an inflector.
      */
-    public function testAggregateAddsInflectorWithoutCallback()
+    public function testAggregateAddsInflector()
     {
         $aggregate = new InflectorAggregate;
-        $return = $aggregate->add('SomeType');
+        $inflector = $aggregate->add('Some\Type');
 
-        $this->assertInstanceOf('League\Container\Inflector\Inflector', $return);
-
-        $inflectors = (new \ReflectionClass($aggregate))->getProperty('inflectors');
-        $inflectors->setAccessible(true);
-
-        $this->assertArrayHasKey('SomeType', $inflectors->getValue($aggregate));
+        $this->assertInstanceOf(Inflector::class, $inflector);
+        $this->assertSame('Some\Type', $inflector->getType());
     }
 
     /**
-     * Asserts that the aggregate inflects on an object without a callback.
+     * Asserts that the aggregate adds and iterates multiple inflectors.
      */
-    public function testAggregateInflectsOnObjectWithoutCallback()
+    public function testAggregateAddsAndIteratesMultipleInflectors()
     {
-        $container = $this->getMock('League\Container\ImmutableContainerInterface');
-        $aggregate = (new InflectorAggregate)->setContainer($container);
+        $aggregate  = new InflectorAggregate;
+        $inflectors = [];
 
-        $aggregate->add('SomeType');
+        for ($i = 0; $i < 10; $i++) {
+            $inflectors[] = $aggregate->add('Some\Type' . $i);
+        }
 
-        $aggregate->add('stdClass')
-                  ->setProperty('foo', new RawArgument('Foo'));
-
-        $object = new \stdClass;
-
-        $aggregate->inflect($object);
-
-        $this->assertSame('Foo', $object->foo);
+        foreach ($aggregate->getIterator() as $key => $inflector) {
+            $this->assertSame($inflectors[$key], $inflector);
+        }
     }
 
     /**
-     * Asserts that the aggregate inflects on an object with a callback.
+     * Asserts that the aggregate iterates and inflects on an object.
      */
-    public function testAggregateInflectsOnObjectWithCallback()
+    public function testAggregateIteratesAndInflectsOnObject()
     {
-        $container = $this->getMock('League\Container\ImmutableContainerInterface');
-        $aggregate = (new InflectorAggregate)->setContainer($container);
+        $aggregate      = new InflectorAggregate;
+        $containerAware = $this->getMockBuilder(ContaineAwareInterface::class)->setMethods(['setContainer'])->getMock();
+        $container      = $this->getMockBuilder(ContainerInterface::class)->getMock();
 
-        $aggregate->add('stdClass', function ($object) {
-            $object->foo = 'Foo';
-        });
+        $containerAware->expects($this->once())->method('setContainer')->with($this->equalTo($container));
+        $aggregate->add(ContaineAwareInterface::class)->invokeMethod('setContainer', [$container]);
+        $aggregate->add('Ignored\Type');
 
-        $object = new \stdClass;
+        $aggregate->setContainer($container);
 
-        $aggregate->inflect($object);
-
-        $this->assertSame('Foo', $object->foo);
+        $aggregate->inflect($containerAware);
     }
 }

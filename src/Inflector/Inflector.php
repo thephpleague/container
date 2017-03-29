@@ -1,15 +1,25 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace League\Container\Inflector;
 
-use League\Container\ImmutableContainerAwareTrait;
+use League\Container\ContainerAwareTrait;
 use League\Container\Argument\ArgumentResolverInterface;
 use League\Container\Argument\ArgumentResolverTrait;
 
 class Inflector implements ArgumentResolverInterface
 {
     use ArgumentResolverTrait;
-    use ImmutableContainerAwareTrait;
+    use ContainerAwareTrait;
+
+    /**
+     * @var string
+     */
+    protected $type;
+
+    /**
+     * @var callable
+     */
+    protected $callback;
 
     /**
      * @var array
@@ -22,13 +32,36 @@ class Inflector implements ArgumentResolverInterface
     protected $properties = [];
 
     /**
+     * Construct.
+     *
+     * @param string        $type
+     * @param callable|null $callback
+     */
+    public function __construct(string $type, callable $callback = null)
+    {
+        $this->type     = $type;
+        $this->callback = $callback;
+    }
+
+    /**
+     * Get the type.
+     *
+     * @return string
+     */
+    public function getType(): string
+    {
+        return $this->type;
+    }
+
+    /**
      * Defines a method to be invoked on the subject object.
      *
-     * @param  string $name
-     * @param  array  $args
-     * @return $this
+     * @param string $name
+     * @param array  $args
+     *
+     * @return self
      */
-    public function invokeMethod($name, array $args)
+    public function invokeMethod(string $name, array $args): self
     {
         $this->methods[$name] = $args;
 
@@ -38,10 +71,11 @@ class Inflector implements ArgumentResolverInterface
     /**
      * Defines multiple methods to be invoked on the subject object.
      *
-     * @param  array $methods
-     * @return $this
+     * @param array $methods
+     *
+     * @return self
      */
-    public function invokeMethods(array $methods)
+    public function invokeMethods(array $methods): self
     {
         foreach ($methods as $name => $args) {
             $this->invokeMethod($name, $args);
@@ -53,11 +87,12 @@ class Inflector implements ArgumentResolverInterface
     /**
      * Defines a property to be set on the subject object.
      *
-     * @param  string $property
-     * @param  mixed  $value
-     * @return $this
+     * @param string $property
+     * @param mixed  $value
+     *
+     * @return self
      */
-    public function setProperty($property, $value)
+    public function setProperty(string $property, $value): self
     {
         $this->properties[$property] = $value;
 
@@ -67,10 +102,11 @@ class Inflector implements ArgumentResolverInterface
     /**
      * Defines multiple properties to be set on the subject object.
      *
-     * @param  array $properties
-     * @return $this
+     * @param array $properties
+     *
+     * @return self
      */
-    public function setProperties(array $properties)
+    public function setProperties(array $properties): self
     {
         foreach ($properties as $property => $value) {
             $this->setProperty($property, $value);
@@ -82,7 +118,8 @@ class Inflector implements ArgumentResolverInterface
     /**
      * Apply inflections to an object.
      *
-     * @param  object $object
+     * @param object $object
+     *
      * @return void
      */
     public function inflect($object)
@@ -98,6 +135,10 @@ class Inflector implements ArgumentResolverInterface
             $args = $this->resolveArguments($args);
 
             call_user_func_array([$object, $method], $args);
+        }
+
+        if (! is_null($this->callback)) {
+            call_user_func_array($this->callback, [$object]);
         }
     }
 }
