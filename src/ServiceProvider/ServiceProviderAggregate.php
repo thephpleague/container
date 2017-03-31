@@ -23,7 +23,7 @@ class ServiceProviderAggregate implements ServiceProviderAggregateInterface
     /**
      * {@inheritdoc}
      */
-    public function add($provider)
+    public function add($provider): ServiceProviderAggregateInterface
     {
         if (is_string($provider) && $this->getContainer()->has($provider)) {
             $provider = $this->getContainer()->get($provider);
