@@ -6,6 +6,7 @@ All Notable changes to `League\Container` will be documented in this file
 
 ### Added
 - Service providers can now be pulled from the container if they are registered.
+- Definition logic now handled by aggregate for better separation.
 
 ### Changed
 - Updated minimum PHP requirements to 7.0.
