@@ -19,7 +19,7 @@ trait ContainerAwareTrait
      *
      * @return self
      */
-    public function setContainer(ContainerInterface $container)
+    public function setContainer(ContainerInterface $container): ContainerAwareInterface
     {
         $this->container = $container;
 
