@@ -27,7 +27,7 @@ class Container implements ContainerInterface
     /**
      * @var \Psr\Container\ContainerInterface
      */
-    protected $delagates = [];
+    protected $delegates = [];
 
     /**
      * Construct.

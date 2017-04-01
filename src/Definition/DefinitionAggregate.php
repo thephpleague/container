@@ -3,7 +3,6 @@
 namespace League\Container\Definition;
 
 use Generator;
-use League\Container\Argument\RawArgument;
 use League\Container\ContainerAwareTrait;
 use League\Container\Exception\NotFoundException;
 

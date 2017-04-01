@@ -76,9 +76,10 @@ interface DefinitionInterface extends ContainerAwareInterface
     /**
      * Handle instantiation and manipulation of value and return.
      *
-     * @param array $args
+     * @param array   $args
+     * @param boolean $new
      *
      * @return mixed
      */
-    public function resolve(array $args = []);
+    public function resolve(array $args = [], bool $new = false);
 }
