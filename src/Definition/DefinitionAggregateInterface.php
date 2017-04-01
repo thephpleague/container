@@ -19,20 +19,13 @@ interface DefinitionAggregateInterface extends ContainerAwareInterface, Iterator
     public function add(string $id, $definition, bool $shared = false): DefinitionInterface;
 
     /**
-     * Factory method to build a definition based on the incoming concretion.
-     *
-     * @param mixed $concrete
-     *
-     * @return \League\Container\Definition\DefinitionInterface
-     */
-    public function factory($concrete): DefinitionInterface;
-
-    /**
      * Resolve and build a concrete value from an id/alias.
      *
-     * @param string $id
+     * @param string  $id
+     * @param array   $args
+     * @param boolean $new
      *
      * @return mixed
      */
-    public function resolve(string $id);
+    public function resolve(string $id, array $args = [], bool $new = false);
 }

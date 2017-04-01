@@ -22,43 +22,26 @@ class DefinitionAggregate implements DefinitionAggregateInterface
     public function add(string $id, $definition, bool $shared = false): DefinitionInterface
     {
         if (! $definition instanceof DefinitionInterface) {
-            $definition = $this->factory($definition);
+            $definition = (new Definition($id, $definition));
         }
 
-        $definition->setAlias($id)->setShared($shared);
+        $this->definitions[] = $definition
+            ->setContainer($this->getContainer())
+            ->setAlias($id)
+            ->setShared($shared)
+        ;
 
-        $this->definitions[] = $definition;
-
-        return $this;
+        return $definition;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function factory($concrete): DefinitionInterface
-    {
-        // TODO handle the never ending struggle of __invoke
-        if (is_callable($concrete)) {
-            return (new CallableDefinition($concrete))->setContainer($this->getContainer());
-        }
-
-        if (is_string($concrete) && class_exists($concrete)) {
-            return (new ClassDefinition($concrete))->setContainer($this->getContainer());
-        }
-
-        $concrete = ($concrete instanceof RawArgument) ? $concrete : new RawArgument($concrete);
-
-        return new Definition($concrete);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function resolve(string $id)
+    public function resolve(string $id, array $args = [], bool $new = false)
     {
         foreach ($this->getIterator() as $definition) {
             if ($id === $definition->getAlias()) {
-                return $definition->resolve();
+                return $definition->resolve($args, $new);
             }
         }
 

@@ -21,6 +21,10 @@ trait ArgumentResolverTrait
                 continue;
             }
 
+            if ($arg instanceof ClassNameInterface) {
+                $arg = $arg->getValue();
+            }
+
             if (! is_string($arg)) {
                  continue;
             }

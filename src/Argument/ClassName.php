@@ -2,19 +2,19 @@
 
 namespace League\Container\Argument;
 
-class RawArgument implements RawArgumentInterface
+class ClassName implements ClassNameInterface
 {
     /**
-     * @var mixed
+     * @var string
      */
     protected $value;
 
     /**
      * Construct.
      *
-     * @param mixed $value
+     * @param string $value
      */
-    public function __construct($value)
+    public function __construct(string $value)
     {
         $this->value = $value;
     }
@@ -22,7 +22,7 @@ class RawArgument implements RawArgumentInterface
     /**
      * {@inheritdoc}
      */
-    public function getValue()
+    public function getValue(): string
     {
         return $this->value;
     }

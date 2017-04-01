@@ -14,6 +14,7 @@ All Notable changes to `League\Container` will be documented in this file
 - Refactored inflector logic to accept type on construction and use generator to iterate.
 - Refactored service provider logic with better separation and performance.
 - Merged service provider signature logic in to one interface and abstract.
+- Heavily simplified definition logic providing more control to user.
 
 ## 2.3.0
 
