@@ -37,15 +37,37 @@ class DefinitionAggregate implements DefinitionAggregateInterface
     /**
      * {@inheritdoc}
      */
-    public function resolve(string $id, array $args = [], bool $new = false)
+    public function has(string $id): bool
     {
         foreach ($this->getIterator() as $definition) {
             if ($id === $definition->getAlias()) {
-                return $definition->resolve($args, $new);
+                return true;
             }
         }
 
-        throw new NotFoundException(sprintf('Alias (%s) is not being handled by the container', $id));
+        return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDefinition(string $id): DefinitionInterface
+    {
+        foreach ($this->getIterator() as $definition) {
+            if ($id === $definition->getAlias()) {
+                return $definition;
+            }
+        }
+
+        throw new NotFoundException(sprintf('Alias (%s) is not being handled as a definition.', $id));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function resolve(string $id, array $args = [], bool $new = false)
+    {
+        return $this->getDefinition($id)->resolve($args, $new);
     }
 
     /**

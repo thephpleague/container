@@ -19,6 +19,24 @@ interface DefinitionAggregateInterface extends ContainerAwareInterface, Iterator
     public function add(string $id, $definition, bool $shared = false): DefinitionInterface;
 
     /**
+     * Checks whether alias exists as definition.
+     *
+     * @param string $id
+     *
+     * @return boolean
+     */
+    public function has(string $id): bool;
+
+    /**
+     * Get the definition to be extended.
+     *
+     * @param string $id
+     *
+     * @return \League\Container\Definition\DefinitionInterface
+     */
+    public function getDefinition(string $id): DefinitionInterface;
+
+    /**
      * Resolve and build a concrete value from an id/alias.
      *
      * @param string  $id

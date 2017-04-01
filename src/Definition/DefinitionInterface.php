@@ -11,7 +11,7 @@ interface DefinitionInterface extends ContainerAwareInterface
      *
      * @param string $id
      */
-    public function setAlias(string $id): self;
+    public function setAlias(string $id): DefinitionInterface;
 
     /**
      * Get the alias of the definition.
@@ -27,7 +27,7 @@ interface DefinitionInterface extends ContainerAwareInterface
      *
      * @return self
      */
-    public function setShared(bool $shared): self;
+    public function setShared(bool $shared): DefinitionInterface;
 
     /**
      * Is this a shared definition?
@@ -43,7 +43,7 @@ interface DefinitionInterface extends ContainerAwareInterface
      *
      * @return self
      */
-    public function addArgument($arg): self;
+    public function addArgument($arg): DefinitionInterface;
 
     /**
      * Add multiple arguments to be injected.
@@ -52,7 +52,7 @@ interface DefinitionInterface extends ContainerAwareInterface
      *
      * @return self
      */
-    public function addArguments(array $args): self;
+    public function addArguments(array $args): DefinitionInterface;
 
     /**
      * Add a method to be invoked
@@ -62,7 +62,7 @@ interface DefinitionInterface extends ContainerAwareInterface
      *
      * @return self
      */
-    public function addMethodCall(string $method, array $args = []): self;
+    public function addMethodCall(string $method, array $args = []): DefinitionInterface;
 
     /**
      * Add multiple methods to be invoked
@@ -71,7 +71,7 @@ interface DefinitionInterface extends ContainerAwareInterface
      *
      * @return self
      */
-    public function addMethodCalls(array $methods = []): self;
+    public function addMethodCalls(array $methods = []): DefinitionInterface;
 
     /**
      * Handle instantiation and manipulation of value and return.
