@@ -6,7 +6,7 @@ use League\Container\ContainerAwareTrait;
 use League\Container\Argument\ArgumentResolverInterface;
 use League\Container\Argument\ArgumentResolverTrait;
 
-class Inflector implements ArgumentResolverInterface
+class Inflector implements ArgumentResolverInterface, InflectorInterface
 {
     use ArgumentResolverTrait;
     use ContainerAwareTrait;
@@ -44,9 +44,7 @@ class Inflector implements ArgumentResolverInterface
     }
 
     /**
-     * Get the type.
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getType(): string
     {
@@ -54,14 +52,9 @@ class Inflector implements ArgumentResolverInterface
     }
 
     /**
-     * Defines a method to be invoked on the subject object.
-     *
-     * @param string $name
-     * @param array  $args
-     *
-     * @return self
+     * {@inheritdoc}
      */
-    public function invokeMethod(string $name, array $args): self
+    public function invokeMethod(string $name, array $args): InflectorInterface
     {
         $this->methods[$name] = $args;
 
@@ -69,13 +62,9 @@ class Inflector implements ArgumentResolverInterface
     }
 
     /**
-     * Defines multiple methods to be invoked on the subject object.
-     *
-     * @param array $methods
-     *
-     * @return self
+     * {@inheritdoc}
      */
-    public function invokeMethods(array $methods): self
+    public function invokeMethods(array $methods): InflectorInterface
     {
         foreach ($methods as $name => $args) {
             $this->invokeMethod($name, $args);
@@ -85,14 +74,9 @@ class Inflector implements ArgumentResolverInterface
     }
 
     /**
-     * Defines a property to be set on the subject object.
-     *
-     * @param string $property
-     * @param mixed  $value
-     *
-     * @return self
+     * {@inheritdoc}
      */
-    public function setProperty(string $property, $value): self
+    public function setProperty(string $property, $value): InflectorInterface
     {
         $this->properties[$property] = $value;
 
@@ -100,13 +84,9 @@ class Inflector implements ArgumentResolverInterface
     }
 
     /**
-     * Defines multiple properties to be set on the subject object.
-     *
-     * @param array $properties
-     *
-     * @return self
+     * {@inheritdoc}
      */
-    public function setProperties(array $properties): self
+    public function setProperties(array $properties): InflectorInterface
     {
         foreach ($properties as $property => $value) {
             $this->setProperty($property, $value);
@@ -116,11 +96,7 @@ class Inflector implements ArgumentResolverInterface
     }
 
     /**
-     * Apply inflections to an object.
-     *
-     * @param object $object
-     *
-     * @return void
+     * {@inheritdoc}
      */
     public function inflect($object)
     {

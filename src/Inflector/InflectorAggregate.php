@@ -43,7 +43,9 @@ class InflectorAggregate implements InflectorAggregateInterface
     public function inflect($object)
     {
         foreach ($this->getIterator() as $inflector) {
-            if (! is_subclass_of($object, $inflector->getType())) {
+            $type = $inflector->getType();
+
+            if (! $object instanceof $type) {
                 continue;
             }
 
