@@ -33,7 +33,75 @@
     </ul>
 </section>
 
-{{ content }}
+<header>
+    <div class="inner-content">
+        <a href="http://thephpleague.com/" class="league">Presented by The League of Extraordinary Packages</a>
+        <h1>{{ site.data.project.title }}</h1>
+        <h2>{{ site.data.project.tagline }}</h2>
+        <p class="composer"><span>$ composer require league/container</span></p>
+    </div>
+</header>
+
+<main>
+    <div class="example">
+        <div class="inner-content">
+            <h1>Usage</h1>
+            {{ page.example | markdownify }}
+        </div>
+    </div>
+
+    <div class="highlights">
+        <div class="inner-content">
+            <div class="column one">
+                <h1>Highlights</h1>
+                <div class="description">
+                    {{ page.description | markdownify }}
+                </div>
+            </div>
+            <div class="column two">
+                <ol>
+                    {% for item in page.highlights %}
+                    <li><p>{{ item }}</p></li>
+                    {% endfor %}
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <div class="documentation">
+        <div class="inner-content">
+            <h1>Releases</h1>
+            {% for release in page.releases %}
+            <div class="version {{ release.type }}">
+                <h2>
+                    {% if release.type == 'next' %}Upcoming{% endif %}
+                    {% if release.type == 'current' %}Current Stable Release{% endif %}
+                    {% if release.type == 'old' %}Older Release{% endif %}
+                    {% if release.type == 'legacy' %}No Longer Supported{% endif %}
+                </h2>
+                <div class="content">
+                    <p><code>{{ release.name }}</code></p>
+                    <ul>
+                        <li>Requires: <strong>{{ release.requires }}</strong></li>
+                        <li>Latest: <strong>{{ release.release }}</strong></li>
+                        <li>Supported Until: <strong>{{ release.support }}</strong></li>
+                    </ul>
+                    <p><a href="{{ release.url }}">Full Documentation</a></p>
+                </div>
+            </div>
+            {% endfor %}
+            <p class="footnote">Once a new major version is released, the previous stable release remains supported for six more months through patches and security fixes.</p>
+
+        </div>
+    </div>
+
+    <div class="questions">
+        <div class="inner-content">
+            <h1>Questions?</h1>
+            <p><strong>League\Csv</strong> was created by Phil Bennett. Find him on Twitter at <a href="https://twitter.com/philipobenito">@philipobenito</a>.</p>
+        </div>
+    </div>
+</main>
 
 <footer>
     <span>&copy; Copyright <a href="http://thephpleague.com">The League of Extraordinary Packages</a>.</span>
