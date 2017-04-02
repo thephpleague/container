@@ -42,6 +42,20 @@ class DefinitionAggregateTest extends TestCase
     }
 
     /**
+     * Asserts that the aggregate has a definition.
+     */
+    public function testAggregateHasDefiniton()
+    {
+        $container  = $this->getMockBuilder(ContainerInterface::class)->getMock();
+        $aggregate  = (new DefinitionAggregate)->setContainer($container);
+        $definition = $aggregate->add('alias', Foo::class);
+
+        $this->assertInstanceOf(DefinitionInterface::class, $definition);
+        $this->assertTrue($aggregate->has('alias'));
+        $this->assertFalse($aggregate->has('nope'));
+    }
+
+    /**
      * Asserts that the aggregate adds and iterates multiple definitions.
      */
     public function testAggregateAddsAndIteratesMultipleDefinitions()
