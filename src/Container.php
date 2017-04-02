@@ -25,7 +25,7 @@ class Container implements ContainerInterface
     protected $inflectors;
 
     /**
-     * @var \Psr\Container\ContainerInterface
+     * @var \Psr\Container\ContainerInterface[]
      */
     protected $delegates = [];
 
