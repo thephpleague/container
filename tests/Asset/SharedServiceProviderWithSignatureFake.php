@@ -19,7 +19,8 @@ class SharedServiceProviderWithSignatureFake extends AbstractSignatureServicePro
 
     /**
      * @param string $alias
-     * @param mixed $item
+     * @param mixed  $item
+     * @param string $signature
      */
     public function __construct($alias, $item, $signature)
     {

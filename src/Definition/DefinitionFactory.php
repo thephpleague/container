@@ -21,7 +21,7 @@ class DefinitionFactory implements DefinitionFactoryInterface
             return (new ClassDefinition($alias, $concrete))->setContainer($this->getContainer());
         }
 
-        // if the item is not defineable we just return the value to be stored
+        // if the item is not definable we just return the value to be stored
         // in the container as an arbitrary value/instance
         return $concrete;
     }

@@ -2,6 +2,7 @@
 
 namespace League\Container\Test;
 
+use League\Container\Argument\RawArgument;
 use League\Container\Container;
 use League\Container\ImmutableContainerInterface;
 use League\Container\ReflectionContainer;
@@ -23,8 +24,10 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($container->get('test', ['hello']), 'hello');
         $this->assertEquals($container->get('test', ['world']), 'world');
+        $this->assertEquals($container->get('test', [true]), true);
+        $this->assertEquals($container->get('test', [false]), false);
     }
-
+    
     /**
      * Asserts that the container sets and gets an instance as shared.
      */
@@ -39,6 +42,20 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($container->has('test'));
 
         $this->assertSame($container->get('test'), $class);
+    }
+
+    /**
+     * Asserts that the container can set and get a concrete value wrapped in a RawArgument.
+     */
+    public function testSetsAndGetsRawArgument()
+    {
+        $container = new Container;
+
+        $container->add('test', new RawArgument('some_string'));
+
+        $this->assertTrue($container->has('test'));
+
+        $this->assertEquals('some_string', $container->get('test'));
     }
 
     /**
@@ -249,6 +266,102 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $container = new Container;
 
         $container->extend('something');
+    }
+
+    public function testReregisteringSharedItemWillRemoveAPreviouslyResolvedSharedItem()
+    {
+        // Arrange
+        $container = new Container();
+        $container->share('key', function () {
+            return 'bar';
+        });
+        $container->get('key');
+        $container->share('key', function () {
+            return 'baz';
+        });
+
+        // Act
+        $baz = $container->get('key');
+
+        // Assert
+        $this->assertEquals('baz', $baz);
+    }
+
+    public function testReregisteringWillRemoveAPreviouslyResolvedSharedItem()
+    {
+        // Arrange
+        $container = new Container();
+        $container->share('key', function () {
+            return 'bar';
+        });
+        $container->get('key');
+        $container->add('key', function () {
+            return 'baz';
+        });
+
+        // Act
+        $baz = $container->get('key');
+
+        // Assert
+        $this->assertEquals('baz', $baz);
+    }
+
+    public function testRegisteringShareItemAfterRegisteringNonShareItemWithSameKeyWillMakeItShared()
+    {
+        // Arrange
+        $nonShared = 0;
+        $shared = 0;
+
+        $container = new Container();
+        $container->add('key', function () use (&$nonShared) {
+            $nonShared++;
+            return 'non-shared';
+        });
+        $container->share('key', function () use (&$shared) {
+            $shared++;
+            return 'shared';
+        });
+
+        // Act
+        $result1 = $container->get('key');
+        $result2 = $container->get('key');
+
+        // Assert
+        $this->assertEquals('shared', $result1);
+        $this->assertEquals('shared', $result2);
+        $this->assertEquals(0, $nonShared);
+        $this->assertEquals(1, $shared);
+    }
+
+    public function testRegisteringNonSharedItemAfterRegisteringSharedItemWithSameKeyWillMakeItNonShared()
+    {
+        // Arrange
+        $nonShared = 0;
+        $shared = 0;
+
+        $container = new Container();
+        $container->share('key', function () use (&$shared) {
+            $shared++;
+            return 'shared';
+        });
+        $result1 = $container->get('key');
+        $result2 = $container->get('key');
+        $container->add('key', function () use (&$nonShared) {
+            $nonShared++;
+            return 'non-shared';
+        });
+
+        // Act
+        $result3 = $container->get('key');
+        $result4 = $container->get('key');
+
+        // Assert
+        $this->assertEquals('shared', $result1);
+        $this->assertEquals('shared', $result2);
+        $this->assertEquals('non-shared', $result3);
+        $this->assertEquals('non-shared', $result4);
+        $this->assertEquals(2, $nonShared);
+        $this->assertEquals(1, $shared);
     }
 
     /**

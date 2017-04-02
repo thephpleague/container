@@ -16,6 +16,7 @@ please send a patch via pull request.
 [PSR-1]: https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-1-basic-coding-standard.md
 [PSR-2]: https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-2-coding-style-guide.md
 [PSR-4]: https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-4-autoloader.md
+[PSR-11]: https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-11-container.md
 
 ## Install
 
@@ -33,6 +34,7 @@ The following versions of PHP are supported by this version.
 * PHP 5.5
 * PHP 5.6
 * PHP 7.0
+* PHP 7.1
 * HHVM
 
 ## Documentation
