@@ -3,6 +3,7 @@
 namespace League\Container;
 
 use League\Container\Definition\{DefinitionAggregate, DefinitionInterface, DefinitionAggregateInterface};
+use League\Container\Exception\NotFoundException;
 use League\Container\Inflector\{InflectorAggregate, InflectorInterface, InflectorAggregateInterface};
 use League\Container\ServiceProvider\{ServiceProviderAggregate, ServiceProviderAggregateInterface};
 use Psr\Container\ContainerInterface;
