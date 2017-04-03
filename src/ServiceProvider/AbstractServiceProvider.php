@@ -16,7 +16,7 @@ abstract class AbstractServiceProvider implements ServiceProviderInterface
     /**
      * @var string
      */
-    protected $signature;
+    protected $identifier;
 
     /**
      * {@inheritdoc}
@@ -29,9 +29,9 @@ abstract class AbstractServiceProvider implements ServiceProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function withSignature(string $signature): ServiceProviderInterface
+    public function setIdentifier(string $id): ServiceProviderInterface
     {
-        $this->signature = $signature;
+        $this->identifier = $id;
 
         return $this;
     }
@@ -39,8 +39,8 @@ abstract class AbstractServiceProvider implements ServiceProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getSignature(): string
+    public function getIdentifier(): string
     {
-        return (is_null($this->signature)) ? get_class($this) : $this->signature;
+        return $this->identifier ?? get_class($this);
     }
 }

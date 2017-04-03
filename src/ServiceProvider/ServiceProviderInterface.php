@@ -26,21 +26,21 @@ interface ServiceProviderInterface extends ContainerAwareInterface
     public function register();
 
     /**
-     * Set a custom signature for the service provider. This enables
+     * Set a custom id for the service provider. This enables
      * registering the same service provider multiple times.
      *
-     * @param string $signature
+     * @param string $id
      *
      * @return self
      */
-    public function withSignature(string $signature): ServiceProviderInterface;
+    public function setIdentifier(string $id): ServiceProviderInterface;
 
     /**
-     * The signature of the service provider uniquely identifies it, so
+     * The id of the service provider uniquely identifies it, so
      * that we can quickly determine if it has already been registered.
      * Defaults to get_class($provider).
      *
      * @return string
      */
-    public function getSignature(): string;
+    public function getIdentifier(): string;
 }

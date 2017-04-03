@@ -41,7 +41,7 @@ class ServiceProviderTest extends TestCase
      */
     public function testServiceProviderCorrectlyDeterminesWhatIsProvided()
     {
-        $provider = $this->getServiceProvider()->withSignature('something');
+        $provider = $this->getServiceProvider()->setIdentifier('something');
 
         $this->assertTrue($provider->provides('SomeService'));
         $this->assertTrue($provider->provides('AnotherService'));
