@@ -102,21 +102,31 @@ class Container implements ContainerInterface
     /**
      * {@inheritdoc}
      */
-    public function get($id, array $args = [], bool $new = false)
+    public function get($id, bool $new = false)
     {
         if ($this->definitions->has($id)) {
-            $resolved = $this->definitions->resolve($id, $args, $new);
+            $resolved = $this->definitions->resolve($id, $new);
             return $this->inflectors->inflect($resolved);
+        }
+
+        if ($this->definitions->hasTag($id)) {
+            $arrayOf = $this->definitions->resolveTagged($id);
+
+            array_walk($arrayOf, function (&$resolved) {
+                $resolved = $this->inflectors->inflect($resolved);
+            });
+
+            return $arrayOf;
         }
 
         if ($this->providers->provides($id)) {
             $this->providers->register($id);
-            return $this->get($id, $args, $new);
+            return $this->get($id, $new);
         }
 
         foreach ($this->delegates as $delegate) {
             if ($delegate->has($id)) {
-                $resolved = $delegate->get($id, $args);
+                $resolved = $delegate->get($id);
                 return $this->inflectors->inflect($resolved);
             }
         }
@@ -130,6 +140,10 @@ class Container implements ContainerInterface
     public function has($id): bool
     {
         if ($this->definitions->has($id)) {
+            return true;
+        }
+
+        if ($this->definitions->hasTag($id)) {
             return true;
         }
 

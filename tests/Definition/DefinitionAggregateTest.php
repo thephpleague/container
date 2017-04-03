@@ -93,15 +93,48 @@ class DefinitionAggregateTest extends TestCase
         $definition2->expects($this->once())->method('setContainer')->with($this->equalTo($container))->will($this->returnSelf());
         $definition2->expects($this->once())->method('setShared')->with($this->equalTo(true))->will($this->returnSelf());
         $definition2->expects($this->once())->method('setAlias')->with($this->equalTo('alias2'))->will($this->returnSelf());
-        $definition2->expects($this->once())->method('resolve')->with($this->equalTo([]), $this->equalTo(false))->will($this->returnSelf());
+        $definition2->expects($this->once())->method('resolve')->with($this->equalTo(false))->will($this->returnSelf());
 
         $aggregate->setContainer($container);
 
         $aggregate->add('alias1', $definition1);
         $aggregate->add('alias2', $definition2, true);
 
-        $resolved = $aggregate->resolve('alias2', []);
+        $resolved = $aggregate->resolve('alias2');
         $this->assertSame($definition2, $resolved);
+    }
+
+    /**
+     * Asserts that the aggregate can resolved array of tagged definitions.
+     */
+    public function testAggregateCanResolveArrayOfTaggedDefinitions()
+    {
+        $aggregate   = new DefinitionAggregate;
+        $definition1 = $this->getMockBuilder(DefinitionInterface::class)->getMock();
+        $definition2 = $this->getMockBuilder(DefinitionInterface::class)->getMock();
+        $container   = $this->getMockBuilder(ContainerInterface::class)->getMock();
+
+        $definition1->expects($this->once())->method('setContainer')->with($this->equalTo($container))->will($this->returnSelf());
+        $definition1->expects($this->once())->method('setShared')->with($this->equalTo(false))->will($this->returnSelf());
+        $definition1->expects($this->once())->method('setAlias')->with($this->equalTo('alias1'))->will($this->returnSelf());
+        $definition1->expects($this->exactly(2))->method('hasTag')->with($this->equalTo('tag'))->will($this->returnValue(true));
+        $definition1->expects($this->once())->method('resolve')->with($this->equalTo(false))->will($this->returnValue('definition1'));
+
+        $definition2->expects($this->once())->method('setContainer')->with($this->equalTo($container))->will($this->returnSelf());
+        $definition2->expects($this->once())->method('setShared')->with($this->equalTo(false))->will($this->returnSelf());
+        $definition2->expects($this->once())->method('setAlias')->with($this->equalTo('alias2'))->will($this->returnSelf());
+        $definition2->expects($this->once())->method('hasTag')->with($this->equalTo('tag'))->will($this->returnValue(true));
+        $definition2->expects($this->once())->method('resolve')->with($this->equalTo(false))->will($this->returnValue('definition2'));
+
+        $aggregate->setContainer($container);
+
+        $aggregate->add('alias1', $definition1);
+        $aggregate->add('alias2', $definition2);
+
+        $this->assertTrue($aggregate->hasTag('tag'));
+
+        $resolved = $aggregate->resolveTagged('tag');
+        $this->assertSame(['definition1', 'definition2'], $resolved);
     }
 
     /**
@@ -131,6 +164,6 @@ class DefinitionAggregateTest extends TestCase
         $aggregate->add('alias1', $definition1);
         $aggregate->add('alias2', $definition2, true);
 
-        $resolved = $aggregate->resolve('alias', []);
+        $resolved = $aggregate->resolve('alias');
     }
 }

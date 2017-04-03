@@ -31,6 +31,11 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
     /**
      * @var array
      */
+    protected $tags = [];
+
+    /**
+     * @var array
+     */
     protected $arguments = [];
 
     /**
@@ -53,6 +58,24 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
     {
         $this->alias    = $id;
         $this->concrete = $concrete;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addTag(string $tag): DefinitionInterface
+    {
+        $this->tags[] = $tag;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasTag(string $tag): bool
+    {
+        return in_array($tag, $this->tags);
     }
 
     /**
@@ -141,7 +164,7 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
     /**
      * {@inheritdoc}
      */
-    public function resolve(array $args = [], bool $new = false)
+    public function resolve(bool $new = false)
     {
         $concrete = $this->concrete;
 
@@ -150,7 +173,7 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
         }
 
         if (is_callable($concrete)) {
-            $concrete = $this->resolveCallable($concrete, $args);
+            $concrete = $this->resolveCallable($concrete);
         }
 
         if ($concrete instanceof RawArgumentInterface) {
@@ -164,7 +187,7 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
         }
 
         if (is_string($concrete) && class_exists($concrete)) {
-            $concrete = $this->resolveClass($concrete, $args);
+            $concrete = $this->resolveClass($concrete);
         }
 
         if (is_object($concrete)) {
@@ -180,14 +203,12 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
      * Resolve a callable.
      *
      * @param callable $concrete
-     * @param array    $args
      *
      * @return mixed
      */
-    protected function resolveCallable(callable $concrete, array $args = [])
+    protected function resolveCallable(callable $concrete)
     {
-        $args     = (empty($args)) ? $this->arguments : $args;
-        $resolved = $this->resolveArguments($args);
+        $resolved = $this->resolveArguments($this->arguments);
 
         return call_user_func_array($concrete, $resolved);
     }
@@ -200,10 +221,9 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
      *
      * @return object
      */
-    protected function resolveClass(string $concrete, array $args = [])
+    protected function resolveClass(string $concrete)
     {
-        $args       = (empty($args)) ? $this->arguments : $args;
-        $resolved   = $this->resolveArguments($args);
+        $resolved   = $this->resolveArguments($this->arguments);
         $reflection = new ReflectionClass($concrete);
 
         return $reflection->newInstanceArgs($resolved);

@@ -27,22 +27,6 @@ class DefinitionTest extends TestCase
     }
 
     /**
-     * Asserts that the definition can resolve a closure with runtime args.
-     */
-    public function testDefinitionResolvesClosureWithRuntimedArgs()
-    {
-        $definition = new Definition('callable', function (...$args) {
-            return implode(' ', $args);
-        });
-
-        $definition->addArguments(['hello', 'world']);
-
-        $actual = $definition->resolve(['goodbye', 'earth']);
-
-        $this->assertSame('goodbye earth', $actual);
-    }
-
-    /**
      * Asserts that the definition can resolve a closure returning raw argument.
      */
     public function testDefinitionResolvesClosureReturningRawArgument()
@@ -131,28 +115,6 @@ class DefinitionTest extends TestCase
     }
 
     /**
-     * Asserts that the definition can resolve a class with runtime args.
-     */
-    public function testDefinitionResolvesClassWithRuntimeArgs()
-    {
-        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
-
-        $bar = new Bar;
-
-        $container->expects($this->once())->method('has')->with($this->equalTo(Bar::class))->will($this->returnValue(true));
-        $container->expects($this->once())->method('get')->with($this->equalTo(Bar::class))->will($this->returnValue($bar));
-
-        $definition = new Definition('callable', Foo::class);
-
-        $definition->setContainer($container);
-
-        $actual = $definition->resolve([Bar::class]);
-
-        $this->assertInstanceOf(Foo::class, $actual);
-        $this->assertInstanceOf(Bar::class, $actual->bar);
-    }
-
-    /**
      * Asserts that the definition can resolve a class as class name.
      */
     public function testDefinitionResolvesClassAsClassName()
@@ -186,9 +148,23 @@ class DefinitionTest extends TestCase
 
         $actual1 = $definition->resolve();
         $actual2 = $definition->resolve();
-        $actual3 = $definition->resolve([], true);
+        $actual3 = $definition->resolve(true);
 
         $this->assertSame($actual1, $actual2);
         $this->assertFalse($actual1 === $actual3);
+    }
+
+    /**
+     * Asserts that the definition can add tags.
+     */
+    public function testDefinitionCanAddTags()
+    {
+        $definition = new Definition('callable', new ClassName(Foo::class));
+
+        $definition->addTag('tag1')->addTag('tag2');
+
+        $this->assertTrue($definition->hasTag('tag1'));
+        $this->assertTrue($definition->hasTag('tag2'));
+        $this->assertFalse($definition->hasTag('tag3'));
     }
 }

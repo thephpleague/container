@@ -7,6 +7,24 @@ use League\Container\ContainerAwareInterface;
 interface DefinitionInterface extends ContainerAwareInterface
 {
     /**
+     * Add a tag to the definition.
+     *
+     * @param string $tag
+     *
+     * @return self
+     */
+    public function addTag(string $tag): DefinitionInterface;
+
+    /**
+     * Does the definition have a tag?
+     *
+     * @param string $tag
+     *
+     * @return boolean
+     */
+    public function hasTag(string $tag): bool;
+
+    /**
      * Set the alias of the definition.
      *
      * @param string $id
@@ -76,10 +94,9 @@ interface DefinitionInterface extends ContainerAwareInterface
     /**
      * Handle instantiation and manipulation of value and return.
      *
-     * @param array   $args
      * @param boolean $new
      *
      * @return mixed
      */
-    public function resolve(array $args = [], bool $new = false);
+    public function resolve(bool $new = false);
 }

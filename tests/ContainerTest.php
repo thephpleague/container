@@ -28,6 +28,27 @@ class ContainerTest extends TestCase
     }
 
     /**
+     * Asserts that the container can add and get services by tag.
+     */
+    public function testContainerAddsAndGetsFromTag()
+    {
+        $container = new Container;
+
+        $container->add(Foo::class)->addTag('foobar');
+        $container->add(Bar::class)->addTag('foobar');
+
+        $this->assertTrue($container->has(Foo::class));
+
+        $arrayOf = $container->get('foobar');
+
+        $this->assertTrue($container->has('foobar'));
+        $this->assertInternalType('array', $arrayOf);
+        $this->assertCount(2, $arrayOf);
+        $this->assertInstanceOf(Foo::class, $arrayOf[0]);
+        $this->assertInstanceOf(Bar::class, $arrayOf[1]);
+    }
+
+    /**
      * Asserts that the container can add and get a service from service provider.
      */
     public function testContainerAddsAndGetsWithServiceProvider()

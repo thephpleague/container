@@ -50,6 +50,20 @@ class DefinitionAggregate implements DefinitionAggregateInterface
     /**
      * {@inheritdoc}
      */
+    public function hasTag(string $tag): bool
+    {
+        foreach ($this->getIterator() as $definition) {
+            if ($definition->hasTag($tag)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getDefinition(string $id): DefinitionInterface
     {
         foreach ($this->getIterator() as $definition) {
@@ -64,9 +78,25 @@ class DefinitionAggregate implements DefinitionAggregateInterface
     /**
      * {@inheritdoc}
      */
-    public function resolve(string $id, array $args = [], bool $new = false)
+    public function resolve(string $id, bool $new = false)
     {
-        return $this->getDefinition($id)->resolve($args, $new);
+        return $this->getDefinition($id)->resolve($new);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function resolveTagged(string $tag, bool $new = false): array
+    {
+        $arrayOf = [];
+
+        foreach ($this->getIterator() as $definition) {
+            if ($definition->hasTag($tag)) {
+                $arrayOf[] = $definition->resolve($new);
+            }
+        }
+
+        return $arrayOf;
     }
 
     /**

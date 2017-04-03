@@ -28,6 +28,15 @@ interface DefinitionAggregateInterface extends ContainerAwareInterface, Iterator
     public function has(string $id): bool;
 
     /**
+     * Checks whether tag exists as definition.
+     *
+     * @param string $tag
+     *
+     * @return boolean
+     */
+    public function hasTag(string $tag): bool;
+
+    /**
      * Get the definition to be extended.
      *
      * @param string $id
@@ -40,10 +49,19 @@ interface DefinitionAggregateInterface extends ContainerAwareInterface, Iterator
      * Resolve and build a concrete value from an id/alias.
      *
      * @param string  $id
-     * @param array   $args
      * @param boolean $new
      *
      * @return mixed
      */
-    public function resolve(string $id, array $args = [], bool $new = false);
+    public function resolve(string $id, bool $new = false);
+
+    /**
+     * Resolve and build an array of concrete values from a tag.
+     *
+     * @param string  $tag
+     * @param boolean $new
+     *
+     * @return mixed
+     */
+    public function resolveTagged(string $tag, bool $new = false);
 }
