@@ -81,7 +81,7 @@ class Container implements ContainerInterface
         }
 
         throw new NotFoundException(
-            sprintf('Unable to extend alias (%s) as it is not being managed as a definition', $alias)
+            sprintf('Unable to extend alias (%s) as it is not being managed as a definition', $id)
         );
     }
 
