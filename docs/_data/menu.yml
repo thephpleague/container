@@ -1,0 +1,42 @@
+'3.x':
+    Getting Started:
+        Introduction: '/3.x/'
+        Installation: '/3.x/installation/'
+    Basic Usage:
+        Getting Started: '/3.x/getting-started/'
+        Constructor Injection: '/3.x/constructor-injection/'
+        Setter Injection: '/3.x/setter-injection/'
+        Factory Closures: '/3.x/factory-closures/'
+    Advanced:
+        Delegate Containers: '/3.x/delegates/'
+        Auto Wiring: '/3.x/auto-wiring/'
+        Inflectors: '/3.x/inflectors/'
+        Service Providers: '/3.x/service-providers/'
+'2.x':
+    Getting Started:
+        Introduction: '/2.x/'
+        Installation: '/2.x/installation/'
+    Basic Usage:
+        Getting Started: '/2.x/getting-started/'
+        Constructor Injection: '/2.x/constructor-injection/'
+        Setter Injection: '/2.x/setter-injection/'
+        Factory Closures: '/2.x/factory-closures/'
+    Advanced:
+        Delegate Containers: '/2.x/delegates/'
+        Auto Wiring: '/2.x/auto-wiring/'
+        Inflectors: '/2.x/inflectors/'
+        Service Providers: '/2.x/service-providers/'
+'1.x':
+    Getting Started:
+        Introduction: '/1.x/'
+        Installation: '/1.x/installation/'
+    Usage:
+        Service Providers: '/1.x/service-providers/'
+        Constructor Injection: '/1.x/constructor-injection/'
+        Setter Injection: '/1.x/setter-injection/'
+        Factory Closures: '/1.x/factory-closures/'
+        Auto Dependency Resolution: '/1.x/auto-dependency-resolution/'
+        Singletons: '/1.x/singletons/'
+        Inflectors: '/1.x/inflectors/'
+        Registering Callables: '/1.x/registering-callables/'
+        Configuration: '/1.x/configuration/'
