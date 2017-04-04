@@ -217,7 +217,6 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
      * Resolve a class.
      *
      * @param string $concrete
-     * @param array  $args
      *
      * @return object
      */
