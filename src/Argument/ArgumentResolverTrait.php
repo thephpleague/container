@@ -39,6 +39,7 @@ trait ArgumentResolverTrait
 
                 continue;
             }
+            
         }
 
         return $arguments;
