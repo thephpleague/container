@@ -20,7 +20,8 @@ interface ServiceProviderInterface extends ContainerAwareInterface
      * protected $this->container property or the `getContainer` method
      * from the ContainerAwareTrait.
      *
+     * @param  string $alias The service to be registered
      * @return void
      */
-    public function register();
+    public function register($alias);
 }
