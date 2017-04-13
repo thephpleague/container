@@ -40,16 +40,27 @@ class SomeServiceProvider extends AbstractServiceProvider
      * that you need to, but remember, every alias registered
      * within this method must be declared in the `$provides` array.
      */
-    public function register()
+    public function register($alias)
     {
-        $this->getContainer()->add('key', 'value');
+        switch ($alias) {
+            case 'key': 
+                $this->getContainer()->add('key', 'value');
+                break;
+            case 'Some\Controller':
+                $this->getContainer()->add('Some\Controller')
+                     ->withArgument('Some\Request')
+                     ->withArgument('Some\Model');
 
-        $this->getContainer()->add('Some\Controller')
-             ->withArgument('Some\Request')
-             ->withArgument('Some\Model');
+                break;
+            case 'Some\Request':
+                $this->getContainer()->add('Some\Request');
+                break;
+            case 'Some\Model':
+                $this->getContainer()->add('Some\Model');
+                break;
+        }
 
-        $this->getContainer()->add('Some\Request');
-        $this->getContainer()->add('Some\Model');
+
     }
 }
 ~~~
@@ -110,7 +121,7 @@ class SomeServiceProvider extends AbstractServiceProvider implements BootableSer
     /**
      * {@inheritdoc}
      */
-    public function register()
+    public function register($alias)
     {
         // ...
     }

@@ -18,6 +18,7 @@ class ServiceProviderAggregate implements ServiceProviderAggregateInterface
      * @var array
      */
     protected $registered = [];
+    protected $registered_services = [];
 
     /**
      * {@inheritdoc}
@@ -68,17 +69,24 @@ class ServiceProviderAggregate implements ServiceProviderAggregateInterface
                 sprintf('(%s) is not provided by a service provider', $service)
             );
         }
-
+        
         $provider  = $this->providers[$service];
 
-        // ensure that the service hasn't already been invoked by any other service request
-        if (in_array($service, $this->registered)) {
+        $signature = get_class($provider);
+        if ($provider instanceof SignatureServiceProviderInterface) {
+            $signature = $provider->getSignature();
+        }
+
+        // ensure that the provider hasn't already been invoked by any other service request
+        if (in_array($signature, $this->registered) 
+            && isset($this->registered_services[$signature]) 
+            && in_array($service, $this->registered_services[$signature])) {
             return;
         }
 
-        // we pass the wanted service to the provider
         $provider->register($service);
+        $this->registered[] = $signature;
+        $this->registered_service[$signature] = $service;
 
-        $this->registered[] = $service;
     }
 }
