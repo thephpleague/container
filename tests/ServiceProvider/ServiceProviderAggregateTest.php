@@ -48,14 +48,14 @@ class ServiceProviderAggregateTest extends \PHPUnit_Framework_TestCase
         $aggregate->register('SomeService');
     }
 
-    public function testAggregateInvokesCorrectRegisterMethodOnlyOnce()
+    public function testAggregateInvokesCorrectRegisterMethodOnePerService()
     {
         $container = $this->getMock('League\Container\ContainerInterface');
         $aggregate = (new ServiceProviderAggregate)->setContainer($container);
         $provider  = $this->getMock('League\Container\Test\Asset\ServiceProviderFake');
 
         $provider->expects($this->once())->method('boot');
-        $provider->expects($this->once())->method('register');
+        $provider->expects($this->exactly(2))->method('register');
         $provider->expects($this->once())->method('provides')->will($this->returnValue(['SomeService', 'AnotherService']));
 
 

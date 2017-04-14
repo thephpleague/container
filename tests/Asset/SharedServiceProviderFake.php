@@ -28,11 +28,13 @@ class SharedServiceProviderFake extends AbstractServiceProvider
         $this->provides[] = $alias;
     }
 
-    public function register()
+    public function register($alias)
     {
-        $this->getContainer()->share($this->alias, function () {
-            return $this->item;
-        });
+        if($alias == $this->alias) {
+            $this->getContainer()->share($this->alias, function () {
+                return $this->item;
+            });
+        }
 
         return true;
     }
