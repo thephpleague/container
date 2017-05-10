@@ -147,6 +147,8 @@ class ReflectionContainerTest extends \PHPUnit_Framework_TestCase
     {
         $container = new ReflectionContainer;
 
+        $container->setContainer($container);
+
         $container->call('League\Container\Test\Asset\Foo::staticSetBar');
 
         $this->assertInstanceOf('League\Container\Test\Asset\Bar', Asset\Foo::$staticBar);
