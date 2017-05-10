@@ -1,17 +1,23 @@
 '3.x':
     Getting Started:
-        Introduction: '/3.x/'
         Installation: '/3.x/installation/'
-    Basic Usage:
-        Getting Started: '/3.x/getting-started/'
+        Basic Usage: '/3.x/basic-usage/'
+    Dependency Injection:
         Constructor Injection: '/3.x/constructor-injection/'
         Setter Injection: '/3.x/setter-injection/'
-        Factory Closures: '/3.x/factory-closures/'
-    Advanced:
-        Delegate Containers: '/3.x/delegates/'
+        Factories: '/3.x/factories/'
+    Definitions:
+        Introduction: '/3.x/definitions-introduction/'
+        Usage: '/3.x/definitions-usage/'
+    Service Providers:
+        Introduction: '/3.x/service-providers-introduction/'
+        Usage: '/3.x/service-providers-usage/'
+    Inflectors:
+        Introduction: '/3.x/inflectors-introduction/'
+        Usage: '/3.x/inflectors-usage/'
+    Delegates:
+        Containers: '/3.x/delegate-containers/'
         Auto Wiring: '/3.x/auto-wiring/'
-        Inflectors: '/3.x/inflectors/'
-        Service Providers: '/3.x/service-providers/'
 '2.x':
     Getting Started:
         Introduction: '/2.x/'

@@ -6,6 +6,7 @@ menu .documentation {
     menu {
         text-align: center;
     }
+
     menu .documentation {
         margin: 15px 0 0 0;
         display: inline-block;
@@ -189,19 +190,17 @@ h5:hover .header-permalink {
 }
 
 .documentation .version {
-    margin:.3em auto;
-    padding:0;
-    border:1px solid #0491a0;
-    max-width:289px;
+    margin: 1em auto;
+    padding: 0;
 }
 
 .documentation .version h2 {
-    margin:0;
+    margin: 0;
     padding:.3em;
     text-transform: uppercase;
-    font-size:18px;
-    color:#fff;
-    background:#0491a0;
+    font-size: 18px;
+    color: #fff;
+    background: #0491a0;
 }
 
 .documentation .version ul {
@@ -229,7 +228,7 @@ h5:hover .header-permalink {
 }
 
 .documentation .version .content {
-    padding:1em 0;
+    padding: 1em 0;
     background: #fff;
 }
 
@@ -249,6 +248,24 @@ h5:hover .header-permalink {
 
 .documentation .next a:hover {
     background: #0a7c87;
+}
+
+.documentation .old {
+    border-color: #ffb347;
+}
+
+.documentation .old h2 {
+    background: #ffb347;
+}
+
+.documentation .old a {
+    background: #ffb347;
+    border-radius: 4px;
+    box-shadow: 3px 3px 0 #fa9200;
+}
+
+.documentation .old a:hover {
+    background: #ff9e14;
 }
 
 .documentation .current {
@@ -364,20 +381,35 @@ h5:hover .header-permalink {
     }
 }
 
-@media screen and (min-width:700px) {
+@media screen and (max-width: 700px) {
+    .homepage header h1 {
+        font-size: 50px;
+    }
+
+    .homepage header h2 {
+        font-size: 24px;
+    }
+
+    .homepage .composer span {
+        font-size: 13px;
+    }
+}
+
+@media screen and (min-width: 700px) {
+    .documentation .inner-content {
+        text-align: center;
+    }
+
     .documentation .version {
-        float:left;
-        width:42%;
-        margin:2%;
-        max-width:289px;
+        display: inline-block;
+        width: 42%;
+        margin: 2%;
     }
 }
 
 @media screen and (min-width: 910px) {
-
     .documentation .version {
-        float:left;
-        width:30%;
-        margin:1%;
+        width: 30%;
+        margin: 1%;
     }
 }

@@ -74,9 +74,9 @@
             {% for release in page.releases %}
             <div class="version {{ release.type }}">
                 <h2>
-                    {% if release.type == 'next' %}Upcoming{% endif %}
+                    {% if release.type == 'next' %}Upcoming Release{% endif %}
                     {% if release.type == 'current' %}Current Stable Release{% endif %}
-                    {% if release.type == 'old' %}Older Release{% endif %}
+                    {% if release.type == 'old' %}Patches &amp; Security Fixes{% endif %}
                     {% if release.type == 'legacy' %}No Longer Supported{% endif %}
                 </h2>
                 <div class="content">
