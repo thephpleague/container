@@ -17,10 +17,12 @@ All Notable changes to `League\Container` will be documented in this file
 - Merged service provider signature logic in to one interface and abstract.
 - Heavily simplified definition logic providing more control to user.
 
-## 2.3.0
+## 2.4.1
 
-### Added
-- Now implementation of the PSR-11.
+### Fixed
+- Ensures `ReflectionContainer` converts class name in array callable to object.
+
+## 2.4.0
 
 ### Changed
 - Can now wrap shared objects as `RawArgument`.
@@ -31,6 +33,11 @@ All Notable changes to `League\Container` will be documented in this file
 - Various docblock fixes.
 - Unused imports removed.
 - Unreachable arguments no longer passed.
+
+## 2.3.0
+
+### Added
+- Now implementation of the PSR-11.
 
 ## 2.2.0
 
