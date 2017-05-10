@@ -61,6 +61,10 @@ class ReflectionContainer implements
         }
 
         if (is_array($callable)) {
+            if (is_string($callable[0])) {
+                $callable[0] = $this->getContainer()->get($callable[0]);
+            }
+
             $reflection = new ReflectionMethod($callable[0], $callable[1]);
 
             if ($reflection->isStatic()) {
