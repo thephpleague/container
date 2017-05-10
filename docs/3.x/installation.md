@@ -8,14 +8,14 @@ Installation
 
 ## System Requirements
 
-You need **PHP >= 5.4.0** to use `League\Container` but the latest stable version of PHP is recommended.
+You need **PHP >= 7.0.0** to use `League\Container` but the latest stable version of PHP is recommended.
 
 ## Composer
 
 Container is available on [Packagist](https://packagist.org/packages/league/container) and can be installed using [Composer](https://getcomposer.org/):
 
 ~~~
-composer require league/container
+composer require league/container:^3.0
 ~~~
 
 Most modern frameworks will include Composer out of the box, but ensure the following file is included:

@@ -1,18 +1,40 @@
 ---
 layout: default
-title: Getting Started
+title: Basic Usage
 ---
 
-# Getting Started
+# Basic Usage
 
-Container allows you to register services, with or without their dependencies for later retrieval.
+At it's core, League\\Container allows you to register services, with or without their dependencies for later retrieval. It is a registry of sorts that used correctly can allow you to implement the Dependency Injection design pattern.
+
+## Classes &amp; dependencies
+
+We have a class, `Foo`, that depends on another class, `Bar`.
 
 ~~~ php
 <?php
 
-namespace Acme\Service;
+namespace Acme;
 
-class SomeService
+class Foo
+{
+    /**
+     * @type Acme\Bar
+     */
+    public $bar;
+
+    /**
+     * Construct.
+     *
+     * @param \Acme\Bar $bar
+     */
+    public function __construct(Bar $bar)
+    {
+        $this->bar = $bar;
+    }
+}
+
+class Bar
 {
     // ...
 }
@@ -20,21 +42,63 @@ class SomeService
 
 There are several ways to now register this service with the container.
 
+### Aliases
+
+The container can be configured to register `Foo` against an alias with it's dependencies as a prototype so that every time it is retrieved, it will be a new instance of `Foo` with `Bar` injected in to the constructor.
+
 ~~~ php
 <?php
 
-$container = new League\Container\Container;
+use Acme\{Foo, Bar};
+use League\Container\Container;
 
-// register the service as a prototype against an alias
-$container->add('service', 'Acme\Service\SomeService');
+$container = new Container;
 
-// now to retrieve this service we can just retrieve the alias
-// each time we `get` the service it will be a new instance
-$service1 = $container->get('service');
-$service2 = $container->get('service');
+$container
+    ->add('alias_for_foo', Foo::class)
+    ->addArgument('alias_for_bar')
+;
 
-var_dump($service1 instanceof Acme\Service\SomeService); // true
-var_dump($service1 === $service2); // false
+$container->add('alias_for_bar', Bar::class);
+
+$foo1 = $container->get('alias_for_foo');
+$foo2 = $container->get('alias_for_foo');
+
+var_dump($foo1 instanceof Foo);      // true
+var_dump($foo1 === $foo2);           // false
+var_dump($foo1->bar instanceof Bar); // true
+var_dump($foo1->bar === $foo2->bar); // false
+~~~
+
+Aliases can be useful when implementing interfaces.
+
+~~~ php
+<?php
+
+namespace Acme;
+
+interface FooInterface
+{
+    // ...
+}
+
+class Foo implements FooInterface
+{
+    // ...
+}
+~~~
+
+Now you can register `Foo` against it's interface as an alias `FooInterface`, meaning that whenever you retrieve `FooInterface` from the container, it will be the concrete implementation `Foo` that is returned.
+
+~~~ php
+<?php
+
+use Acme\{Foo, FooInterface};
+use League\Container\Container;
+
+$container = new Container;
+
+$container->add(FooInterface::class, Foo::class);
 ~~~
 
 ~~~ php

@@ -8,7 +8,7 @@ releases:
     support: TBD
     url: /3.x/
   - name: League\Container 2.x
-    type: current
+    type: old
     requires: PHP >= 5.4.0
     release: 2.4.0 - 2017-03
     support: TBD
