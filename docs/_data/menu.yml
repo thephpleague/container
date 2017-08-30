@@ -5,7 +5,7 @@
     Dependency Injection:
         Constructor Injection: '/3.x/constructor-injection/'
         Setter Injection: '/3.x/setter-injection/'
-        Factories: '/3.x/factories/'
+        Factory Closures: '/3.x/factory-closures/'
     Definitions:
         Introduction: '/3.x/definitions-introduction/'
         Usage: '/3.x/definitions-usage/'
