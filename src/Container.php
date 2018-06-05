@@ -12,6 +12,7 @@ use League\Container\Inflector\InflectorAggregate;
 use League\Container\Inflector\InflectorAggregateInterface;
 use League\Container\ServiceProvider\ServiceProviderAggregate;
 use League\Container\ServiceProvider\ServiceProviderAggregateInterface;
+use Psr\Container\ContainerInterface;
 
 class Container implements ContainerInterface
 {
