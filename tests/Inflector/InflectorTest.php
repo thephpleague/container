@@ -4,8 +4,9 @@ namespace League\Container\Test\Inflector;
 
 use League\Container\Inflector\Inflector;
 use League\Container\Test\Asset;
+use PHPUnit\Framework\TestCase;
 
-class InflectorTest extends \PHPUnit_Framework_TestCase
+class InflectorTest extends TestCase
 {
     /**
      * Asserts that the inflector sets expected method calls.

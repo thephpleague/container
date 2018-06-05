@@ -6,8 +6,9 @@ use League\Container\Argument\RawArgument;
 use League\Container\Container;
 use League\Container\ImmutableContainerInterface;
 use League\Container\ReflectionContainer;
+use PHPUnit\Framework\TestCase;
 
-class ContainerTest extends \PHPUnit_Framework_TestCase
+class ContainerTest extends TestCase
 {
     /**
      * Asserts that the container can set and get a simple closure with args.
