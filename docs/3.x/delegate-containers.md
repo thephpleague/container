@@ -1,20 +1,20 @@
 ---
 layout: default
-title: Delegates
+title: Delegate Containers
 ---
 
-# Delegates
+# Delegate Containers
 
-Delegates are a way to allow you to register one or multiple backup containers that will be used to attempt the resolution of services when they cannot be resolved via this container.
+Delegate containers are a way to allow you to register one or multiple backup containers that will be used to attempt the resolution of services when they cannot be resolved via this container.
 
-A delegate must be an implementation of the [container-interop](https://github.com/container-interop/container-interop) project and can be registered using the `delegate` method.
+A delegate must be a [PSR-11](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-11-container.md) implementation and can be registered using the `delegate` method.
 
 ~~~ php
 <?php
 
 namespace Acme\Container;
 
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 
 class DelegateContainer implements ContainerInterface
 {
