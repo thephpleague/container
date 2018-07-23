@@ -39,8 +39,8 @@ class Container implements ContainerInterface
      */
     public function __construct(
         DefinitionAggregateInterface      $definitions = null,
-        ServiceProviderAggregateInterface $providers   = null,
-        InflectorAggregateInterface       $inflectors  = null
+        ServiceProviderAggregateInterface $providers = null,
+        InflectorAggregateInterface       $inflectors = null
     ) {
         $this->definitions = $definitions ?? (new DefinitionAggregate)->setContainer($this);
         $this->providers   = $providers   ?? (new ServiceProviderAggregate)->setContainer($this);
