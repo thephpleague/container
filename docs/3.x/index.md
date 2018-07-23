@@ -5,10 +5,6 @@ title: Introduction
 
 # Introduction
 
-<span style="float: left; margin: 0 10px 0 0;">
-[![SensioLabsInsight](https://insight.sensiolabs.com/projects/ad6b4c3e-8f93-4968-8dd3-391d39a4c3c2/big.png)](https://insight.sensiolabs.com/projects/ad6b4c3e-8f93-4968-8dd3-391d39a4c3c2)
-</span>
-
 [![Author](http://img.shields.io/badge/author-@philipobenito-blue.svg?style=flat-square)](https://twitter.com/philipobenito)
 [![Latest Version](https://img.shields.io/github/release/thephpleague/container.svg?style=flat-square)](https://github.com/thephpleague/container/releases)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
