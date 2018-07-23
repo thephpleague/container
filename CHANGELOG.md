@@ -2,7 +2,7 @@
 
 All Notable changes to `League\Container` will be documented in this file
 
-## Unreleased
+## 3.0.0
 
 ### Added
 - Service providers can now be pulled from the container if they are registered.
