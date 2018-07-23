@@ -29,7 +29,7 @@ trait ContainerAwareTrait
     /**
      * Get the container.
      *
-     * @return \League\Container\ContainerInterface
+     * @return \Psr\Container\ContainerInterface
      */
     public function getContainer(): ContainerInterface
     {

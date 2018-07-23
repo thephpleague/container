@@ -12,9 +12,9 @@ This is useful for example when you want to invoke a method on all objects that 
 Imagine that you have a `LoggerAwareInterface` and would like to invoke the method called `setLogger` passing in a logger every time a class is retrieved that implements this interface.
 
 ~~~ php
-$container->register('Some\Logger');
-$container->register('Some\LoggerAwareClass'); // implements LoggerAwareInterface
-$container->register('Some\Other\LoggerAwareClass'); // implements LoggerAwareInterface
+$container->add('Some\Logger');
+$container->add('Some\LoggerAwareClass'); // implements LoggerAwareInterface
+$container->add('Some\Other\LoggerAwareClass'); // implements LoggerAwareInterface
 
 $container->inflector('LoggerAwareInterface')
           ->invokeMethod('setLogger', ['Some\Logger']); // Some\Logger will be resolved via the container
