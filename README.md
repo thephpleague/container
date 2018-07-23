@@ -10,9 +10,7 @@
 
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/ad6b4c3e-8f93-4968-8dd3-391d39a4c3c2/big.png)](https://insight.sensiolabs.com/projects/ad6b4c3e-8f93-4968-8dd3-391d39a4c3c2)
 
-**Warning! `3.x` branch is in active development and is in no way ready for production!**
-
-This package is compliant with [PSR-1], [PSR-2] and [PSR-4]. If you notice compliance oversights,
+This package is compliant with [PSR-1], [PSR-2], [PSR-4] and [PSR-11]. If you notice compliance oversights,
 please send a patch via pull request.
 
 [PSR-1]: https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-1-basic-coding-standard.md
@@ -34,6 +32,7 @@ The following versions of PHP are supported by this version.
 
 * PHP 7.0
 * PHP 7.1
+* PHP 7.2
 
 ## Documentation
 

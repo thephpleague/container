@@ -2,16 +2,16 @@
 layout: homepage
 releases:
   - name: League\Container 3.x
-    type: next
+    type: current
     requires: PHP >= 7.0.0
-    release: TBD
-    support: TBD
+    release: 3.0.0 - 2018-07
+    support: Ongoing
     url: /3.x/
   - name: League\Container 2.x
     type: old
     requires: PHP >= 5.4.0
     release: 2.4.0 - 2017-03
-    support: TBD
+    support: 2018-12
     url: /2.x/
   - name: League\Container 1.x
     type: legacy
