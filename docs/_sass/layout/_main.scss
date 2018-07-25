@@ -1,0 +1,62 @@
+///
+/// Forty by HTML5 UP
+/// html5up.net | @ajlkn
+/// Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+///
+
+/* Main */
+
+	#one {
+		&.light {
+			background: _palette(bg-light);
+			color: _palette(fg-dark);
+
+			h1, h2, h3, h4, h5, h6 {
+				color: _palette(bg);
+			}
+
+			blockquote {
+				:last-child {
+					margin: 0;
+				}
+			}
+
+			b, strong {
+				color: _palette(fg-bold-dark);
+			}
+
+			a:hover {
+				color: _palette(highlight-dark) !important;
+			}
+		}
+
+		.sticky-nav {
+			position: -webkit-sticky;
+			position: sticky;
+			top: 5em;
+
+			@include breakpoint(small) {
+				position: relative;
+				top: 0;
+			}
+		}
+	}
+
+	#main {
+		background-color: _palette(bg-alt);
+
+		> * {
+			border-top: solid 1px _palette(border);
+
+			&:first-child {
+				border-top: 0;
+			}
+
+			@include inner;
+		}
+
+		&.alt {
+			background-color: transparent;
+			border-bottom: solid 1px _palette(border);
+		}
+	}

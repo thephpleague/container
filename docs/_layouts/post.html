@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<!--
+    Forty by HTML5 UP
+    html5up.net | @ajlkn
+    Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+
+{% include head.html %}
+
+<body>
+
+    {% include header.html %}
+
+
+<!-- Main -->
+<div id="main" class="alt">
+    <section id="one" class="light">
+        <div class="inner">
+            <div class="row">
+                <div class="3u 12u$(small) sticky-nav">
+                    <ul class="alt">
+                        {% for section in page.sections %}
+                        <li><a href="#{{ section[1] }}" class="scrolly">{{ section[0] }}</a></li>
+                        {% endfor %}
+                        <li><a href="#menu">More...</a></li>
+                    </ul>
+                </div>
+                <div class="9u 12u$(small)">
+                    <header class="major">
+                        <h1>{{ page.title }}</h1>
+                    </header>
+                    {{ content }}
+                </div>
+            </div>
+        </div>
+    </section>
+
+</div>
+
+    {% include footer.html %}
+
+</body>
+
+</html>

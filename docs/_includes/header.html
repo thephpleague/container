@@ -1,0 +1,46 @@
+{% assign version = page.url | remove_first: "/" | split: "/"" | first %}
+{% assign menu = false %}
+
+{% for release in site.data.releases %}
+	{% if version == release.version %}
+		{% assign menu = release.menu %}
+		{% break %}
+	{% endif %}
+{% endfor %}
+
+{% if menu == false %}
+	{% for release in site.data.releases %}
+		{% if true == release.default %}
+			{% assign menu = release.menu %}
+			{% assign version = release.version %}
+			{% break %}
+		{% endif %}
+	{% endfor %}
+{% endif %}
+
+<!-- Wrapper -->
+<div id="wrapper">
+
+<!-- Header -->
+<header id="header"{% if page.layout == "landing" %} class="alt style2"{% endif %}{% if page.layout == "home" %} class="alt"{% endif %}>
+	<a href="{{ "" | absolute_url }}" class="logo"><strong>{{ site.title }}</strong> <span>{{ site.subtitle }}</span></a>
+	<nav>
+		<a href="#menu">Menu ({{ version }})&nbsp;</a>
+	</nav>
+</header>
+
+<!-- Menu -->
+<nav id="menu">
+	<ul class="links">
+		{% for page in menu %}
+		    <li><a href="{{ page[1] }}">{{ page[0] }}</a></li>
+		{% endfor %}
+	</ul>
+	<p>
+		{% for release in site.data.releases %}
+			{% if version != release.version %}
+				<a href="{{ release.url }}" class="button special">{{ release.version }}</a>
+			{% endif %}
+		{% endfor %}
+	</p>
+</nav>

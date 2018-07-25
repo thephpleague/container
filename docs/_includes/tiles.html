@@ -1,0 +1,14 @@
+<section id="one" class="tiles">
+	{% for release in site.data.releases limit:site.tiles-count %}
+        <article>
+                <header class="major">
+                        <h3 style="font-weight: 300"><a href="{{ release.url }}" class="link">{{ release.type }}</a></h3>
+                        <p style="letter-spacing: .15em">{{ release.name }}</p>
+                        <p style="letter-spacing: .15em">Latest: {{ release.release }}</p>
+                        <p style="letter-spacing: .15em">Requires: {{ release.requires }}</p>
+                        <p style="letter-spacing: .15em">Support: {{ release.support }}</p>
+                        <p style="margin-top: 1.2em"><a href="{{ release.url }}" class="button special">Documentation</a></p>
+                </header>
+        </article>
+	{% endfor %}
+</section>

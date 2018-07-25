@@ -1,0 +1,56 @@
+-
+  version: unstable
+  name: League\Container (dev-master)
+  type: Unstable
+  requires: PHP >= 7.0.0
+  release: None
+  support: Own Risk
+  url: /unstable/
+  menu:
+    Getting Started: '/unstable/'
+    Dependency Injection: '/unstable/dependency-injection/'
+    Definitions: '/unstable/definitions/'
+    Service Providers: '/unstable/service-providers/'
+    Inflectors: '/unstable/inflectors/'
+    Delegate Containers: '/unstable/delegate-containers/'
+    Auto Wiring: '/unstable/auto-wiring/'
+-
+  default: true
+  version: 3.x
+  name: League\Container 3.x
+  type: Current
+  requires: PHP >= 7.0.0
+  release: 3.0.0 - 2018-07
+  support: Ongoing
+  url: /3.x/
+  menu:
+    Getting Started: '/3.x/'
+    Dependency Injection: '/3.x/dependency-injection/'
+    Definitions: '/3.x/definitions/'
+    Service Providers: '/3.x/service-providers/'
+    Inflectors: '/3.x/inflectors/'
+    Delegate Containers: '/3.x/delegate-containers/'
+    Auto Wiring: '/3.x/auto-wiring/'
+-
+  version: 2.x
+  name: League\Container 2.x
+  type: Old
+  requires: PHP >= 5.4.0
+  release: 2.4.1 - 2018-07
+  support: 2019-02
+  url: /2.x/
+  menu:
+    Getting Started: '/2.x/'
+    Basic Usage: '/2.x/basic-usage/'
+    Advanced: '/2.x/advanced/'
+-
+  version: 1.x
+  name: League\Container 1.x
+  type: Legacy
+  requires: PHP >= 5.4.0
+  release: 1.3.2 - 2015-04
+  support: 2015-10
+  url: /1.x/
+  menu:
+    Getting Started: '/1.x/'
+    Usage: '/1.x/usage/'
