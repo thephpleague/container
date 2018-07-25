@@ -1,2 +1,23 @@
----
+# site settings
+title: Container
+subtitle: The PHP League
+email: philipo@benito.email
+description: A simple but powerful PSR-11 dependency injection container
+baseurl: # the subpath of your site, e.g. /blog
+url: # the base hostname & protocol for your site
+
+# homepage tiles
+tiles-count: 4
+
+# social settings
+github_url: https://github.com/thephpleague/container
+slack_url: https://thephpleague.slack.com
+twitter_url: https://twitter.com/philipobenito
+
+# build settings
+markdown: kramdown
+
 permalink: pretty
+
+sass:
+  style: compressed

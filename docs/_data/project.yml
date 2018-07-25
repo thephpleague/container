@@ -1,5 +1,1 @@
-title: Container
-tagline: "A simple but powerful dependency injection container."
-description: "Container is a simple but powerful dependency injection container that allows you to decouple components in your application in order to write clean and testable code."
-google_analytics_tracking_id: UA-58477653-1
-default_version: "3.x"
+default_version: '3.x'

@@ -1,16 +1,20 @@
 ---
-layout: default
+layout: post
 title: Delegate Containers
+sections:
+    Introduction: introduction
+    Usage: usage
 ---
-
-# Delegate Containers
+## Introduction
 
 Delegate containers are a way to allow you to register one or multiple backup containers that will be used to attempt the resolution of services when they cannot be resolved via this container.
+
+## Usage
 
 A delegate must be a [PSR-11](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-11-container.md) implementation and can be registered using the `delegate` method.
 
 ~~~ php
-<?php
+<?php declare(strict_types=1);
 
 namespace Acme\Container;
 
@@ -23,7 +27,7 @@ class DelegateContainer implements ContainerInterface
 ~~~
 
 ~~~ php
-<?php
+<?php declare(strict_types=1);
 
 $container = new League\Container\Container;
 $delegate  = new Acme\Container\DelegateContainer;
@@ -33,4 +37,4 @@ $delegate  = new Acme\Container\DelegateContainer;
 $container->delegate($delegate);
 ~~~
 
-Now that the delegate has been registered, if a service cannot be resolved, the container will resort to the `has` and `get` methods of the delegate to resolve the requested service.
+Now that the delegate has been registered, if a service cannot be resolved via the primary container, it will resort to the `has` and `get` methods of the delegates to resolve the requested service.

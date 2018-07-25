@@ -1,16 +1,21 @@
 ---
-layout: default
+layout: post
 title: Service Providers
+sections:
+    Introduction: introduction
+    Usage: usage
+    Bootable Service Providers: bootable-service-providers
 ---
+## Introduction
 
-# Service Providers
+Service providers give the benefit of organising your container definitions along with an increase in performance for larger applications as definitions registered within a service provider are lazily registered at the point where a service is retrieved.
 
-Service providers give the benefit of organising your container definitions along with an increase in performance for larger applications as definitions registered within a service provider are lazily registered.
+## Usage
 
 To build a service provider it is as simple as extending the base service provider and defining what you would like to register.
 
 ~~~ php
-<?php
+<?php declare(strict_types=1);
 
 namespace Acme\ServiceProvider;
 
@@ -19,7 +24,7 @@ use League\Container\ServiceProvider\AbstractServiceProvider;
 class SomeServiceProvider extends AbstractServiceProvider
 {
     /**
-     * The provides array is a way to let the container
+     * The provided array is a way to let the container
      * know that a service is provided by this service
      * provider. Every service that is registered via
      * this service provider must have an alias added
@@ -44,9 +49,11 @@ class SomeServiceProvider extends AbstractServiceProvider
     {
         $this->getContainer()->add('key', 'value');
 
-        $this->getContainer()->add('Some\Controller')
-             ->withArgument('Some\Request')
-             ->withArgument('Some\Model');
+        $this->getContainer()
+            ->add('Some\Controller')
+             ->addArgument('Some\Request')
+             ->addArgument('Some\Model')
+        ;
 
         $this->getContainer()->add('Some\Request');
         $this->getContainer()->add('Some\Model');
@@ -57,7 +64,7 @@ class SomeServiceProvider extends AbstractServiceProvider
 To register this service provider with the container simply pass an instance of your provider or a fully qualified class name to the `League\Container\Container::addServiceProvider` method.
 
 ~~~ php
-<?php
+<?php declare(strict_types=1);
 
 $container = new League\Container\Container;
 
@@ -69,7 +76,7 @@ The register method is not invoked until one of the aliases in the `$provides` a
 
 ## Bootable Service Providers
 
-If there is functionality that needs to be run as the service provider is added to the container, for example, setting up inflectors, including config files etc, we can make the service provider bootable by implementing the `BootableServiceProviderInterface`.
+If there is functionality that needs to be run as the service provider is added to the container, for example, setting up inflectors, including config files etc, we can make the service provider bootable by implementing the `League\Container\ServiceProvider\BootableServiceProviderInterface`.
 
 ~~~ php
 <?php
