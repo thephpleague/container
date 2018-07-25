@@ -16,6 +16,18 @@ class DefinitionAggregate implements DefinitionAggregateInterface
     protected $definitions = [];
 
     /**
+     * Construct.
+     *
+     * @param \League\Container\Definition\DefinitionInterface[] $definitions
+     */
+    public function __construct(array $definitions = [])
+    {
+        $this->definitions = array_filter($definitions, function ($definition) {
+            return ($definition instanceof DefinitionInterface);
+        });
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function add(string $id, $definition, bool $shared = false): DefinitionInterface
@@ -25,7 +37,6 @@ class DefinitionAggregate implements DefinitionAggregateInterface
         }
 
         $this->definitions[] = $definition
-            ->setContainer($this->getContainer())
             ->setAlias($id)
             ->setShared($shared)
         ;
@@ -68,7 +79,7 @@ class DefinitionAggregate implements DefinitionAggregateInterface
     {
         foreach ($this->getIterator() as $definition) {
             if ($id === $definition->getAlias()) {
-                return $definition;
+                return $definition->setContainer($this->getContainer());
             }
         }
 
@@ -92,7 +103,7 @@ class DefinitionAggregate implements DefinitionAggregateInterface
 
         foreach ($this->getIterator() as $definition) {
             if ($definition->hasTag($tag)) {
-                $arrayOf[] = $definition->resolve($new);
+                $arrayOf[] = $definition->setContainer($this->getContainer())->resolve($new);
             }
         }
 

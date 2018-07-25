@@ -54,8 +54,10 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
      * @param string $id
      * @param mixed  $concrete
      */
-    public function __construct(string $id, $concrete)
+    public function __construct(string $id, $concrete = null)
     {
+        $concrete = $concrete ?? $id;
+
         $this->alias    = $id;
         $this->concrete = $concrete;
     }
@@ -99,7 +101,7 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
     /**
      * {@inheritdoc}
      */
-    public function setShared(bool $shared): DefinitionInterface
+    public function setShared(bool $shared = true): DefinitionInterface
     {
         $this->shared = $shared;
 

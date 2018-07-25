@@ -42,9 +42,21 @@ class Container implements ContainerInterface
         ServiceProviderAggregateInterface $providers = null,
         InflectorAggregateInterface       $inflectors = null
     ) {
-        $this->definitions = $definitions ?? (new DefinitionAggregate)->setContainer($this);
-        $this->providers   = $providers   ?? (new ServiceProviderAggregate)->setContainer($this);
-        $this->inflectors  = $inflectors  ?? (new InflectorAggregate)->setContainer($this);
+        $this->definitions = $definitions ?? (new DefinitionAggregate);
+        $this->providers   = $providers   ?? (new ServiceProviderAggregate);
+        $this->inflectors  = $inflectors  ?? (new InflectorAggregate);
+
+        if ($this->definitions instanceof ContainerAwareInterface) {
+            $this->definitions->setContainer($this);
+        }
+
+        if ($this->providers instanceof ContainerAwareInterface) {
+            $this->providers->setContainer($this);
+        }
+
+        if ($this->inflectors instanceof ContainerAwareInterface) {
+            $this->inflectors->setContainer($this);
+        }
     }
 
     /**

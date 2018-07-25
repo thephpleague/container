@@ -18,7 +18,6 @@ class DefinitionAggregateTest extends TestCase
         $container  = $this->getMockBuilder(ContainerInterface::class)->getMock();
         $definition = $this->getMockBuilder(DefinitionInterface::class)->getMock();
 
-        $definition->expects($this->once())->method('setContainer')->with($this->equalTo($container))->will($this->returnSelf());
         $definition->expects($this->once())->method('setShared')->with($this->equalTo(false))->will($this->returnSelf());
         $definition->expects($this->once())->method('setAlias')->with($this->equalTo('alias'))->will($this->returnSelf());
 
@@ -85,7 +84,6 @@ class DefinitionAggregateTest extends TestCase
         $container   = $this->getMockBuilder(ContainerInterface::class)->getMock();
 
         $definition1->expects($this->once())->method('getAlias')->will($this->returnValue('alias1'));
-        $definition1->expects($this->once())->method('setContainer')->with($this->equalTo($container))->will($this->returnSelf());
         $definition1->expects($this->once())->method('setShared')->with($this->equalTo(false))->will($this->returnSelf());
         $definition1->expects($this->once())->method('setAlias')->with($this->equalTo('alias1'))->will($this->returnSelf());
 
@@ -109,27 +107,21 @@ class DefinitionAggregateTest extends TestCase
      */
     public function testAggregateCanResolveArrayOfTaggedDefinitions()
     {
-        $aggregate   = new DefinitionAggregate;
         $definition1 = $this->getMockBuilder(DefinitionInterface::class)->getMock();
         $definition2 = $this->getMockBuilder(DefinitionInterface::class)->getMock();
         $container   = $this->getMockBuilder(ContainerInterface::class)->getMock();
 
         $definition1->expects($this->once())->method('setContainer')->with($this->equalTo($container))->will($this->returnSelf());
-        $definition1->expects($this->once())->method('setShared')->with($this->equalTo(false))->will($this->returnSelf());
-        $definition1->expects($this->once())->method('setAlias')->with($this->equalTo('alias1'))->will($this->returnSelf());
         $definition1->expects($this->exactly(2))->method('hasTag')->with($this->equalTo('tag'))->will($this->returnValue(true));
         $definition1->expects($this->once())->method('resolve')->with($this->equalTo(false))->will($this->returnValue('definition1'));
 
         $definition2->expects($this->once())->method('setContainer')->with($this->equalTo($container))->will($this->returnSelf());
-        $definition2->expects($this->once())->method('setShared')->with($this->equalTo(false))->will($this->returnSelf());
-        $definition2->expects($this->once())->method('setAlias')->with($this->equalTo('alias2'))->will($this->returnSelf());
         $definition2->expects($this->once())->method('hasTag')->with($this->equalTo('tag'))->will($this->returnValue(true));
         $definition2->expects($this->once())->method('resolve')->with($this->equalTo(false))->will($this->returnValue('definition2'));
 
-        $aggregate->setContainer($container);
+        $aggregate = new DefinitionAggregate([$definition1, $definition2]);
 
-        $aggregate->add('alias1', $definition1);
-        $aggregate->add('alias2', $definition2);
+        $aggregate->setContainer($container);
 
         $this->assertTrue($aggregate->hasTag('tag'));
 
@@ -150,12 +142,10 @@ class DefinitionAggregateTest extends TestCase
         $container   = $this->getMockBuilder(ContainerInterface::class)->getMock();
 
         $definition1->expects($this->once())->method('getAlias')->will($this->returnValue('alias1'));
-        $definition1->expects($this->once())->method('setContainer')->with($this->equalTo($container))->will($this->returnSelf());
         $definition1->expects($this->once())->method('setShared')->with($this->equalTo(false))->will($this->returnSelf());
         $definition1->expects($this->once())->method('setAlias')->with($this->equalTo('alias1'))->will($this->returnSelf());
 
         $definition2->expects($this->once())->method('getAlias')->will($this->returnValue('alias2'));
-        $definition2->expects($this->once())->method('setContainer')->with($this->equalTo($container))->will($this->returnSelf());
         $definition2->expects($this->once())->method('setShared')->with($this->equalTo(true))->will($this->returnSelf());
         $definition2->expects($this->once())->method('setAlias')->with($this->equalTo('alias2'))->will($this->returnSelf());
 
