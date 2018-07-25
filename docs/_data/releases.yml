@@ -20,7 +20,7 @@
   name: League\Container 3.x
   type: Current
   requires: PHP >= 7.0.0
-  release: 3.0.0 - 2018-07
+  release: 3.0.1 - 2018-07
   support: Ongoing
   url: /3.x/
   menu:
