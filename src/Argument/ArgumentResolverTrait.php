@@ -13,7 +13,7 @@ trait ArgumentResolverTrait
     /**
      * {@inheritdoc}
      */
-    public function resolveArguments(array $arguments): array
+    public function resolveArguments(array $arguments) : array
     {
         foreach ($arguments as &$arg) {
             if ($arg instanceof RawArgumentInterface) {
@@ -57,7 +57,7 @@ trait ArgumentResolverTrait
     /**
      * {@inheritdoc}
      */
-    public function reflectArguments(ReflectionFunctionAbstract $method, array $args = []): array
+    public function reflectArguments(ReflectionFunctionAbstract $method, array $args = []) : array
     {
         $arguments = array_map(function (ReflectionParameter $param) use ($method, $args) {
             $name  = $param->getName();
@@ -88,5 +88,5 @@ trait ArgumentResolverTrait
     /**
      * @return \Psr\Container\ContainerInterface
      */
-    abstract public function getContainer(): ContainerInterface;
+    abstract public function getContainer() : ContainerInterface;
 }

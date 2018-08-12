@@ -46,7 +46,7 @@ class Inflector implements ArgumentResolverInterface, InflectorInterface
     /**
      * {@inheritdoc}
      */
-    public function getType(): string
+    public function getType() : string
     {
         return $this->type;
     }
@@ -54,7 +54,7 @@ class Inflector implements ArgumentResolverInterface, InflectorInterface
     /**
      * {@inheritdoc}
      */
-    public function invokeMethod(string $name, array $args): InflectorInterface
+    public function invokeMethod(string $name, array $args) : InflectorInterface
     {
         $this->methods[$name] = $args;
 
@@ -64,7 +64,7 @@ class Inflector implements ArgumentResolverInterface, InflectorInterface
     /**
      * {@inheritdoc}
      */
-    public function invokeMethods(array $methods): InflectorInterface
+    public function invokeMethods(array $methods) : InflectorInterface
     {
         foreach ($methods as $name => $args) {
             $this->invokeMethod($name, $args);
@@ -76,7 +76,7 @@ class Inflector implements ArgumentResolverInterface, InflectorInterface
     /**
      * {@inheritdoc}
      */
-    public function setProperty(string $property, $value): InflectorInterface
+    public function setProperty(string $property, $value) : InflectorInterface
     {
         $this->properties[$property] = $this->resolveArguments([$value])[0];
 
@@ -86,7 +86,7 @@ class Inflector implements ArgumentResolverInterface, InflectorInterface
     /**
      * {@inheritdoc}
      */
-    public function setProperties(array $properties): InflectorInterface
+    public function setProperties(array $properties) : InflectorInterface
     {
         foreach ($properties as $property => $value) {
             $this->setProperty($property, $value);

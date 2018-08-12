@@ -38,3 +38,5 @@ $container->delegate($delegate);
 ~~~
 
 Now that the delegate has been registered, if a service cannot be resolved via the primary container, it will resort to the `has` and `get` methods of the delegates to resolve the requested service.
+
+

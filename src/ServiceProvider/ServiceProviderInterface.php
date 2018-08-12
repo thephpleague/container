@@ -14,7 +14,7 @@ interface ServiceProviderInterface extends ContainerAwareInterface
      *
      * @return boolean
      */
-    public function provides(string $service): bool;
+    public function provides(string $service) : bool;
 
     /**
      * Use the register method to register items with the container via the
@@ -33,7 +33,7 @@ interface ServiceProviderInterface extends ContainerAwareInterface
      *
      * @return self
      */
-    public function setIdentifier(string $id): ServiceProviderInterface;
+    public function setIdentifier(string $id) : ServiceProviderInterface;
 
     /**
      * The id of the service provider uniquely identifies it, so
@@ -42,5 +42,5 @@ interface ServiceProviderInterface extends ContainerAwareInterface
      *
      * @return string
      */
-    public function getIdentifier(): string;
+    public function getIdentifier() : string;
 }

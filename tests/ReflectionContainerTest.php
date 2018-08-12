@@ -73,6 +73,23 @@ class ReflectionContainerTest extends TestCase
     }
 
     /**
+     * Asserts that ReflectionContainer instantiates and cacheds a class that does not have a constructor.
+     */
+    public function testContainerInstantiatesAndCachesClassWithoutConstructor()
+    {
+        $classWithoutConstructor = \stdClass::class;
+
+        $container = (new ReflectionContainer)->cacheResolutions();
+
+        $classWithoutConstructorOne = $container->get($classWithoutConstructor);
+        $classWithoutConstructorTwo = $container->get($classWithoutConstructor);
+
+        $this->assertInstanceOf($classWithoutConstructor, $classWithoutConstructorOne);
+        $this->assertInstanceOf($classWithoutConstructor, $classWithoutConstructorTwo);
+        $this->assertSame($classWithoutConstructorOne, $classWithoutConstructorTwo);
+    }
+
+    /**
      * Asserts that ReflectionContainer instantiates a class that has a constructor.
      */
     public function testGetInstantiatesClassWithConstructor()
@@ -88,6 +105,31 @@ class ReflectionContainerTest extends TestCase
 
         $this->assertInstanceOf($classWithConstructor, $item);
         $this->assertInstanceOf($dependencyClass, $item->bar);
+    }
+
+    /**
+     * Asserts that ReflectionContainer instantiates and caches a class that has a constructor.
+     */
+    public function testGetInstantiatesAndCachedClassWithConstructor()
+    {
+        $classWithConstructor = Foo::class;
+        $dependencyClass      = Bar::class;
+
+        $container = (new ReflectionContainer)->cacheResolutions();
+
+        $container->setContainer($container);
+
+        $itemOne = $container->get($classWithConstructor);
+        $itemTwo = $container->get($classWithConstructor);
+
+        $this->assertInstanceOf($classWithConstructor, $itemOne);
+        $this->assertInstanceOf($dependencyClass, $itemOne->bar);
+
+        $this->assertInstanceOf($classWithConstructor, $itemTwo);
+        $this->assertInstanceOf($dependencyClass, $itemTwo->bar);
+
+        $this->assertSame($itemOne, $itemTwo);
+        $this->assertSame($itemOne->bar, $itemTwo->bar);
     }
 
     /**

@@ -13,12 +13,12 @@ interface ContainerAwareInterface
      *
      * @return self
      */
-    public function setContainer(ContainerInterface $container): self;
+    public function setContainer(ContainerInterface $container) : self;
 
     /**
      * Get the container
      *
      * @return \Psr\Container\ContainerInterface
      */
-    public function getContainer(): ContainerInterface;
+    public function getContainer() : ContainerInterface;
 }

@@ -14,7 +14,7 @@ interface ArgumentResolverInterface extends ContainerAwareInterface
      *
      * @return array
      */
-    public function resolveArguments(array $arguments): array;
+    public function resolveArguments(array $arguments) : array;
 
     /**
      * Resolves the correct arguments to be passed to a method.
@@ -24,5 +24,5 @@ interface ArgumentResolverInterface extends ContainerAwareInterface
      *
      * @return array
      */
-    public function reflectArguments(ReflectionFunctionAbstract $method, array $args = []): array;
+    public function reflectArguments(ReflectionFunctionAbstract $method, array $args = []) : array;
 }

@@ -14,7 +14,7 @@ interface ServiceProviderAggregateInterface extends ContainerAwareInterface, Ite
      *
      * @return self
      */
-    public function add($provider): ServiceProviderAggregateInterface;
+    public function add($provider) : ServiceProviderAggregateInterface;
 
     /**
      * Determines whether a service is provided by the aggregate.
@@ -23,7 +23,7 @@ interface ServiceProviderAggregateInterface extends ContainerAwareInterface, Ite
      *
      * @return boolean
      */
-    public function provides(string $service): bool;
+    public function provides(string $service) : bool;
 
     /**
      * Invokes the register method of a provider that provides a specific service.

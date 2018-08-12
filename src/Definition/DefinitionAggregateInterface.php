@@ -16,7 +16,7 @@ interface DefinitionAggregateInterface extends ContainerAwareInterface, Iterator
      *
      * @return \League\Container\Definition\DefinitionInterface
      */
-    public function add(string $id, $definition, bool $shared = false): DefinitionInterface;
+    public function add(string $id, $definition, bool $shared = false) : DefinitionInterface;
 
     /**
      * Checks whether alias exists as definition.
@@ -25,7 +25,7 @@ interface DefinitionAggregateInterface extends ContainerAwareInterface, Iterator
      *
      * @return boolean
      */
-    public function has(string $id): bool;
+    public function has(string $id) : bool;
 
     /**
      * Checks whether tag exists as definition.
@@ -34,7 +34,7 @@ interface DefinitionAggregateInterface extends ContainerAwareInterface, Iterator
      *
      * @return boolean
      */
-    public function hasTag(string $tag): bool;
+    public function hasTag(string $tag) : bool;
 
     /**
      * Get the definition to be extended.
@@ -43,7 +43,7 @@ interface DefinitionAggregateInterface extends ContainerAwareInterface, Iterator
      *
      * @return \League\Container\Definition\DefinitionInterface
      */
-    public function getDefinition(string $id): DefinitionInterface;
+    public function getDefinition(string $id) : DefinitionInterface;
 
     /**
      * Resolve and build a concrete value from an id/alias.

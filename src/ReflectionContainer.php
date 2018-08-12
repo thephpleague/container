@@ -15,10 +15,26 @@ class ReflectionContainer implements ArgumentResolverInterface, ContainerInterfa
     use ContainerAwareTrait;
 
     /**
+     * @var boolean
+     */
+    protected $cacheResolutions = false;
+
+    /**
+     * Cache of reslutions.
+     *
+     * @var array
+     */
+    protected $cache = [];
+
+    /**
      * {@inheritdoc}
      */
     public function get($id, array $args = [])
     {
+        if ($this->cacheResolutions === true && array_key_exists($id, $this->cache)) {
+            return $this->cache[$id];
+        }
+
         if (! $this->has($id)) {
             throw new NotFoundException(
                 sprintf('Alias (%s) is not an existing class and therefore cannot be resolved', $id)
@@ -28,19 +44,22 @@ class ReflectionContainer implements ArgumentResolverInterface, ContainerInterfa
         $reflector = new ReflectionClass($id);
         $construct = $reflector->getConstructor();
 
-        if ($construct === null) {
-            return new $id;
+        $resolution = (is_null($construct))
+            ? new $id
+            : $resolution = $reflector->newInstanceArgs($this->reflectArguments($construct, $args))
+        ;
+
+        if ($this->cacheResolutions === true) {
+            $this->cache[$id] = $resolution;
         }
 
-        return $reflector->newInstanceArgs(
-            $this->reflectArguments($construct, $args)
-        );
+        return $resolution;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function has($id): bool
+    public function has($id) : bool
     {
         return class_exists($id);
     }
@@ -82,5 +101,20 @@ class ReflectionContainer implements ArgumentResolverInterface, ContainerInterfa
         $reflection = new ReflectionFunction($callable);
 
         return $reflection->invokeArgs($this->reflectArguments($reflection, $args));
+    }
+
+    /**
+     * Whether the container should default to caching resolutions and returning
+     * the cache on following calls.
+     *
+     * @param boolean $option
+     *
+     * @return self
+     */
+    public function cacheResolutions(bool $option = true) : ContainerInterface
+    {
+        $this->cacheResolutions = $option;
+
+        return $this;
     }
 }

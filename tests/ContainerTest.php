@@ -28,6 +28,44 @@ class ContainerTest extends TestCase
     }
 
     /**
+     * Asserts that the container can add and get a service defined as shared.
+     */
+    public function testContainerAddsAndGetsShared()
+    {
+        $container = new Container;
+
+        $container->share(Foo::class);
+
+        $this->assertTrue($container->has(Foo::class));
+
+        $fooOne = $container->get(Foo::class);
+        $fooTwo = $container->get(Foo::class);
+
+        $this->assertInstanceOf(Foo::class, $fooOne);
+        $this->assertInstanceOf(Foo::class, $fooTwo);
+        $this->assertSame($fooOne, $fooTwo);
+    }
+
+    /**
+     * Asserts that the container can add and get a service defined as shared.
+     */
+    public function testContainerAddsAndGetsSharedByDefault()
+    {
+        $container = (new Container)->defaultToShared();
+
+        $container->share(Foo::class);
+
+        $this->assertTrue($container->has(Foo::class));
+
+        $fooOne = $container->get(Foo::class);
+        $fooTwo = $container->get(Foo::class);
+
+        $this->assertInstanceOf(Foo::class, $fooOne);
+        $this->assertInstanceOf(Foo::class, $fooTwo);
+        $this->assertSame($fooOne, $fooTwo);
+    }
+
+    /**
      * Asserts that the container can add and get services by tag.
      */
     public function testContainerAddsAndGetsFromTag()

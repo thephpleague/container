@@ -19,7 +19,7 @@ trait ContainerAwareTrait
      *
      * @return self
      */
-    public function setContainer(ContainerInterface $container): ContainerAwareInterface
+    public function setContainer(ContainerInterface $container) : ContainerAwareInterface
     {
         $this->container = $container;
 
@@ -31,7 +31,7 @@ trait ContainerAwareTrait
      *
      * @return \Psr\Container\ContainerInterface
      */
-    public function getContainer(): ContainerInterface
+    public function getContainer() : ContainerInterface
     {
         if ($this->container instanceof ContainerInterface) {
             return $this->container;

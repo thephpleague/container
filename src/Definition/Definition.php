@@ -65,7 +65,7 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
     /**
      * {@inheritdoc}
      */
-    public function addTag(string $tag): DefinitionInterface
+    public function addTag(string $tag) : DefinitionInterface
     {
         $this->tags[] = $tag;
 
@@ -75,7 +75,7 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
     /**
      * {@inheritdoc}
      */
-    public function hasTag(string $tag): bool
+    public function hasTag(string $tag) : bool
     {
         return in_array($tag, $this->tags);
     }
@@ -83,7 +83,7 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
     /**
      * {@inheritdoc}
      */
-    public function setAlias(string $id): DefinitionInterface
+    public function setAlias(string $id) : DefinitionInterface
     {
         $this->alias = $id;
 
@@ -93,7 +93,7 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
     /**
      * {@inheritdoc}
      */
-    public function getAlias(): string
+    public function getAlias() : string
     {
         return $this->alias;
     }
@@ -101,7 +101,7 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
     /**
      * {@inheritdoc}
      */
-    public function setShared(bool $shared = true): DefinitionInterface
+    public function setShared(bool $shared = true) : DefinitionInterface
     {
         $this->shared = $shared;
 
@@ -111,7 +111,7 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
     /**
      * {@inheritdoc}
      */
-    public function isShared(): bool
+    public function isShared() : bool
     {
         return $this->shared;
     }
@@ -119,7 +119,7 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
     /**
      * {@inheritdoc}
      */
-    public function addArgument($arg): DefinitionInterface
+    public function addArgument($arg) : DefinitionInterface
     {
         $this->arguments[] = $arg;
 
@@ -129,7 +129,7 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
     /**
      * {@inheritdoc}
      */
-    public function addArguments(array $args): DefinitionInterface
+    public function addArguments(array $args) : DefinitionInterface
     {
         foreach ($args as $arg) {
             $this->addArgument($arg);
@@ -141,7 +141,7 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
     /**
      * {@inheritdoc}
      */
-    public function addMethodCall(string $method, array $args = []): DefinitionInterface
+    public function addMethodCall(string $method, array $args = []) : DefinitionInterface
     {
         $this->methods[] = [
             'method'    => $method,
@@ -154,7 +154,7 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
     /**
      * {@inheritdoc}
      */
-    public function addMethodCalls(array $methods = []): DefinitionInterface
+    public function addMethodCalls(array $methods = []) : DefinitionInterface
     {
         foreach ($methods as $method => $args) {
             $this->addMethodCall($method, $args);

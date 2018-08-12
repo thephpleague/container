@@ -104,3 +104,23 @@ var_dump($foo->bar instanceof Acme\Bar);      // true
 var_dump($foo->baz instanceof Acme\Baz);      // true
 var_dump($foo->bar->bam instanceof Acme\Bam); // true
 ~~~
+
+**Note:** The reflection container, by default, will resolve what you are requesting every time you request it.
+
+If you would like the reflection container to cache resolutions and pull from that cache if available, you can enable it to do so as below.
+
+~~~ php
+<?php declare(strict_types=1);
+
+$container = new League\Container\Container;
+
+// register the reflection container as a delegate to enable auto wiring
+$container->delegate(
+    (new League\Container\ReflectionContainer)->cacheResolutions()
+);
+
+$fooOne = $container->get(Acme\Foo::class);
+$fooTwo = $container->get(Acme\Foo::class);
+
+var_dump($fooOne === $fooTwo); // true
+~~~

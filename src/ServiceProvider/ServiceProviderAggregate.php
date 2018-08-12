@@ -23,7 +23,7 @@ class ServiceProviderAggregate implements ServiceProviderAggregateInterface
     /**
      * {@inheritdoc}
      */
-    public function add($provider): ServiceProviderAggregateInterface
+    public function add($provider) : ServiceProviderAggregateInterface
     {
         if (is_string($provider) && $this->getContainer()->has($provider)) {
             $provider = $this->getContainer()->get($provider);
@@ -54,7 +54,7 @@ class ServiceProviderAggregate implements ServiceProviderAggregateInterface
     /**
      * {@inheritdoc}
      */
-    public function provides(string $service): bool
+    public function provides(string $service) : bool
     {
         foreach ($this->getIterator() as $provider) {
             if ($provider->provides($service)) {
@@ -68,7 +68,7 @@ class ServiceProviderAggregate implements ServiceProviderAggregateInterface
     /**
      * {@inheritdoc}
      */
-    public function getIterator(): Generator
+    public function getIterator() : Generator
     {
         $count = count($this->providers);
 

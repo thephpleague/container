@@ -11,6 +11,11 @@ use Psr\Container\ContainerInterface;
 class Container implements ContainerInterface
 {
     /**
+     * @var boolean
+     */
+    protected $defaultToShared = false;
+
+    /**
      * @var \League\Container\Definition\DefinitionAggregateInterface
      */
     protected $definitions;
@@ -68,11 +73,39 @@ class Container implements ContainerInterface
      *
      * @return \League\Container\Definition\DefinitionInterface
      */
-    public function add(string $id, $concrete = null, bool $shared = false): DefinitionInterface
+    public function add(string $id, $concrete = null, bool $shared = false) : DefinitionInterface
     {
         $concrete = $concrete ?? $id;
+        $shared   = ($this->defaultToShared === true || $shared === true);
 
         return $this->definitions->add($id, $concrete, $shared);
+    }
+
+    /**
+     * Proxy to add with shared as true.
+     *
+     * @param string $id
+     * @param mixed  $concrete
+     *
+     * @return \League\Container\Definition\DefinitionInterface
+     */
+    public function share(string $id, $concrete = null) : DefinitionInterface
+    {
+        return $this->add($id, $concrete, true);
+    }
+
+    /**
+     * Whether the container should default to defining shared definitions.
+     *
+     * @param boolean $shared
+     *
+     * @return self
+     */
+    public function defaultToShared(bool $shared = true) : ContainerInterface
+    {
+        $this->defaultToShared = $shared;
+
+        return $this;
     }
 
     /**
@@ -82,7 +115,7 @@ class Container implements ContainerInterface
      *
      * @return \League\Container\Definition\DefinitionInterface
      */
-    public function extend(string $id): DefinitionInterface
+    public function extend(string $id) : DefinitionInterface
     {
         if ($this->providers->provides($id)) {
             $this->providers->register($id);
@@ -104,7 +137,7 @@ class Container implements ContainerInterface
      *
      * @return self
      */
-    public function addServiceProvider($provider): self
+    public function addServiceProvider($provider) : self
     {
         $this->providers->add($provider);
 
@@ -149,7 +182,7 @@ class Container implements ContainerInterface
     /**
      * {@inheritdoc}
      */
-    public function has($id): bool
+    public function has($id) : bool
     {
         if ($this->definitions->has($id)) {
             return true;
@@ -180,7 +213,7 @@ class Container implements ContainerInterface
      *
      * @return \League\Container\Inflector\InflectorInterface
      */
-    public function inflector(string $type, callable $callback = null): InflectorInterface
+    public function inflector(string $type, callable $callback = null) : InflectorInterface
     {
         return $this->inflectors->add($type, $callback);
     }
@@ -193,7 +226,7 @@ class Container implements ContainerInterface
      *
      * @return self
      */
-    public function delegate(ContainerInterface $container): self
+    public function delegate(ContainerInterface $container) : self
     {
         $this->delegates[] = $container;
 
