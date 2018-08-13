@@ -53,7 +53,7 @@ class ContainerTest extends TestCase
     {
         $container = (new Container)->defaultToShared();
 
-        $container->share(Foo::class);
+        $container->add(Foo::class);
 
         $this->assertTrue($container->has(Foo::class));
 
@@ -63,6 +63,25 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(Foo::class, $fooOne);
         $this->assertInstanceOf(Foo::class, $fooTwo);
         $this->assertSame($fooOne, $fooTwo);
+    }
+
+    /**
+     * Asserts that the container can add and get a service defined as non-shared with defaultToShared enabled.
+     */
+    public function testContainerAddsNonSharedWithSharedByDefault()
+    {
+        $container = (new Container)->defaultToShared();
+
+        $container->add(Foo::class, null, false);
+
+        $this->assertTrue($container->has(Foo::class));
+
+        $fooOne = $container->get(Foo::class);
+        $fooTwo = $container->get(Foo::class);
+
+        $this->assertInstanceOf(Foo::class, $fooOne);
+        $this->assertInstanceOf(Foo::class, $fooTwo);
+        $this->assertNotSame($fooOne, $fooTwo);
     }
 
     /**
