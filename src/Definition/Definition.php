@@ -119,6 +119,24 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
     /**
      * {@inheritdoc}
      */
+    public function getConcrete()
+    {
+        return $this->concrete;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setConcrete($concrete): DefinitionInterface
+    {
+        $this->concrete = $concrete;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function addArgument($arg) : DefinitionInterface
     {
         $this->arguments[] = $arg;
