@@ -76,7 +76,7 @@ class Container implements ContainerInterface
     public function add(string $id, $concrete = null, bool $shared = null) : DefinitionInterface
     {
         $concrete = $concrete ?? $id;
-        $shared = ($shared === null) ? $this->defaultToShared : $shared;
+        $shared = $shared ?? $this->defaultToShared;
 
         return $this->definitions->add($id, $concrete, $shared);
     }
