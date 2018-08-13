@@ -167,4 +167,28 @@ class DefinitionTest extends TestCase
         $this->assertTrue($definition->hasTag('tag2'));
         $this->assertFalse($definition->hasTag('tag3'));
     }
+
+    /**
+     * Assert that the definition returns the concrete.
+     */
+    public function testDefinitionCanGetConcrete()
+    {
+        $concrete = new ClassName(Foo::class);
+        $definition = new Definition('callable', $concrete);
+
+        $this->assertSame($concrete, $definition->getConcrete());
+    }
+
+    /**
+     * Assert that the definition set the concrete.
+     */
+    public function testDefinitionCanSetConcrete()
+    {
+        $definition = new Definition('callable', null);
+
+        $concrete = new ClassName(Foo::class);
+        $definition->setConcrete($concrete);
+
+        $this->assertSame($concrete, $definition->getConcrete());
+    }
 }

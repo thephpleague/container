@@ -55,6 +55,22 @@ interface DefinitionInterface extends ContainerAwareInterface
     public function isShared() : bool;
 
     /**
+     * Get the concrete of the definition.
+     *
+     * @return mixed
+     */
+    public function getConcrete();
+
+    /**
+     * Set the concrete of the definition.
+     *
+     * @param mixed $concrete
+     *
+     * @return DefinitionInterface
+     */
+    public function setConcrete($concrete): DefinitionInterface;
+
+    /**
      * Add an argument to be injected.
      *
      * @param mixed $arg
