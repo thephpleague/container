@@ -66,7 +66,7 @@ class ContainerTest extends TestCase
     }
 
     /**
-     * Asserts that the container can add and get a service defined as shared.
+     * Asserts that the container can add and get a service defined as non-shared with defaultToShared enabled.
      */
     public function testContainerAddsNonSharedWithSharedByDefault()
     {
