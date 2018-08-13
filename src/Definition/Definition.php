@@ -127,7 +127,7 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
     /**
      * {@inheritdoc}
      */
-    public function setConcrete($concrete): DefinitionInterface
+    public function setConcrete($concrete) : DefinitionInterface
     {
         $this->concrete = $concrete;
 

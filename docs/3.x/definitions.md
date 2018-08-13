@@ -186,6 +186,16 @@ $container = (new League\Container\Container)->defaultToShared();
 $container->add(Acme\Foo::class);
 ~~~
 
+To define a definition not to be shared when the container is set to default to shared, we can reverse the functionality of defining it as shared.
+
+~~~ php
+<?php declare(strict_types=1);
+
+$container = (new League\Container\Container)->defaultToShared();
+
+$container->add(Acme\Foo::class, Acme\Foo::class, $shared = false);
+~~~
+
 If we have a definition marked as shared and we want to force the retrieval of a new instance, we can pass a second argument to Container on `get`.
 
 ~~~ php

@@ -68,7 +68,7 @@ interface DefinitionInterface extends ContainerAwareInterface
      *
      * @return DefinitionInterface
      */
-    public function setConcrete($concrete): DefinitionInterface;
+    public function setConcrete($concrete) : DefinitionInterface;
 
     /**
      * Add an argument to be injected.

@@ -2,6 +2,12 @@
 
 All Notable changes to `League\Container` will be documented in this file
 
+## 3.2.0
+
+### Added
+- Added ability to add definition as not shared when container is set to default to shared.
+- Added `{set|get}Concrete` to definitions to allow for better use of `extend`.
+
 ## 3.1.0
 
 ### Added
