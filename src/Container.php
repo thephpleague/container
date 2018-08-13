@@ -73,10 +73,10 @@ class Container implements ContainerInterface
      *
      * @return \League\Container\Definition\DefinitionInterface
      */
-    public function add(string $id, $concrete = null, bool $shared = false) : DefinitionInterface
+    public function add(string $id, $concrete = null, bool $shared = null) : DefinitionInterface
     {
         $concrete = $concrete ?? $id;
-        $shared   = ($this->defaultToShared === true || $shared === true);
+        $shared = ($shared === null) ? $this->defaultToShared : $shared;
 
         return $this->definitions->add($id, $concrete, $shared);
     }
