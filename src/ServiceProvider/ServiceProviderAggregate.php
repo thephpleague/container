@@ -93,9 +93,10 @@ class ServiceProviderAggregate implements ServiceProviderAggregateInterface
                 return;
             }
 
-            $provider->register();
-
-            $this->registered[] = $provider->getIdentifier();
+            if ($provider->provides($service)) {
+                $provider->register();
+                $this->registered[] = $provider->getIdentifier();
+            }
         }
     }
 }

@@ -2,6 +2,11 @@
 
 All Notable changes to `League\Container` will be documented in this file
 
+## 3.2.1
+
+### Fixed
+- Fixed issue where all service providers were registered regardless of whether they need to be.
+
 ## 3.2.0
 
 ### Added
