@@ -2,6 +2,11 @@
 
 All Notable changes to `League\Container` will be documented in this file
 
+## 3.2.2
+
+### Fixed
+- Fixed issue that prevented service providers from registering if a previous one in the aggregate was already registered.
+
 ## 3.2.1
 
 ### Fixed

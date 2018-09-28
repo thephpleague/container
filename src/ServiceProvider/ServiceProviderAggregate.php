@@ -90,7 +90,7 @@ class ServiceProviderAggregate implements ServiceProviderAggregateInterface
 
         foreach ($this->getIterator() as $provider) {
             if (in_array($provider->getIdentifier(), $this->registered)) {
-                return;
+                continue;
             }
 
             if ($provider->provides($service)) {
