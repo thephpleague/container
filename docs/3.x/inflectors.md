@@ -16,7 +16,7 @@ This is useful for example when you want to invoke a method on all objects that 
 Imagine that you have a `LoggerAwareInterface` and would like to invoke the method called `setLogger` passing in a logger every time a class is retrieved that implements this interface.
 
 ~~~ php
-<?pgp declare(strict_types=1);
+<?php declare(strict_types=1);
 
 $container = new League\Container\Container;
 
