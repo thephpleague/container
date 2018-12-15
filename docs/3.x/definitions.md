@@ -90,7 +90,7 @@ Interfaces are provided for definitions and the aggregates meaning that you can 
 
 Definitions provide several methods to define what behaviour is desired on resolution of the object you are defining. All of these methods can be chained.
 
-### Adding Contructor Arguments
+### Adding Constructor Arguments
 
 Adding an argument to a definition will pass that argument to the constructor of the defined class on instantiation, invoking this multiple times will pass more arguments, in the order they were added.
 
@@ -144,7 +144,7 @@ $container = new League\Container\Container;
 
 $container
     ->add(Acme\Foo::class)
-    ->addMethodCall([
+    ->addMethodCalls([
         ['setBar', [Acme\Bar::class]],
         ['setBaz', [Acme\Baz::class]],
     ])
