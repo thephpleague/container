@@ -3,7 +3,7 @@
 namespace League\Container\Test;
 
 use League\Container\Definition\DefinitionInterface;
-use League\Container\Exception\NotFoundException;
+use League\Container\Exception\{ContainerException, NotFoundException};
 use League\Container\ServiceProvider\AbstractServiceProvider;
 use League\Container\Test\Asset\{Foo, Bar};
 use League\Container\{Container, ReflectionContainer};
