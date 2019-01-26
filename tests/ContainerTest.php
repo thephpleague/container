@@ -132,6 +132,34 @@ class ContainerTest extends TestCase
 
         $this->assertInstanceOf(Foo::class, $foo);
     }
+    
+    /**
+     * Expect an exception to be thrown if a service provider lies
+     * about providing a specific service.
+     */
+    public function testThrowsWhenServiceProviderLies()
+    {
+        $liar = new class extends AbstractServiceProvider
+        {
+            protected $provides = [
+                'lie'
+            ];
+
+            public function register()
+            {
+            }
+        };
+        
+        $container = new Container;
+        
+        $container->addServiceProvider($provider);
+        
+        $this->assertTrue($container->has('lie'));
+        
+        $this->expectException(ContainerException::class);
+        
+        $lie = $container->get('lie');
+    }
 
     /**
      * Asserts that the container can add and get a service from a delegate.
