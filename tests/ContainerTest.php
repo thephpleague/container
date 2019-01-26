@@ -152,7 +152,7 @@ class ContainerTest extends TestCase
         
         $container = new Container;
         
-        $container->addServiceProvider($provider);
+        $container->addServiceProvider($liar);
         
         $this->assertTrue($container->has('lie'));
         
