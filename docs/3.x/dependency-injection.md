@@ -10,7 +10,7 @@ Container at it's core is a simple dependency injection container, this section 
 
 ## Constructor Injection
 
-Passing dependencies to a class constructor is the simplest way of achieving dependency injection. When your classes are defined with Conatiner, it can easily wire them together for you using this method.
+Passing dependencies to a class constructor is the simplest way of achieving dependency injection. When your classes are defined with Container, it can easily wire them together for you using this method.
 
 As a basic example, consider we have a controller class that depends on a model, and that model depends on PDO for database connections.
 
