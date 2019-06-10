@@ -17,7 +17,7 @@ class Inflector implements ArgumentResolverInterface, InflectorInterface
     protected $type;
 
     /**
-     * @var callable
+     * @var callable|null
      */
     protected $callback;
 
