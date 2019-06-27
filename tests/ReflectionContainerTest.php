@@ -2,11 +2,11 @@
 
 namespace League\Container\Test;
 
+use League\Container\Container;
 use League\Container\Exception\NotFoundException;
 use League\Container\ReflectionContainer;
 use League\Container\Test\Asset\{Foo, FooCallable, Bar};
 use PHPUnit\Framework\TestCase;
-use Psr\Container\ContainerInterface;
 
 class ReflectionContainerTest extends TestCase
 {
@@ -17,7 +17,7 @@ class ReflectionContainerTest extends TestCase
      */
     private function getContainerMock(array $items = [])
     {
-        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
+        $container = $this->getMockBuilder(Container::class)->getMock();
 
         $container
             ->expects($this->any())

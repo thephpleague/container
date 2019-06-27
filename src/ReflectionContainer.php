@@ -4,12 +4,11 @@ namespace League\Container;
 
 use League\Container\Argument\{ArgumentResolverInterface, ArgumentResolverTrait};
 use League\Container\Exception\NotFoundException;
-use Psr\Container\ContainerInterface;
 use ReflectionClass;
 use ReflectionFunction;
 use ReflectionMethod;
 
-class ReflectionContainer implements ArgumentResolverInterface, ContainerInterface
+class ReflectionContainer extends Container implements ArgumentResolverInterface
 {
     use ArgumentResolverTrait;
     use ContainerAwareTrait;
@@ -111,7 +110,7 @@ class ReflectionContainer implements ArgumentResolverInterface, ContainerInterfa
      *
      * @return self
      */
-    public function cacheResolutions(bool $option = true) : ContainerInterface
+    public function cacheResolutions(bool $option = true): self
     {
         $this->cacheResolutions = $option;
 

@@ -2,11 +2,11 @@
 
 namespace League\Container\Test\Definition;
 
+use League\Container\Container;
 use League\Container\Exception\NotFoundException;
 use League\Container\Definition\{DefinitionAggregate, DefinitionInterface};
 use League\Container\Test\Asset\Foo;
 use PHPUnit\Framework\TestCase;
-use Psr\Container\ContainerInterface;
 
 class DefinitionAggregateTest extends TestCase
 {
@@ -15,7 +15,7 @@ class DefinitionAggregateTest extends TestCase
      */
     public function testAggregateAddsDefinition()
     {
-        $container  = $this->getMockBuilder(ContainerInterface::class)->getMock();
+        $container  = $this->getMockBuilder(Container::class)->getMock();
         $definition = $this->getMockBuilder(DefinitionInterface::class)->getMock();
 
         $definition->expects($this->once())->method('setShared')->with($this->equalTo(false))->will($this->returnSelf());
@@ -32,7 +32,7 @@ class DefinitionAggregateTest extends TestCase
      */
     public function testAggregateCreatesDefinition()
     {
-        $container  = $this->getMockBuilder(ContainerInterface::class)->getMock();
+        $container  = $this->getMockBuilder(Container::class)->getMock();
         $aggregate  = (new DefinitionAggregate)->setContainer($container);
         $definition = $aggregate->add('alias', Foo::class);
 
@@ -45,7 +45,7 @@ class DefinitionAggregateTest extends TestCase
      */
     public function testAggregateHasDefiniton()
     {
-        $container  = $this->getMockBuilder(ContainerInterface::class)->getMock();
+        $container  = $this->getMockBuilder(Container::class)->getMock();
         $aggregate  = (new DefinitionAggregate)->setContainer($container);
         $definition = $aggregate->add('alias', Foo::class);
 
@@ -59,7 +59,7 @@ class DefinitionAggregateTest extends TestCase
      */
     public function testAggregateAddsAndIteratesMultipleDefinitions()
     {
-        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
+        $container = $this->getMockBuilder(Container::class)->getMock();
         $aggregate = (new DefinitionAggregate)->setContainer($container);
 
         $definitions = [];
@@ -81,7 +81,7 @@ class DefinitionAggregateTest extends TestCase
         $aggregate   = new DefinitionAggregate;
         $definition1 = $this->getMockBuilder(DefinitionInterface::class)->getMock();
         $definition2 = $this->getMockBuilder(DefinitionInterface::class)->getMock();
-        $container   = $this->getMockBuilder(ContainerInterface::class)->getMock();
+        $container   = $this->getMockBuilder(Container::class)->getMock();
 
         $definition1->expects($this->once())->method('getAlias')->will($this->returnValue('alias1'));
         $definition1->expects($this->once())->method('setShared')->with($this->equalTo(false))->will($this->returnSelf());
@@ -109,7 +109,7 @@ class DefinitionAggregateTest extends TestCase
     {
         $definition1 = $this->getMockBuilder(DefinitionInterface::class)->getMock();
         $definition2 = $this->getMockBuilder(DefinitionInterface::class)->getMock();
-        $container   = $this->getMockBuilder(ContainerInterface::class)->getMock();
+        $container   = $this->getMockBuilder(Container::class)->getMock();
 
         $definition1->expects($this->once())->method('setContainer')->with($this->equalTo($container))->will($this->returnSelf());
         $definition1->expects($this->exactly(2))->method('hasTag')->with($this->equalTo('tag'))->will($this->returnValue(true));
@@ -139,7 +139,7 @@ class DefinitionAggregateTest extends TestCase
         $aggregate   = new DefinitionAggregate;
         $definition1 = $this->getMockBuilder(DefinitionInterface::class)->getMock();
         $definition2 = $this->getMockBuilder(DefinitionInterface::class)->getMock();
-        $container   = $this->getMockBuilder(ContainerInterface::class)->getMock();
+        $container   = $this->getMockBuilder(Container::class)->getMock();
 
         $definition1->expects($this->once())->method('getAlias')->will($this->returnValue('alias1'));
         $definition1->expects($this->once())->method('setShared')->with($this->equalTo(false))->will($this->returnSelf());

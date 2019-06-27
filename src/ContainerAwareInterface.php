@@ -2,23 +2,21 @@
 
 namespace League\Container;
 
-use Psr\Container\ContainerInterface;
-
 interface ContainerAwareInterface
 {
     /**
      * Set a container
      *
-     * @param \Psr\Container\ContainerInterface $container
+     * @param Container $container
      *
-     * @return self
+     * @return ContainerAwareInterface
      */
-    public function setContainer(ContainerInterface $container) : self;
+    public function setContainer(Container $container): ContainerAwareInterface;
 
     /**
      * Get the container
      *
-     * @return \Psr\Container\ContainerInterface
+     * @return Container
      */
-    public function getContainer() : ContainerInterface;
+    public function getContainer(): Container;
 }

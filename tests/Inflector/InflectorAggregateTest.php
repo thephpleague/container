@@ -2,10 +2,10 @@
 
 namespace League\Container\Test\Inflector;
 
-use League\Container\ContaineAwareInterface;
+use League\Container\Container;
+use League\Container\ContainerAwareInterface;
 use League\Container\Inflector\{InflectorAggregate, Inflector};
 use PHPUnit\Framework\TestCase;
-use Psr\Container\ContainerInterface;
 
 class InflectorAggregateTest extends TestCase
 {
@@ -44,11 +44,13 @@ class InflectorAggregateTest extends TestCase
     public function testAggregateIteratesAndInflectsOnObject()
     {
         $aggregate      = new InflectorAggregate;
-        $containerAware = $this->getMockBuilder(ContaineAwareInterface::class)->setMethods(['setContainer'])->getMock();
-        $container      = $this->getMockBuilder(ContainerInterface::class)->getMock();
+        $containerAware = $this->getMockBuilder(ContainerAwareInterface::class)
+                               ->setMethods(['setContainer', 'getContainer'])
+                               ->getMock();
+        $container      = $this->getMockBuilder(Container::class)->getMock();
 
         $containerAware->expects($this->once())->method('setContainer')->with($this->equalTo($container));
-        $aggregate->add(ContaineAwareInterface::class)->invokeMethod('setContainer', [$container]);
+        $aggregate->add(ContainerAwareInterface::class)->invokeMethod('setContainer', [$container]);
         $aggregate->add('Ignored\Type');
 
         $aggregate->setContainer($container);

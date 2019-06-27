@@ -3,9 +3,9 @@
 namespace League\Container\Test;
 
 use League\Container\Argument\{ArgumentResolverInterface, ArgumentResolverTrait, RawArgument};
-use League\Container\{ContainerAwareTrait, Exception\NotFoundException};
+use League\Container\{Container, ContainerAwareTrait};
 use PHPUnit\Framework\TestCase;
-use Psr\Container\{ContainerInterface, NotFoundExceptionInterface};
+use Psr\Container\{NotFoundExceptionInterface};
 use ReflectionClass;
 use ReflectionFunctionAbstract;
 use ReflectionParameter;
@@ -22,7 +22,7 @@ class ArgumentResolverTest extends TestCase
             use ContainerAwareTrait;
         };
 
-        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
+        $container = $this->getMockBuilder(Container::class)->getMock();
 
         $container->expects($this->at(0))->method('has')->with($this->equalTo('alias1'))->will($this->returnValue(true));
         $container->expects($this->at(1))->method('get')->with($this->equalTo('alias1'))->will($this->returnValue($resolver));
@@ -46,7 +46,7 @@ class ArgumentResolverTest extends TestCase
             use ContainerAwareTrait;
         };
 
-        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
+        $container = $this->getMockBuilder(Container::class)->getMock();
 
         $container->expects($this->at(0))->method('has')->with($this->equalTo('alias1'))->will($this->returnValue(true));
         $container->expects($this->at(1))->method('get')->with($this->equalTo('alias1'))->will($this->returnValue(new RawArgument('value1')));
@@ -69,7 +69,7 @@ class ArgumentResolverTest extends TestCase
         $param2    = $this->getMockBuilder(ReflectionParameter::class)->disableOriginalConstructor()->getMock();
         $param3    = $this->getMockBuilder(ReflectionParameter::class)->disableOriginalConstructor()->getMock();
         $class     = $this->getMockBuilder(ReflectionClass::class)->disableOriginalConstructor()->getMock();
-        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
+        $container = $this->getMockBuilder(Container::class)->getMock();
 
         $class->expects($this->once())->method('getName')->will($this->returnValue('Class'));
 

@@ -2,9 +2,9 @@
 
 namespace League\Container\Argument;
 
+use League\Container\Container;
 use League\Container\Exception\{ContainerException, NotFoundException};
 use League\Container\ReflectionContainer;
-use Psr\Container\ContainerInterface;
 use ReflectionFunctionAbstract;
 use ReflectionParameter;
 
@@ -86,7 +86,7 @@ trait ArgumentResolverTrait
     }
 
     /**
-     * @return \Psr\Container\ContainerInterface
+     * @return Container
      */
-    abstract public function getContainer() : ContainerInterface;
+    abstract public function getContainer(): Container;
 }

@@ -2,9 +2,9 @@
 
 namespace League\Container;
 
-use League\Container\Definition\{DefinitionAggregate, DefinitionInterface, DefinitionAggregateInterface};
+use League\Container\Definition\{DefinitionAggregate, DefinitionAggregateInterface, DefinitionInterface};
 use League\Container\Exception\NotFoundException;
-use League\Container\Inflector\{InflectorAggregate, InflectorInterface, InflectorAggregateInterface};
+use League\Container\Inflector\{InflectorAggregate, InflectorAggregateInterface, InflectorInterface};
 use League\Container\ServiceProvider\{ServiceProviderAggregate, ServiceProviderAggregateInterface};
 use Psr\Container\ContainerInterface;
 
@@ -101,7 +101,7 @@ class Container implements ContainerInterface
      *
      * @return self
      */
-    public function defaultToShared(bool $shared = true) : ContainerInterface
+    public function defaultToShared(bool $shared = true): self
     {
         $this->defaultToShared = $shared;
 

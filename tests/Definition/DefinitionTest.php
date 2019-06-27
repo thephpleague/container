@@ -3,6 +3,7 @@
 namespace League\Container\Test\Definition;
 
 use League\Container\Argument\{ClassName, RawArgument};
+use League\Container\Container;
 use League\Container\Definition\Definition;
 use League\Container\Test\Asset\{Foo, FooCallable, Bar};
 use PHPUnit\Framework\TestCase;
@@ -73,7 +74,7 @@ class DefinitionTest extends TestCase
      */
     public function testDefinitionResolvesClassWithMethodCalls()
     {
-        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
+        $container = $this->getMockBuilder(Container::class)->getMock();
 
         $bar = new Bar;
 
@@ -96,7 +97,7 @@ class DefinitionTest extends TestCase
      */
     public function testDefinitionResolvesClassWithDefinedArgs()
     {
-        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
+        $container = $this->getMockBuilder(Container::class)->getMock();
 
         $bar = new Bar;
 
@@ -119,7 +120,7 @@ class DefinitionTest extends TestCase
      */
     public function testDefinitionResolvesClassAsClassName()
     {
-        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
+        $container = $this->getMockBuilder(Container::class)->getMock();
 
         $bar = new Bar;
 

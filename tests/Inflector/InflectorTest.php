@@ -2,9 +2,9 @@
 
 namespace League\Container\Test\Inflector;
 
+use League\Container\Container;
 use League\Container\Inflector\Inflector;
 use PHPUnit\Framework\TestCase;
-use Psr\Container\ContainerInterface;
 
 class InflectorTest extends TestCase
 {
@@ -13,7 +13,7 @@ class InflectorTest extends TestCase
      */
     public function testInflectorSetsExpectedMethodCalls()
     {
-        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
+        $container = $this->getMockBuilder(Container::class)->getMock();
         $inflector = (new Inflector('Type'))->setContainer($container);
 
         $inflector->invokeMethod('method1', ['arg1']);
@@ -38,7 +38,7 @@ class InflectorTest extends TestCase
      */
     public function testInflectorSetsExpectedProperties()
     {
-        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
+        $container = $this->getMockBuilder(Container::class)->getMock();
         $inflector = (new Inflector('Type'))->setContainer($container);
 
         $inflector->setProperty('property1', 'value');
@@ -63,7 +63,7 @@ class InflectorTest extends TestCase
      */
     public function testInflectorInflectsWithProperties()
     {
-        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
+        $container = $this->getMockBuilder(Container::class)->getMock();
 
         $bar = new class {};
 
@@ -89,7 +89,7 @@ class InflectorTest extends TestCase
      */
     public function testInflectorInflectsWithMethodCall()
     {
-        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
+        $container = $this->getMockBuilder(Container::class)->getMock();
 
         $bar = new class {};
 

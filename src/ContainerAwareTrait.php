@@ -3,23 +3,22 @@
 namespace League\Container;
 
 use League\Container\Exception\ContainerException;
-use Psr\Container\ContainerInterface;
 
 trait ContainerAwareTrait
 {
     /**
-     * @var \Psr\Container\ContainerInterface
+     * @var Container
      */
     protected $container;
 
     /**
      * Set a container.
      *
-     * @param \Psr\Container\ContainerInterface $container
+     * @param Container $container
      *
-     * @return self
+     * @return ContainerAwareInterface
      */
-    public function setContainer(ContainerInterface $container) : ContainerAwareInterface
+    public function setContainer(Container $container): ContainerAwareInterface
     {
         $this->container = $container;
 
@@ -29,11 +28,11 @@ trait ContainerAwareTrait
     /**
      * Get the container.
      *
-     * @return \Psr\Container\ContainerInterface
+     * @return Container
      */
-    public function getContainer() : ContainerInterface
+    public function getContainer(): Container
     {
-        if ($this->container instanceof ContainerInterface) {
+        if ($this->container instanceof Container) {
             return $this->container;
         }
 
