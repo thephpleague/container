@@ -40,7 +40,7 @@ Contribute to this documentation in the [gh-pages branch](https://github.com/the
 ## Testing
 
 ``` bash
-$ vendor/bin/phpunit
+$ composer test
 ```
 
 ## Contributing
