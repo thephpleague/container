@@ -2,9 +2,9 @@
 
 namespace League\Container\Inflector;
 
-use League\Container\ContainerAwareTrait;
 use League\Container\Argument\ArgumentResolverInterface;
 use League\Container\Argument\ArgumentResolverTrait;
+use League\Container\ContainerAwareTrait;
 
 class Inflector implements ArgumentResolverInterface, InflectorInterface
 {
@@ -17,7 +17,7 @@ class Inflector implements ArgumentResolverInterface, InflectorInterface
     protected $type;
 
     /**
-     * @var callable
+     * @var callable|null
      */
     protected $callback;
 
@@ -113,7 +113,7 @@ class Inflector implements ArgumentResolverInterface, InflectorInterface
             call_user_func_array([$object, $method], $args);
         }
 
-        if (! is_null($this->callback)) {
+        if ($this->callback !== null) {
             call_user_func_array($this->callback, [$object]);
         }
     }
