@@ -25,8 +25,10 @@
         "psr/container": "^1.0"
     },
     "require-dev": {
+        "php": "^7.1",
         "phpunit/phpunit" : "^6.0",
-        "squizlabs/php_codesniffer": "^3.3"
+        "squizlabs/php_codesniffer": "^3.3",
+        "phpstan/phpstan": "^0.11.8"
     },
     "provide": {
         "psr/container-implementation": "^1.0"
