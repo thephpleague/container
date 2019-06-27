@@ -103,14 +103,17 @@ class Inflector implements ArgumentResolverInterface, InflectorInterface
         $properties = $this->resolveArguments(array_values($this->properties));
         $properties = array_combine(array_keys($this->properties), $properties);
 
-        foreach ($properties as $property => $value) {
+        // array_combine() can technically return false
+        foreach ($properties ?: [] as $property => $value) {
             $object->{$property} = $value;
         }
 
         foreach ($this->methods as $method => $args) {
             $args = $this->resolveArguments($args);
 
-            call_user_func_array([$object, $method], $args);
+            /** @var callable $callable */
+            $callable = [$object, $method];
+            call_user_func_array($callable, $args);
         }
 
         if ($this->callback !== null) {

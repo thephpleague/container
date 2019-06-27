@@ -259,7 +259,10 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
     {
         foreach ($this->methods as $method) {
             $args = $this->resolveArguments($method['arguments']);
-            call_user_func_array([$instance, $method['method']], $args);
+
+            /** @var callable $callable */
+            $callable = [$instance, $method['method']];
+            call_user_func_array($callable, $args);
         }
 
         return $instance;
