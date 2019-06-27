@@ -91,7 +91,7 @@ class DefinitionAggregateTest extends TestCase
         $definition2->expects($this->once())->method('setContainer')->with($this->equalTo($container))->will($this->returnSelf());
         $definition2->expects($this->once())->method('setShared')->with($this->equalTo(true))->will($this->returnSelf());
         $definition2->expects($this->once())->method('setAlias')->with($this->equalTo('alias2'))->will($this->returnSelf());
-        $definition2->expects($this->once())->method('resolve')->with($this->equalTo(false))->will($this->returnSelf());
+        $definition2->expects($this->once())->method('resolve')->will($this->returnSelf());
 
         $aggregate->setContainer($container);
 
@@ -113,11 +113,11 @@ class DefinitionAggregateTest extends TestCase
 
         $definition1->expects($this->once())->method('setContainer')->with($this->equalTo($container))->will($this->returnSelf());
         $definition1->expects($this->exactly(2))->method('hasTag')->with($this->equalTo('tag'))->will($this->returnValue(true));
-        $definition1->expects($this->once())->method('resolve')->with($this->equalTo(false))->will($this->returnValue('definition1'));
+        $definition1->expects($this->once())->method('resolve')->will($this->returnValue('definition1'));
 
         $definition2->expects($this->once())->method('setContainer')->with($this->equalTo($container))->will($this->returnSelf());
         $definition2->expects($this->once())->method('hasTag')->with($this->equalTo('tag'))->will($this->returnValue(true));
-        $definition2->expects($this->once())->method('resolve')->with($this->equalTo(false))->will($this->returnValue('definition2'));
+        $definition2->expects($this->once())->method('resolve')->will($this->returnValue('definition2'));
 
         $aggregate = new DefinitionAggregate([$definition1, $definition2]);
 

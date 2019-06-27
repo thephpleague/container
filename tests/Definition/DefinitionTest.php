@@ -149,10 +149,8 @@ class DefinitionTest extends TestCase
 
         $actual1 = $definition->resolve();
         $actual2 = $definition->resolve();
-        $actual3 = $definition->resolve(true);
 
         $this->assertSame($actual1, $actual2);
-        $this->assertFalse($actual1 === $actual3);
     }
 
     /**

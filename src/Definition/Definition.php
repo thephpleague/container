@@ -184,11 +184,11 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
     /**
      * {@inheritdoc}
      */
-    public function resolve(bool $new = false)
+    public function resolve()
     {
         $concrete = $this->concrete;
 
-        if ($this->isShared() && ! is_null($this->resolved) && $new === false) {
+        if ($this->resolved !== null && $this->isShared()) {
             return $this->resolved;
         }
 

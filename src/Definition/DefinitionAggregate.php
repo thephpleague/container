@@ -89,21 +89,21 @@ class DefinitionAggregate implements DefinitionAggregateInterface
     /**
      * {@inheritdoc}
      */
-    public function resolve(string $id, bool $new = false)
+    public function resolve(string $id)
     {
-        return $this->getDefinition($id)->resolve($new);
+        return $this->getDefinition($id)->resolve();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function resolveTagged(string $tag, bool $new = false) : array
+    public function resolveTagged(string $tag) : array
     {
         $arrayOf = [];
 
         foreach ($this->getIterator() as $definition) {
             if ($definition->hasTag($tag)) {
-                $arrayOf[] = $definition->setContainer($this->getContainer())->resolve($new);
+                $arrayOf[] = $definition->setContainer($this->getContainer())->resolve();
             }
         }
 

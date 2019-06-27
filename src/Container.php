@@ -147,10 +147,10 @@ class Container implements ContainerInterface
     /**
      * {@inheritdoc}
      */
-    public function get($id, bool $new = false)
+    public function get($id)
     {
         if ($this->definitions->has($id)) {
-            $resolved = $this->definitions->resolve($id, $new);
+            $resolved = $this->definitions->resolve($id);
             return $this->inflectors->inflect($resolved);
         }
 
@@ -166,7 +166,7 @@ class Container implements ContainerInterface
 
         if ($this->providers->provides($id)) {
             $this->providers->register($id);
-            return $this->get($id, $new);
+            return $this->get($id);
         }
 
         foreach ($this->delegates as $delegate) {

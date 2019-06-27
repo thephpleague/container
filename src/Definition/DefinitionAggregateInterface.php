@@ -48,20 +48,18 @@ interface DefinitionAggregateInterface extends ContainerAwareInterface, Iterator
     /**
      * Resolve and build a concrete value from an id/alias.
      *
-     * @param string  $id
-     * @param boolean $new
+     * @param string $id
      *
      * @return mixed
      */
-    public function resolve(string $id, bool $new = false);
+    public function resolve(string $id);
 
     /**
      * Resolve and build an array of concrete values from a tag.
      *
      * @param string  $tag
-     * @param boolean $new
      *
      * @return mixed
      */
-    public function resolveTagged(string $tag, bool $new = false);
+    public function resolveTagged(string $tag);
 }
