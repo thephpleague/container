@@ -6,7 +6,7 @@ use League\Container\Argument\{ClassName, RawArgument};
 use League\Container\Definition\Definition;
 use League\Container\Test\Asset\{Foo, FooCallable, Bar};
 use PHPUnit\Framework\TestCase;
-use Psr\Container\ContainerInterface;
+use League\Container\Container;
 
 class DefinitionTest extends TestCase
 {
@@ -73,16 +73,16 @@ class DefinitionTest extends TestCase
      */
     public function testDefinitionResolvesClassWithMethodCalls()
     {
-        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
+        $container = $this->getMockBuilder(Container::class)->getMock();
 
         $bar = new Bar;
 
-        $container->expects($this->once())->method('has')->with($this->equalTo(Bar::class))->will($this->returnValue(true));
-        $container->expects($this->once())->method('get')->with($this->equalTo(Bar::class))->will($this->returnValue($bar));
+        $container->expects($this->once())->method('has')->with($this->equalTo(Bar::class))->willReturn(true);
+        $container->expects($this->once())->method('get')->with($this->equalTo(Bar::class))->willReturn($bar);
 
         $definition = new Definition('callable', Foo::class);
 
-        $definition->setContainer($container);
+        $definition->setLeagueContainer($container);
         $definition->addMethodCalls(['setBar' => [Bar::class]]);
 
         $actual = $definition->resolve();
@@ -96,16 +96,16 @@ class DefinitionTest extends TestCase
      */
     public function testDefinitionResolvesClassWithDefinedArgs()
     {
-        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
+        $container = $this->getMockBuilder(Container::class)->getMock();
 
         $bar = new Bar;
 
-        $container->expects($this->once())->method('has')->with($this->equalTo(Bar::class))->will($this->returnValue(true));
-        $container->expects($this->once())->method('get')->with($this->equalTo(Bar::class))->will($this->returnValue($bar));
+        $container->expects($this->once())->method('has')->with($this->equalTo(Bar::class))->willReturn(true);
+        $container->expects($this->once())->method('get')->with($this->equalTo(Bar::class))->willReturn($bar);
 
         $definition = new Definition('callable', Foo::class);
 
-        $definition->setContainer($container);
+        $definition->setLeagueContainer($container);
         $definition->addArgument(Bar::class);
 
         $actual = $definition->resolve();
@@ -119,16 +119,16 @@ class DefinitionTest extends TestCase
      */
     public function testDefinitionResolvesClassAsClassName()
     {
-        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
+        $container = $this->getMockBuilder(Container::class)->getMock();
 
         $bar = new Bar;
 
-        $container->expects($this->once())->method('has')->with($this->equalTo(Bar::class))->will($this->returnValue(true));
-        $container->expects($this->once())->method('get')->with($this->equalTo(Bar::class))->will($this->returnValue($bar));
+        $container->expects($this->once())->method('has')->with($this->equalTo(Bar::class))->willReturn(true);
+        $container->expects($this->once())->method('get')->with($this->equalTo(Bar::class))->willReturn($bar);
 
         $definition = new Definition('callable', new ClassName(Foo::class));
 
-        $definition->setContainer($container);
+        $definition->setLeagueContainer($container);
         $definition->addArgument(new ClassName(Bar::class));
 
         $actual = $definition->resolve();
@@ -151,7 +151,7 @@ class DefinitionTest extends TestCase
         $actual3 = $definition->resolve(true);
 
         $this->assertSame($actual1, $actual2);
-        $this->assertFalse($actual1 === $actual3);
+        $this->assertNotSame($actual1, $actual3);
     }
 
     /**

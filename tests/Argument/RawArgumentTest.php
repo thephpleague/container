@@ -14,8 +14,10 @@ class RawArgumentTest extends TestCase
     {
         $arguments = [
             'string',
-            new class {},
-            function () {},
+            new class {
+            },
+            function () {
+            },
             true,
             1,
             1.23

@@ -5,7 +5,9 @@ namespace League\Container;
 use League\Container\Definition\{DefinitionAggregate, DefinitionInterface, DefinitionAggregateInterface};
 use League\Container\Exception\{NotFoundException, ContainerException};
 use League\Container\Inflector\{InflectorAggregate, InflectorInterface, InflectorAggregateInterface};
-use League\Container\ServiceProvider\{ServiceProviderAggregate, ServiceProviderAggregateInterface};
+use League\Container\ServiceProvider\{ServiceProviderAggregate,
+    ServiceProviderAggregateInterface,
+    ServiceProviderInterface};
 use Psr\Container\ContainerInterface;
 
 class Container implements ContainerInterface
@@ -16,51 +18,51 @@ class Container implements ContainerInterface
     protected $defaultToShared = false;
 
     /**
-     * @var \League\Container\Definition\DefinitionAggregateInterface
+     * @var DefinitionAggregateInterface
      */
     protected $definitions;
 
     /**
-     * @var \League\Container\ServiceProvider\ServiceProviderAggregateInterface
+     * @var ServiceProviderAggregateInterface
      */
     protected $providers;
 
     /**
-     * @var \League\Container\Inflector\InflectorAggregateInterface
+     * @var InflectorAggregateInterface
      */
     protected $inflectors;
 
     /**
-     * @var \Psr\Container\ContainerInterface[]
+     * @var ContainerInterface[]
      */
     protected $delegates = [];
 
     /**
      * Construct.
      *
-     * @param \League\Container\Definition\DefinitionAggregateInterface|null           $definitions
-     * @param \League\Container\ServiceProvider\ServiceProviderAggregateInterface|null $providers
-     * @param \League\Container\Inflector\InflectorAggregateInterface|null             $inflectors
+     * @param DefinitionAggregateInterface|null      $definitions
+     * @param ServiceProviderAggregateInterface|null $providers
+     * @param InflectorAggregateInterface|null       $inflectors
      */
     public function __construct(
         DefinitionAggregateInterface      $definitions = null,
         ServiceProviderAggregateInterface $providers = null,
         InflectorAggregateInterface       $inflectors = null
     ) {
-        $this->definitions = $definitions ?? (new DefinitionAggregate);
-        $this->providers   = $providers   ?? (new ServiceProviderAggregate);
-        $this->inflectors  = $inflectors  ?? (new InflectorAggregate);
+        $this->definitions = $definitions ?? new DefinitionAggregate;
+        $this->providers   = $providers   ?? new ServiceProviderAggregate;
+        $this->inflectors  = $inflectors  ?? new InflectorAggregate;
 
         if ($this->definitions instanceof ContainerAwareInterface) {
-            $this->definitions->setContainer($this);
+            $this->definitions->setLeagueContainer($this);
         }
 
         if ($this->providers instanceof ContainerAwareInterface) {
-            $this->providers->setContainer($this);
+            $this->providers->setLeagueContainer($this);
         }
 
         if ($this->inflectors instanceof ContainerAwareInterface) {
-            $this->inflectors->setContainer($this);
+            $this->inflectors->setLeagueContainer($this);
         }
     }
 
@@ -71,7 +73,7 @@ class Container implements ContainerInterface
      * @param mixed   $concrete
      * @param boolean $shared
      *
-     * @return \League\Container\Definition\DefinitionInterface
+     * @return DefinitionInterface
      */
     public function add(string $id, $concrete = null, bool $shared = null) : DefinitionInterface
     {
@@ -87,7 +89,7 @@ class Container implements ContainerInterface
      * @param string $id
      * @param mixed  $concrete
      *
-     * @return \League\Container\Definition\DefinitionInterface
+     * @return DefinitionInterface
      */
     public function share(string $id, $concrete = null) : DefinitionInterface
     {
@@ -113,7 +115,7 @@ class Container implements ContainerInterface
      *
      * @param string $id [description]
      *
-     * @return \League\Container\Definition\DefinitionInterface
+     * @return DefinitionInterface
      */
     public function extend(string $id) : DefinitionInterface
     {
@@ -133,7 +135,7 @@ class Container implements ContainerInterface
     /**
      * Add a service provider.
      *
-     * @param \League\Container\ServiceProvider\ServiceProviderInterface|string $provider
+     * @param ServiceProviderInterface|string $provider
      *
      * @return self
      */
@@ -166,9 +168,9 @@ class Container implements ContainerInterface
 
         if ($this->providers->provides($id)) {
             $this->providers->register($id);
-            
-            if(!$this->definitions->has($id) && !$this->definitions->hasTag($id)) {
-                throw new ContainerException(sprintf('Service provider lied about providing (%s) service', $id));    
+
+            if (!$this->definitions->has($id) && !$this->definitions->hasTag($id)) {
+                throw new ContainerException(sprintf('Service provider lied about providing (%s) service', $id));
             }
 
             return $this->get($id, $new);
@@ -216,7 +218,7 @@ class Container implements ContainerInterface
      * @param string        $type
      * @param callable|null $callback
      *
-     * @return \League\Container\Inflector\InflectorInterface
+     * @return InflectorInterface
      */
     public function inflector(string $type, callable $callback = null) : InflectorInterface
     {
@@ -227,7 +229,7 @@ class Container implements ContainerInterface
      * Delegate a backup container to be checked for services if it
      * cannot be resolved via this container.
      *
-     * @param \Psr\Container\ContainerInterface $container
+     * @param ContainerInterface $container
      *
      * @return self
      */
@@ -236,7 +238,7 @@ class Container implements ContainerInterface
         $this->delegates[] = $container;
 
         if ($container instanceof ContainerAwareInterface) {
-            $container->setContainer($this);
+            $container->setLeagueContainer($this);
         }
 
         return $this;

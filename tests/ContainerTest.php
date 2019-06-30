@@ -118,7 +118,7 @@ class ContainerTest extends TestCase
 
             public function register()
             {
-                $this->getContainer()->add(Foo::class);
+                $this->getLeagueContainer()->add(Foo::class);
             }
         };
 
@@ -132,7 +132,7 @@ class ContainerTest extends TestCase
 
         $this->assertInstanceOf(Foo::class, $foo);
     }
-    
+
     /**
      * Expect an exception to be thrown if a service provider lies
      * about providing a specific service.
@@ -149,16 +149,16 @@ class ContainerTest extends TestCase
             {
             }
         };
-        
+
         $container = new Container;
-        
+
         $container->addServiceProvider($liar);
-        
+
         $this->assertTrue($container->has('lie'));
-        
+
         $this->expectException(ContainerException::class);
-        
-        $lie = $container->get('lie');
+
+        $container->get('lie');
     }
 
     /**
@@ -217,7 +217,7 @@ class ContainerTest extends TestCase
 
             public function register()
             {
-                $this->getContainer()->add(Foo::class);
+                $this->getLeagueContainer()->add(Foo::class);
             }
         };
 

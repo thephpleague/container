@@ -23,7 +23,7 @@ abstract class AbstractServiceProvider implements ServiceProviderInterface
      */
     public function provides(string $alias) : bool
     {
-        return (in_array($alias, $this->provides));
+        return in_array($alias, $this->provides, true);
     }
 
     /**

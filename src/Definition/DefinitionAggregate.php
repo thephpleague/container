@@ -11,14 +11,14 @@ class DefinitionAggregate implements DefinitionAggregateInterface
     use ContainerAwareTrait;
 
     /**
-     * @var \League\Container\Definition\DefinitionInterface[]
+     * @var DefinitionInterface[]
      */
     protected $definitions = [];
 
     /**
      * Construct.
      *
-     * @param \League\Container\Definition\DefinitionInterface[] $definitions
+     * @param DefinitionInterface[] $definitions
      */
     public function __construct(array $definitions = [])
     {
@@ -32,8 +32,8 @@ class DefinitionAggregate implements DefinitionAggregateInterface
      */
     public function add(string $id, $definition, bool $shared = false) : DefinitionInterface
     {
-        if (! $definition instanceof DefinitionInterface) {
-            $definition = (new Definition($id, $definition));
+        if (!$definition instanceof DefinitionInterface) {
+            $definition = new Definition($id, $definition);
         }
 
         $this->definitions[] = $definition
@@ -79,7 +79,7 @@ class DefinitionAggregate implements DefinitionAggregateInterface
     {
         foreach ($this->getIterator() as $definition) {
             if ($id === $definition->getAlias()) {
-                return $definition->setContainer($this->getContainer());
+                return $definition->setLeagueContainer($this->getLeagueContainer());
             }
         }
 
@@ -103,7 +103,7 @@ class DefinitionAggregate implements DefinitionAggregateInterface
 
         foreach ($this->getIterator() as $definition) {
             if ($definition->hasTag($tag)) {
-                $arrayOf[] = $definition->setContainer($this->getContainer())->resolve($new);
+                $arrayOf[] = $definition->setLeagueContainer($this->getLeagueContainer())->resolve($new);
             }
         }
 

@@ -2,6 +2,21 @@
 
 All Notable changes to `League\Container` will be documented in this file
 
+## 3.3.0
+
+### Added
+- Support for PHP 7.3
+- `{set,get}LeagueContainer` methods added to ContainerAwareTrait as a temporary measure until next major release when this can be properly addressed, less hinting of `Psr\Container\ContainerInterface`
+
+### Changed
+- Various internal code improvements
+
+### Fixed
+- Fix for `setConcrete` not re-resolving class on when overriding (@jleeothon)
+- Fix stack overflow error incase a service provider lies about providing a specific service (@azjezz)
+- Fix issue where providers may be aggregated multiple times (@bwg)
+- Various documentation fixes
+
 ## 3.2.2
 
 ### Fixed

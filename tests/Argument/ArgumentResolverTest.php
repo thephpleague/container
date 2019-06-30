@@ -3,9 +3,9 @@
 namespace League\Container\Test;
 
 use League\Container\Argument\{ArgumentResolverInterface, ArgumentResolverTrait, RawArgument};
-use League\Container\{ContainerAwareTrait, Exception\NotFoundException};
+use League\Container\{Container, ContainerAwareTrait};
 use PHPUnit\Framework\TestCase;
-use Psr\Container\{ContainerInterface, NotFoundExceptionInterface};
+use Psr\Container\NotFoundExceptionInterface;
 use ReflectionClass;
 use ReflectionFunctionAbstract;
 use ReflectionParameter;
@@ -22,13 +22,13 @@ class ArgumentResolverTest extends TestCase
             use ContainerAwareTrait;
         };
 
-        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
+        $container = $this->getMockBuilder(Container::class)->getMock();
 
-        $container->expects($this->at(0))->method('has')->with($this->equalTo('alias1'))->will($this->returnValue(true));
-        $container->expects($this->at(1))->method('get')->with($this->equalTo('alias1'))->will($this->returnValue($resolver));
-        $container->expects($this->at(2))->method('has')->with($this->equalTo('alias2'))->will($this->returnValue(false));
+        $container->expects($this->at(0))->method('has')->with($this->equalTo('alias1'))->willReturn(true);
+        $container->expects($this->at(1))->method('get')->with($this->equalTo('alias1'))->willReturn($resolver);
+        $container->expects($this->at(2))->method('has')->with($this->equalTo('alias2'))->willReturn(false);
 
-        $resolver->setContainer($container);
+        $resolver->setLeagueContainer($container);
 
         $args = $resolver->resolveArguments(['alias1', 'alias2']);
 
@@ -46,12 +46,12 @@ class ArgumentResolverTest extends TestCase
             use ContainerAwareTrait;
         };
 
-        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
+        $container = $this->getMockBuilder(Container::class)->getMock();
 
-        $container->expects($this->at(0))->method('has')->with($this->equalTo('alias1'))->will($this->returnValue(true));
-        $container->expects($this->at(1))->method('get')->with($this->equalTo('alias1'))->will($this->returnValue(new RawArgument('value1')));
+        $container->expects($this->at(0))->method('has')->with($this->equalTo('alias1'))->willReturn(true);
+        $container->expects($this->at(1))->method('get')->with($this->equalTo('alias1'))->willReturn(new RawArgument('value1'));
 
-        $resolver->setContainer($container);
+        $resolver->setLeagueContainer($container);
 
         $args = $resolver->resolveArguments(['alias1', new RawArgument('value2')]);
 
@@ -69,32 +69,32 @@ class ArgumentResolverTest extends TestCase
         $param2    = $this->getMockBuilder(ReflectionParameter::class)->disableOriginalConstructor()->getMock();
         $param3    = $this->getMockBuilder(ReflectionParameter::class)->disableOriginalConstructor()->getMock();
         $class     = $this->getMockBuilder(ReflectionClass::class)->disableOriginalConstructor()->getMock();
-        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
+        $container = $this->getMockBuilder(Container::class)->getMock();
 
-        $class->expects($this->once())->method('getName')->will($this->returnValue('Class'));
+        $class->expects($this->once())->method('getName')->willReturn('Class');
 
-        $param1->expects($this->once())->method('getName')->will($this->returnValue('param1'));
-        $param1->expects($this->once())->method('getClass')->will($this->returnValue($class));
+        $param1->expects($this->once())->method('getName')->willReturn('param1');
+        $param1->expects($this->once())->method('getClass')->willReturn($class);
 
-        $param2->expects($this->once())->method('getName')->will($this->returnValue('param2'));
-        $param2->expects($this->once())->method('getClass')->will($this->returnValue(null));
-        $param2->expects($this->once())->method('isDefaultValueAvailable')->will($this->returnValue(true));
-        $param2->expects($this->once())->method('getDefaultValue')->will($this->returnValue('value2'));
+        $param2->expects($this->once())->method('getName')->willReturn('param2');
+        $param2->expects($this->once())->method('getClass')->willReturn(null);
+        $param2->expects($this->once())->method('isDefaultValueAvailable')->willReturn(true);
+        $param2->expects($this->once())->method('getDefaultValue')->willReturn('value2');
 
-        $param3->expects($this->once())->method('getName')->will($this->returnValue('param3'));
+        $param3->expects($this->once())->method('getName')->willReturn('param3');
 
-        $method->expects($this->once())->method('getParameters')->will($this->returnValue([$param1, $param2, $param3]));
+        $method->expects($this->once())->method('getParameters')->willReturn([$param1, $param2, $param3]);
 
-        $container->expects($this->at(0))->method('has')->with($this->equalTo('Class'))->will($this->returnValue(false));
-        $container->expects($this->at(1))->method('has')->with($this->equalTo('value2'))->will($this->returnValue(false));
-        $container->expects($this->at(2))->method('has')->with($this->equalTo('value3'))->will($this->returnValue(false));
+        $container->expects($this->at(0))->method('has')->with($this->equalTo('Class'))->willReturn(false);
+        $container->expects($this->at(1))->method('has')->with($this->equalTo('value2'))->willReturn(false);
+        $container->expects($this->at(2))->method('has')->with($this->equalTo('value3'))->willReturn(false);
 
         $resolver = new class implements ArgumentResolverInterface {
             use ArgumentResolverTrait;
             use ContainerAwareTrait;
         };
 
-        $resolver->setContainer($container);
+        $resolver->setLeagueContainer($container);
 
         $args = $resolver->reflectArguments($method, ['param3' => 'value3']);
 
@@ -113,17 +113,17 @@ class ArgumentResolverTest extends TestCase
         $method = $this->getMockBuilder(ReflectionFunctionAbstract::class)->getMock();
         $param  = $this->getMockBuilder(ReflectionParameter::class)->disableOriginalConstructor()->getMock();
 
-        $param->expects($this->once())->method('getName')->will($this->returnValue('param1'));
-        $param->expects($this->once())->method('getClass')->will($this->returnValue(null));
-        $param->expects($this->once())->method('isDefaultValueAvailable')->will($this->returnValue(false));
+        $param->expects($this->once())->method('getName')->willReturn('param1');
+        $param->expects($this->once())->method('getClass')->willReturn(null);
+        $param->expects($this->once())->method('isDefaultValueAvailable')->willReturn(false);
 
-        $method->expects($this->once())->method('getParameters')->will($this->returnValue([$param]));
+        $method->expects($this->once())->method('getParameters')->willReturn([$param]);
 
         $resolver = new class implements ArgumentResolverInterface {
             use ArgumentResolverTrait;
             use ContainerAwareTrait;
         };
 
-        $args = $resolver->reflectArguments($method);
+        $resolver->reflectArguments($method);
     }
 }

@@ -10,7 +10,7 @@ class ServiceProviderTest extends TestCase
     /**
      * Return a service provider fake
      *
-     * @return \League\Container\ServiceProvider\ServiceProviderInterface
+     * @return ServiceProviderInterface
      */
     protected function getServiceProvider(): ServiceProviderInterface
     {
@@ -27,7 +27,7 @@ class ServiceProviderTest extends TestCase
 
             public function register()
             {
-                $this->getContainer()->add('SomeService', function ($arg) {
+                $this->getLeagueContainer()->add('SomeService', function ($arg) {
                     return $arg;
                 });
 

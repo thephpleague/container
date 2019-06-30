@@ -19,8 +19,8 @@ interface ArgumentResolverInterface extends ContainerAwareInterface
     /**
      * Resolves the correct arguments to be passed to a method.
      *
-     * @param \ReflectionFunctionAbstract $method
-     * @param array                       $args
+     * @param ReflectionFunctionAbstract $method
+     * @param array                      $args
      *
      * @return array
      */

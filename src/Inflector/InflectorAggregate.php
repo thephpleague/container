@@ -10,7 +10,7 @@ class InflectorAggregate implements InflectorAggregateInterface
     use ContainerAwareTrait;
 
     /**
-     * @var \League\Container\Inflector\Inflector[]
+     * @var Inflector[]
      */
     protected $inflectors = [];
 
@@ -49,7 +49,7 @@ class InflectorAggregate implements InflectorAggregateInterface
                 continue;
             }
 
-            $inflector->setContainer($this->getContainer());
+            $inflector->setLeagueContainer($this->getLeagueContainer());
             $inflector->inflect($object);
         }
 

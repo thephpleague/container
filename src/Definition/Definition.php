@@ -7,6 +7,7 @@ use League\Container\Argument\{
 };
 use League\Container\ContainerAwareTrait;
 use ReflectionClass;
+use ReflectionException;
 
 class Definition implements ArgumentResolverInterface, DefinitionInterface
 {
@@ -77,7 +78,7 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
      */
     public function hasTag(string $tag) : bool
     {
-        return in_array($tag, $this->tags);
+        return in_array($tag, $this->tags, true);
     }
 
     /**
@@ -189,7 +190,7 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
     {
         $concrete = $this->concrete;
 
-        if ($this->isShared() && ! is_null($this->resolved) && $new === false) {
+        if ($this->isShared() && $this->resolved !== null && $new === false) {
             return $this->resolved;
         }
 
@@ -240,6 +241,8 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
      * @param string $concrete
      *
      * @return object
+     *
+     * @throws ReflectionException
      */
     protected function resolveClass(string $concrete)
     {

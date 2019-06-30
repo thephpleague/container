@@ -28,6 +28,8 @@ interface DefinitionInterface extends ContainerAwareInterface
      * Set the alias of the definition.
      *
      * @param string $id
+     *
+     * @return DefinitionInterface
      */
     public function setAlias(string $id) : DefinitionInterface;
 

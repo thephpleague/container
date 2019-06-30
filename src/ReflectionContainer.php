@@ -6,6 +6,7 @@ use League\Container\Argument\{ArgumentResolverInterface, ArgumentResolverTrait}
 use League\Container\Exception\NotFoundException;
 use Psr\Container\ContainerInterface;
 use ReflectionClass;
+use ReflectionException;
 use ReflectionFunction;
 use ReflectionMethod;
 
@@ -20,7 +21,7 @@ class ReflectionContainer implements ArgumentResolverInterface, ContainerInterfa
     protected $cacheResolutions = false;
 
     /**
-     * Cache of reslutions.
+     * Cache of resolutions.
      *
      * @var array
      */
@@ -28,6 +29,8 @@ class ReflectionContainer implements ArgumentResolverInterface, ContainerInterfa
 
     /**
      * {@inheritdoc}
+     *
+     * @throws ReflectionException
      */
     public function get($id, array $args = [])
     {
@@ -44,7 +47,7 @@ class ReflectionContainer implements ArgumentResolverInterface, ContainerInterfa
         $reflector = new ReflectionClass($id);
         $construct = $reflector->getConstructor();
 
-        $resolution = (is_null($construct))
+        $resolution = $construct === null
             ? new $id
             : $resolution = $reflector->newInstanceArgs($this->reflectArguments($construct, $args))
         ;
@@ -71,6 +74,8 @@ class ReflectionContainer implements ArgumentResolverInterface, ContainerInterfa
      * @param array    $args
      *
      * @return mixed
+     *
+     * @throws ReflectionException
      */
     public function call(callable $callable, array $args = [])
     {

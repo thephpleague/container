@@ -8,14 +8,19 @@ use Psr\Container\ContainerInterface;
 trait ContainerAwareTrait
 {
     /**
-     * @var \Psr\Container\ContainerInterface
+     * @var ContainerInterface
      */
     protected $container;
 
     /**
+     * @var Container
+     */
+    protected $leagueContainer;
+
+    /**
      * Set a container.
      *
-     * @param \Psr\Container\ContainerInterface $container
+     * @param ContainerInterface $container
      *
      * @return self
      */
@@ -29,12 +34,41 @@ trait ContainerAwareTrait
     /**
      * Get the container.
      *
-     * @return \Psr\Container\ContainerInterface
+     * @return ContainerInterface
      */
     public function getContainer() : ContainerInterface
     {
         if ($this->container instanceof ContainerInterface) {
             return $this->container;
+        }
+
+        throw new ContainerException('No container implementation has been set.');
+    }
+
+    /**
+     * Set a container.
+     *
+     * @param Container $container
+     *
+     * @return self
+     */
+    public function setLeagueContainer(Container $container) : ContainerAwareInterface
+    {
+        $this->container = $container;
+        $this->leagueContainer = $container;
+
+        return $this;
+    }
+
+    /**
+     * Get the container.
+     *
+     * @return Container
+     */
+    public function getLeagueContainer() : Container
+    {
+        if ($this->leagueContainer instanceof Container) {
+            return $this->leagueContainer;
         }
 
         throw new ContainerException('No container implementation has been set.');

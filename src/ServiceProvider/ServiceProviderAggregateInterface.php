@@ -10,7 +10,7 @@ interface ServiceProviderAggregateInterface extends ContainerAwareInterface, Ite
     /**
      * Add a service provider to the aggregate.
      *
-     * @param string|\League\Container\ServiceProvider\ServiceProviderInterface $provider
+     * @param string|ServiceProviderInterface $provider
      *
      * @return self
      */

@@ -12,7 +12,7 @@ class ServiceProviderAggregateTest extends TestCase
     /**
      * Return a service provider fake
      *
-     * @return \League\Container\ServiceProvider\ServiceProviderInterface
+     * @return ServiceProviderInterface
      */
     protected function getServiceProvider(): ServiceProviderInterface
     {
@@ -38,7 +38,7 @@ class ServiceProviderAggregateTest extends TestCase
             {
                 $this->registered++;
 
-                $this->getContainer()->add('SomeService', function ($arg) {
+                $this->getLeagueContainer()->add('SomeService', function ($arg) {
                     return $arg;
                 });
 
@@ -53,7 +53,7 @@ class ServiceProviderAggregateTest extends TestCase
     public function testAggregateAddsClassNameServiceProvider()
     {
         $container = $this->getMockBuilder(Container::class)->getMock();
-        $aggregate = (new ServiceProviderAggregate)->setContainer($container);
+        $aggregate = (new ServiceProviderAggregate)->setLeagueContainer($container);
 
         $aggregate->add($this->getServiceProvider());
 
@@ -70,7 +70,7 @@ class ServiceProviderAggregateTest extends TestCase
         $this->expectException(ContainerException::class);
 
         $container = $this->getMockBuilder(Container::class)->getMock();
-        $aggregate = (new ServiceProviderAggregate)->setContainer($container);
+        $aggregate = (new ServiceProviderAggregate)->setLeagueContainer($container);
 
         $aggregate->add('NonExistentClass');
     }
@@ -84,7 +84,7 @@ class ServiceProviderAggregateTest extends TestCase
         $this->expectException(ContainerException::class);
 
         $container = $this->getMockBuilder(Container::class)->getMock();
-        $aggregate = (new ServiceProviderAggregate)->setContainer($container);
+        $aggregate = (new ServiceProviderAggregate)->setLeagueContainer($container);
 
         $aggregate->register('SomeService');
     }
@@ -95,7 +95,7 @@ class ServiceProviderAggregateTest extends TestCase
     public function testAggregateInvokesCorrectRegisterMethodOnlyOnce()
     {
         $container = $this->getMockBuilder(Container::class)->getMock();
-        $aggregate = (new ServiceProviderAggregate)->setContainer($container);
+        $aggregate = (new ServiceProviderAggregate)->setLeagueContainer($container);
         $provider  = $this->getServiceProvider();
 
         $aggregate->add($provider);
@@ -114,7 +114,7 @@ class ServiceProviderAggregateTest extends TestCase
     public function testAggregateSkipsExistingProviders()
     {
         $container = $this->getMockBuilder(Container::class)->getMock();
-        $aggregate = (new ServiceProviderAggregate)->setContainer($container);
+        $aggregate = (new ServiceProviderAggregate)->setLeagueContainer($container);
         $provider  = $this->getServiceProvider();
 
         $aggregate->add($provider);

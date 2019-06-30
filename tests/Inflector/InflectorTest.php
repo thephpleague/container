@@ -4,7 +4,9 @@ namespace League\Container\Test\Inflector;
 
 use League\Container\Inflector\Inflector;
 use PHPUnit\Framework\TestCase;
-use Psr\Container\ContainerInterface;
+use League\Container\Container;
+use ReflectionClass;
+use League\Container\Test\Asset\Bar;
 
 class InflectorTest extends TestCase
 {
@@ -13,8 +15,8 @@ class InflectorTest extends TestCase
      */
     public function testInflectorSetsExpectedMethodCalls()
     {
-        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
-        $inflector = (new Inflector('Type'))->setContainer($container);
+        $container = $this->getMockBuilder(Container::class)->getMock();
+        $inflector = (new Inflector('Type'))->setLeagueContainer($container);
 
         $inflector->invokeMethod('method1', ['arg1']);
 
@@ -23,7 +25,7 @@ class InflectorTest extends TestCase
             'method3' => ['arg1']
         ]);
 
-        $methods = (new \ReflectionClass($inflector))->getProperty('methods');
+        $methods = (new ReflectionClass($inflector))->getProperty('methods');
         $methods->setAccessible(true);
 
         $this->assertSame($methods->getValue($inflector), [
@@ -38,8 +40,8 @@ class InflectorTest extends TestCase
      */
     public function testInflectorSetsExpectedProperties()
     {
-        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
-        $inflector = (new Inflector('Type'))->setContainer($container);
+        $container = $this->getMockBuilder(Container::class)->getMock();
+        $inflector = (new Inflector('Type'))->setLeagueContainer($container);
 
         $inflector->setProperty('property1', 'value');
 
@@ -48,7 +50,7 @@ class InflectorTest extends TestCase
             'property3' => 'value'
         ]);
 
-        $properties = (new \ReflectionClass($inflector))->getProperty('properties');
+        $properties = (new ReflectionClass($inflector))->getProperty('properties');
         $properties->setAccessible(true);
 
         $this->assertSame($properties->getValue($inflector), [
@@ -63,16 +65,17 @@ class InflectorTest extends TestCase
      */
     public function testInflectorInflectsWithProperties()
     {
-        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
+        $container = $this->getMockBuilder(Container::class)->getMock();
 
-        $bar = new class {};
+        $bar = new class {
+        };
 
-        $container->expects($this->once())->method('has')->with($this->equalTo('League\Container\Test\Asset\Bar'))->will($this->returnValue(true));
-        $container->expects($this->once())->method('get')->with($this->equalTo('League\Container\Test\Asset\Bar'))->will($this->returnValue($bar));
+        $container->expects($this->once())->method('has')->with($this->equalTo('League\Container\Test\Asset\Bar'))->willReturn(true);
+        $container->expects($this->once())->method('get')->with($this->equalTo('League\Container\Test\Asset\Bar'))->willReturn($bar);
 
         $inflector = (new Inflector('Type'))
-            ->setContainer($container)
-            ->setProperty('bar', 'League\Container\Test\Asset\Bar')
+            ->setLeagueContainer($container)
+            ->setProperty('bar', Bar::class)
         ;
 
         $foo = new class {
@@ -89,15 +92,16 @@ class InflectorTest extends TestCase
      */
     public function testInflectorInflectsWithMethodCall()
     {
-        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
+        $container = $this->getMockBuilder(Container::class)->getMock();
 
-        $bar = new class {};
+        $bar = new class {
+        };
 
-        $container->expects($this->once())->method('has')->with($this->equalTo( 'League\Container\Test\Asset\Bar'))->will($this->returnValue(true));
-        $container->expects($this->once())->method('get')->with($this->equalTo( 'League\Container\Test\Asset\Bar'))->will($this->returnValue($bar));
+        $container->expects($this->once())->method('has')->with($this->equalTo('League\Container\Test\Asset\Bar'))->willReturn(true);
+        $container->expects($this->once())->method('get')->with($this->equalTo('League\Container\Test\Asset\Bar'))->willReturn($bar);
 
         $inflector = (new Inflector('Type'))
-            ->setContainer($container)
+            ->setLeagueContainer($container)
             ->invokeMethod('setBar', ['League\Container\Test\Asset\Bar'])
         ;
 
@@ -127,7 +131,8 @@ class InflectorTest extends TestCase
             }
         };
 
-        $bar = new class {};
+        $bar = new class {
+        };
 
         $inflector = new Inflector('Type', function ($object) use ($bar) {
             $object->setBar($bar);

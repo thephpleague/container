@@ -32,7 +32,7 @@ trait ArgumentResolverTrait
             $container = null;
 
             try {
-                $container = $this->getContainer();
+                $container = $this->getLeagueContainer();
             } catch (ContainerException $e) {
                 if ($this instanceof ReflectionContainer) {
                     $container = $this;
@@ -40,7 +40,7 @@ trait ArgumentResolverTrait
             }
 
 
-            if (! is_null($container) && $container->has($arg)) {
+            if ($container !== null && $container->has($arg)) {
                 $arg = $container->get($arg);
 
                 if ($arg instanceof RawArgumentInterface) {
@@ -67,7 +67,7 @@ trait ArgumentResolverTrait
                 return $args[$name];
             }
 
-            if (! is_null($class)) {
+            if ($class !== null) {
                 return $class->getName();
             }
 
@@ -86,7 +86,7 @@ trait ArgumentResolverTrait
     }
 
     /**
-     * @return \Psr\Container\ContainerInterface
+     * @return ContainerInterface
      */
     abstract public function getContainer() : ContainerInterface;
 }

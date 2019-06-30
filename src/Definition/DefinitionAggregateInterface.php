@@ -14,7 +14,7 @@ interface DefinitionAggregateInterface extends ContainerAwareInterface, Iterator
      * @param mixed   $definition
      * @param boolean $shared
      *
-     * @return \League\Container\Definition\DefinitionInterface
+     * @return DefinitionInterface
      */
     public function add(string $id, $definition, bool $shared = false) : DefinitionInterface;
 
@@ -41,7 +41,7 @@ interface DefinitionAggregateInterface extends ContainerAwareInterface, Iterator
      *
      * @param string $id
      *
-     * @return \League\Container\Definition\DefinitionInterface
+     * @return DefinitionInterface
      */
     public function getDefinition(string $id) : DefinitionInterface;
 

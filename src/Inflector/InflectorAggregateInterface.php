@@ -10,10 +10,10 @@ interface InflectorAggregateInterface extends ContainerAwareInterface, IteratorA
     /**
      * Add an inflector to the aggregate.
      *
-     * @param  string   $type
-     * @param  callable $callback
+     * @param string   $type
+     * @param callable $callback
      *
-     * @return \League\Container\Inflector\Inflector
+     * @return Inflector
      */
     public function add(string $type, callable $callback = null) : Inflector;
 

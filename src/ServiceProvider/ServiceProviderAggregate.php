@@ -11,7 +11,7 @@ class ServiceProviderAggregate implements ServiceProviderAggregateInterface
     use ContainerAwareTrait;
 
     /**
-     * @var \League\Container\ServiceProvider\ServiceProviderInterface[]
+     * @var ServiceProviderInterface[]
      */
     protected $providers = [];
 
@@ -31,12 +31,12 @@ class ServiceProviderAggregate implements ServiceProviderAggregateInterface
             $provider = new $provider;
         }
 
-        if (in_array($provider, $this->providers)) {
+        if (in_array($provider, $this->providers, true)) {
             return $this;
         }
 
         if ($provider instanceof ContainerAwareInterface) {
-            $provider->setContainer($this->getContainer());
+            $provider->setLeagueContainer($this->getLeagueContainer());
         }
 
         if ($provider instanceof BootableServiceProviderInterface) {
@@ -86,14 +86,14 @@ class ServiceProviderAggregate implements ServiceProviderAggregateInterface
      */
     public function register(string $service)
     {
-        if (! $this->provides($service)) {
+        if (false === $this->provides($service)) {
             throw new ContainerException(
                 sprintf('(%s) is not provided by a service provider', $service)
             );
         }
 
         foreach ($this->getIterator() as $provider) {
-            if (in_array($provider->getIdentifier(), $this->registered)) {
+            if (in_array($provider->getIdentifier(), $this->registered, true)) {
                 continue;
             }
 

@@ -6,18 +6,18 @@ use League\Container\Exception\NotFoundException;
 use League\Container\ReflectionContainer;
 use League\Container\Test\Asset\{Foo, FooCallable, Bar};
 use PHPUnit\Framework\TestCase;
-use Psr\Container\ContainerInterface;
+use League\Container\Container;
 
 class ReflectionContainerTest extends TestCase
 {
     /**
      * @param array $items
      *
-     * @return \Psr\Container\ContainerInterface
+     * @return Container
      */
-    private function getContainerMock(array $items = [])
+    private function getLeagueContainerMock(array $items = [])
     {
-        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
+        $container = $this->getMockBuilder(Container::class)->getMock();
 
         $container
             ->expects($this->any())
@@ -144,7 +144,7 @@ class ReflectionContainerTest extends TestCase
         $dependency = new $dependencyClass;
         $container  = new ReflectionContainer;
 
-        $container->setContainer($this->getContainerMock([
+        $container->setLeagueContainer($this->getLeagueContainerMock([
             $dependencyClass => $dependency,
         ]));
 
@@ -226,7 +226,7 @@ class ReflectionContainerTest extends TestCase
 
         $container->call('League\Container\Test\Asset\Foo::staticSetBar');
 
-        $this->assertInstanceOf('League\Container\Test\Asset\Bar', Asset\Foo::$staticBar);
+        $this->assertInstanceOf(Bar::class, Asset\Foo::$staticBar);
         $this->assertEquals('hello world', Asset\Foo::$staticHello);
     }
 
