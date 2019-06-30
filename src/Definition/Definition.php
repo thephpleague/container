@@ -130,6 +130,7 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
     public function setConcrete($concrete) : DefinitionInterface
     {
         $this->concrete = $concrete;
+        $this->resolved = null;
 
         return $this;
     }
