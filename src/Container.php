@@ -3,7 +3,7 @@
 namespace League\Container;
 
 use League\Container\Definition\{DefinitionAggregate, DefinitionInterface, DefinitionAggregateInterface};
-use League\Container\Exception\NotFoundException;
+use League\Container\Exception\{NotFoundException, ContainerException};
 use League\Container\Inflector\{InflectorAggregate, InflectorInterface, InflectorAggregateInterface};
 use League\Container\ServiceProvider\{ServiceProviderAggregate, ServiceProviderAggregateInterface};
 use Psr\Container\ContainerInterface;
@@ -166,6 +166,11 @@ class Container implements ContainerInterface
 
         if ($this->providers->provides($id)) {
             $this->providers->register($id);
+            
+            if(!$this->definitions->has($id) && !$this->definitions->hasTag($id)) {
+                throw new ContainerException(sprintf('Service provider lied about providing (%s) service', $id));    
+            }
+
             return $this->get($id, $new);
         }
 
