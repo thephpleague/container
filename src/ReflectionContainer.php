@@ -98,7 +98,7 @@ class ReflectionContainer implements ArgumentResolverInterface, ContainerInterfa
             return $reflection->invokeArgs($callable, $this->reflectArguments($reflection, $args));
         }
 
-        $reflection = new ReflectionFunction($callable);
+        $reflection = new ReflectionFunction(\Closure::fromCallable($callable));
 
         return $reflection->invokeArgs($this->reflectArguments($reflection, $args));
     }

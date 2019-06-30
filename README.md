@@ -27,9 +27,9 @@ $ composer require league/container
 
 The following versions of PHP are supported by this version.
 
-* PHP 7.0
 * PHP 7.1
 * PHP 7.2
+* PHP 7.3
 
 ## Documentation
 
@@ -40,7 +40,7 @@ Contribute to this documentation in the [gh-pages branch](https://github.com/the
 ## Testing
 
 ``` bash
-$ vendor/bin/phpunit
+$ composer test
 ```
 
 ## Contributing
