@@ -31,6 +31,10 @@ class ServiceProviderAggregate implements ServiceProviderAggregateInterface
             $provider = new $provider;
         }
 
+        if (in_array($provider, $this->providers)) {
+            return $this;
+        }
+
         if ($provider instanceof ContainerAwareInterface) {
             $provider->setContainer($this->getContainer());
         }

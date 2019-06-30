@@ -24,10 +24,13 @@ class ServiceProviderAggregateTest extends TestCase
                 'AnotherService'
             ];
 
+            public $booted     = 0;
             public $registered = 0;
 
             public function boot()
             {
+                $this->booted++;
+
                 return true;
             }
 
@@ -101,5 +104,28 @@ class ServiceProviderAggregateTest extends TestCase
         $aggregate->register('AnotherService');
 
         $this->assertSame(1, $provider->registered);
+    }
+
+
+    /**
+     * Asserts that adding a provider that has already been aggregated
+     * will skip subsequent attempts to add the provider
+     */
+    public function testAggregateSkipsExistingProviders()
+    {
+        $container = $this->getMockBuilder(Container::class)->getMock();
+        $aggregate = (new ServiceProviderAggregate)->setContainer($container);
+        $provider  = $this->getServiceProvider();
+
+        $aggregate->add($provider);
+        $aggregate->add($provider);
+
+        // assert after adding provider multiple times, that it
+        // was only aggregated and booted once
+        $this->assertSame(
+            [$provider],
+            iterator_to_array($aggregate->getIterator())
+        );
+        $this->assertSame(1, $provider->booted);
     }
 }
