@@ -5,9 +5,11 @@ namespace League\Container;
 use League\Container\Definition\{DefinitionAggregate, DefinitionInterface, DefinitionAggregateInterface};
 use League\Container\Exception\{NotFoundException, ContainerException};
 use League\Container\Inflector\{InflectorAggregate, InflectorInterface, InflectorAggregateInterface};
-use League\Container\ServiceProvider\{ServiceProviderAggregate,
+use League\Container\ServiceProvider\{
+    ServiceProviderAggregate,
     ServiceProviderAggregateInterface,
-    ServiceProviderInterface};
+    ServiceProviderInterface
+};
 use Psr\Container\ContainerInterface;
 
 class Container implements ContainerInterface
