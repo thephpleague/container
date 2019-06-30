@@ -10,7 +10,7 @@ class InflectorAggregate implements InflectorAggregateInterface
     use ContainerAwareTrait;
 
     /**
-     * @var \League\Container\Inflector[]
+     * @var \League\Container\Inflector\Inflector[]
      */
     protected $inflectors = [];
 
