@@ -7,6 +7,7 @@ use League\Container\Definition\Definition;
 use League\Container\Test\Asset\{Foo, FooCallable, Bar};
 use PHPUnit\Framework\TestCase;
 use League\Container\Container;
+use Psr\Container\ContainerInterface;
 
 class DefinitionTest extends TestCase
 {
@@ -38,6 +39,26 @@ class DefinitionTest extends TestCase
         $actual = $definition->resolve();
 
         $this->assertSame('hello world', $actual);
+    }
+
+    /**
+     * Asserts that the definition can resolve a closure without explicit arguments.
+     */
+    public function testDefinitionResolvesClosureWithoutArguments()
+    {
+        $container = $this->getMockBuilder(Container::class)->getMock();
+
+        $container->expects($this->once())->method('has')->with($this->equalTo(ContainerInterface::class))->willReturn(true);
+        $container->expects($this->once())->method('get')->with($this->equalTo(ContainerInterface::class))->willReturn($container);
+
+        $definition = new Definition('callable', function (ContainerInterface $container) {
+            return $container;
+        });
+        $definition->setLeagueContainer($container);
+
+        $actual = $definition->resolve();
+
+        $this->assertInstanceOf(ContainerInterface::class, $actual);
     }
 
     /**

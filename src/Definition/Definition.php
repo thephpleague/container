@@ -8,6 +8,7 @@ use League\Container\Argument\{
 use League\Container\ContainerAwareTrait;
 use ReflectionClass;
 use ReflectionException;
+use ReflectionFunction;
 
 class Definition implements ArgumentResolverInterface, DefinitionInterface
 {
@@ -230,9 +231,30 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
      */
     protected function resolveCallable(callable $concrete)
     {
-        $resolved = $this->resolveArguments($this->arguments);
+        $resolved = $this->resolveCallableArguments($concrete);
 
         return call_user_func_array($concrete, $resolved);
+    }
+
+    /**
+     * Resolve callable arguments.
+     *
+     * @param callable $concrete The callable
+     *
+     * @return array The resolved arguments
+     */
+    protected function resolveCallableArguments(callable $concrete): array
+    {
+        $resolved = $this->resolveArguments($this->arguments);
+
+        if (!empty($resolved)) {
+            return $resolved;
+        }
+
+        $reflector = new ReflectionFunction($concrete);
+        $parameters = $reflector->getParameters();
+
+        return $this->reflectArguments($reflector, $parameters);
     }
 
     /**
