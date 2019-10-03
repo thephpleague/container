@@ -56,7 +56,7 @@ class Model
 }
 ~~~
 
-This dependency tree can be defined in Container, then whenever we retrieves `Acme\Controller`, Container will recursively build all dependencies and inject them as required.
+This dependency tree can be defined in Container, then whenever we retrieve `Acme\Controller`, Container will recursively build all dependencies and inject them as required.
 
 ~~~ php
 <?php declare(strict_types=1);
