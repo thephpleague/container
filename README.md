@@ -36,7 +36,7 @@ The following versions of PHP are supported by this version.
 
 Container has [full documentation](http://container.thephpleague.com), powered by [Jekyll](http://jekyllrb.com/).
 
-Contribute to this documentation in the [gh-pages branch](https://github.com/thephpleague/container/tree/gh-pages/).
+Contribute to this documentation in the [docs/](https://github.com/thephpleague/container/tree/master/docs) sub-directory.
 
 ## Testing
 
