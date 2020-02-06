@@ -56,8 +56,7 @@ If you discover any security related issues, please email philipobenito@gmail.co
 
 - [Phil Bennett](https://github.com/philipobenito)
 - [All Contributors](https://github.com/thephpleague/container/contributors)
-
-All `Orno\Di` contributions can be found [here](https://github.com/orno/di/graphs/contributors).
+- `Orno\Di` contributors
 
 ## License
 
