@@ -5,6 +5,7 @@ php:
     - 7.1
     - 7.2
     - 7.3
+    - 7.4
 
 matrix:
     fast_finish: true
@@ -12,9 +13,6 @@ matrix:
 cache:
     directories:
         - $HOME/.composer/cache
-
-before_install:
-    - travis_retry composer self-update
 
 install:
     - travis_retry composer install --no-interaction --prefer-dist
