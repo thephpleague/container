@@ -15,6 +15,11 @@ cache:
         - $HOME/.composer/cache
 
 install:
+    - |
+      if [ "$(phpenv version-name)" == 7.4 ]; then
+          sed -e 's#^\s*\$this->assertInternalType(.array., \$arrayOf);$#$this->assertIsArray($arrayOf);#' -i tests/ContainerTest.php
+          travis_retry composer require "phpunit/phpunit:^9.0"
+      fi
     - travis_retry composer install --no-interaction --prefer-dist
 
 script:
