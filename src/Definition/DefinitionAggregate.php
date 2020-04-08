@@ -22,9 +22,13 @@ class DefinitionAggregate implements DefinitionAggregateInterface
      */
     public function __construct(array $definitions = [])
     {
-        $this->definitions = array_filter($definitions, function ($definition) {
+        $definitions = array_filter($definitions, function ($definition) {
             return ($definition instanceof DefinitionInterface);
         });
+
+        foreach ($definitions as $definition) {
+          $this->definitions[$definition->getAlias()] = $definition;
+        }
     }
 
     /**
@@ -36,7 +40,7 @@ class DefinitionAggregate implements DefinitionAggregateInterface
             $definition = new Definition($id, $definition);
         }
 
-        $this->definitions[] = $definition
+        $this->definitions[$id] = $definition
             ->setAlias($id)
             ->setShared($shared)
         ;
@@ -49,13 +53,7 @@ class DefinitionAggregate implements DefinitionAggregateInterface
      */
     public function has(string $id) : bool
     {
-        foreach ($this->getIterator() as $definition) {
-            if ($id === $definition->getAlias()) {
-                return true;
-            }
-        }
-
-        return false;
+      return array_key_exists($id, $this->definitions);
     }
 
     /**
@@ -77,10 +75,8 @@ class DefinitionAggregate implements DefinitionAggregateInterface
      */
     public function getDefinition(string $id) : DefinitionInterface
     {
-        foreach ($this->getIterator() as $definition) {
-            if ($id === $definition->getAlias()) {
-                return $definition->setLeagueContainer($this->getLeagueContainer());
-            }
+        if (array_key_exists($id, $this->definitions)) {
+            return $this->definitions[$id]->setContainer($this->getContainer());
         }
 
         throw new NotFoundException(sprintf('Alias (%s) is not being handled as a definition.', $id));
@@ -115,10 +111,8 @@ class DefinitionAggregate implements DefinitionAggregateInterface
      */
     public function getIterator() : Generator
     {
-        $count = count($this->definitions);
-
-        for ($i = 0; $i < $count; $i++) {
-            yield $this->definitions[$i];
+        foreach ($this->definitions as $definition) {
+            yield $definition;
         }
     }
 }
