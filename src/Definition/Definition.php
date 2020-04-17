@@ -68,7 +68,7 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
      */
     public function addTag(string $tag) : DefinitionInterface
     {
-        $this->tags[] = $tag;
+        $this->tags[$tag] = true;
 
         return $this;
     }
@@ -78,7 +78,7 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
      */
     public function hasTag(string $tag) : bool
     {
-        return in_array($tag, $this->tags, true);
+        return isset($this->tags[$tag]);
     }
 
     /**
