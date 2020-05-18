@@ -2,6 +2,11 @@
 
 All Notable changes to `League\Container` will be documented in this file
 
+## 3.3.1
+
+### Fixed
+- Respect `$new` argument when getting tagged definitions.
+
 ## 3.3.0
 
 ### Added

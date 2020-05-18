@@ -159,7 +159,7 @@ class Container implements ContainerInterface
         }
 
         if ($this->definitions->hasTag($id)) {
-            $arrayOf = $this->definitions->resolveTagged($id);
+            $arrayOf = $this->definitions->resolveTagged($id, $new);
 
             array_walk($arrayOf, function (&$resolved) {
                 $resolved = $this->inflectors->inflect($resolved);
