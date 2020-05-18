@@ -2,7 +2,7 @@
 
 namespace League\Container\Test\Definition;
 
-use League\Container\Argument\{ClassName, RawArgument};
+use League\Container\Argument\{ClassName, Argument};
 use League\Container\Definition\Definition;
 use League\Container\Test\Asset\{Foo, FooCallable, Bar};
 use PHPUnit\Framework\TestCase;
@@ -32,7 +32,7 @@ class DefinitionTest extends TestCase
     public function testDefinitionResolvesClosureReturningRawArgument()
     {
         $definition = new Definition('callable', function () {
-            return new RawArgument('hello world');
+            return new Argument('hello world');
         });
 
         $actual = $definition->resolve();

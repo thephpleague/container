@@ -22,7 +22,7 @@ class DefinitionAggregate implements DefinitionAggregateInterface
      */
     public function __construct(array $definitions = [])
     {
-        $this->definitions = array_filter($definitions, function ($definition) {
+        $this->definitions = array_filter($definitions, static function ($definition) {
             return ($definition instanceof DefinitionInterface);
         });
     }
@@ -32,14 +32,11 @@ class DefinitionAggregate implements DefinitionAggregateInterface
      */
     public function add(string $id, $definition, bool $shared = false) : DefinitionInterface
     {
-        if (!$definition instanceof DefinitionInterface) {
+        if (false === ($definition instanceof DefinitionInterface)) {
             $definition = new Definition($id, $definition);
         }
 
-        $this->definitions[] = $definition
-            ->setAlias($id)
-            ->setShared($shared)
-        ;
+        $this->definitions[] = $definition->setAlias($id)->setShared($shared);
 
         return $definition;
     }
@@ -115,10 +112,6 @@ class DefinitionAggregate implements DefinitionAggregateInterface
      */
     public function getIterator() : Generator
     {
-        $count = count($this->definitions);
-
-        for ($i = 0; $i < $count; $i++) {
-            yield $this->definitions[$i];
-        }
+        yield from $this->definitions;
     }
 }

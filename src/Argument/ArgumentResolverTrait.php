@@ -1,9 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace League\Container\Argument;
 
-use League\Container\Container;
 use League\Container\Exception\{ContainerException, NotFoundException};
+use League\Container\DefinitionContainerInterface;
 use League\Container\ReflectionContainer;
 use Psr\Container\ContainerInterface;
 use ReflectionFunctionAbstract;
@@ -14,41 +16,30 @@ trait ArgumentResolverTrait
     /**
      * {@inheritdoc}
      */
-    public function resolveArguments(array $arguments) : array
+    public function resolveArguments(array $arguments): array
     {
+        try {
+            $container = $this->getContainer();
+        } catch (ContainerException $e) {
+            $container = ($this instanceof ReflectionContainer) ? $this : null;
+        }
+
         foreach ($arguments as &$arg) {
-            if ($arg instanceof RawArgumentInterface) {
+            if ($arg instanceof ArgumentInterface) {
                 $arg = $arg->getValue();
                 continue;
-            }
-
-            if ($arg instanceof ClassNameInterface) {
-                $arg = $arg->getValue();
             }
 
             if (! is_string($arg)) {
                  continue;
             }
 
-            $container = null;
-
-            try {
-                $container = $this->getLeagueContainer();
-            } catch (ContainerException $e) {
-                if ($this instanceof ReflectionContainer) {
-                    $container = $this;
-                }
-            }
-
-
-            if ($container !== null && $container->has($arg)) {
+            if ($container instanceof ContainerInterface && $container->has($arg)) {
                 $arg = $container->get($arg);
 
-                if ($arg instanceof RawArgumentInterface) {
+                if ($arg instanceof ArgumentInterface) {
                     $arg = $arg->getValue();
                 }
-
-                continue;
             }
         }
 
@@ -58,7 +49,7 @@ trait ArgumentResolverTrait
     /**
      * {@inheritdoc}
      */
-    public function reflectArguments(ReflectionFunctionAbstract $method, array $args = []) : array
+    public function reflectArguments(ReflectionFunctionAbstract $method, array $args = []): array
     {
         $arguments = array_map(function (ReflectionParameter $param) use ($method, $args) {
             $name  = $param->getName();
@@ -87,12 +78,9 @@ trait ArgumentResolverTrait
     }
 
     /**
-     * @return ContainerInterface
+     * Get the container.
+     *
+     * @return DefinitionContainerInterface
      */
-    abstract public function getContainer() : ContainerInterface;
-
-    /**
-     * @return Container
-     */
-    abstract public function getLeagueContainer() : Container;
+    abstract public function getContainer(): DefinitionContainerInterface;
 }

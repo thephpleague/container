@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace League\Container;
 
@@ -18,14 +20,22 @@ class ReflectionContainer implements ArgumentResolverInterface, ContainerInterfa
     /**
      * @var boolean
      */
-    protected $cacheResolutions = false;
+    protected $cacheResolutions;
 
     /**
-     * Cache of resolutions.
-     *
      * @var array
      */
     protected $cache = [];
+
+    /**
+     * Construct.
+     *
+     * @param boolean $cacheResolutions
+     */
+    public function __construct(bool $cacheResolutions = false)
+    {
+        $this->cacheResolutions = $cacheResolutions;
+    }
 
     /**
      * {@inheritdoc}
@@ -48,7 +58,7 @@ class ReflectionContainer implements ArgumentResolverInterface, ContainerInterfa
         $construct = $reflector->getConstructor();
 
         $resolution = $construct === null
-            ? new $id
+            ? new $id()
             : $resolution = $reflector->newInstanceArgs($this->reflectArguments($construct, $args))
         ;
 
@@ -62,7 +72,7 @@ class ReflectionContainer implements ArgumentResolverInterface, ContainerInterfa
     /**
      * {@inheritdoc}
      */
-    public function has($id) : bool
+    public function has($id): bool
     {
         return class_exists($id);
     }
@@ -99,27 +109,11 @@ class ReflectionContainer implements ArgumentResolverInterface, ContainerInterfa
 
         if (is_object($callable)) {
             $reflection = new ReflectionMethod($callable, '__invoke');
-
             return $reflection->invokeArgs($callable, $this->reflectArguments($reflection, $args));
         }
 
         $reflection = new ReflectionFunction(\Closure::fromCallable($callable));
 
         return $reflection->invokeArgs($this->reflectArguments($reflection, $args));
-    }
-
-    /**
-     * Whether the container should default to caching resolutions and returning
-     * the cache on following calls.
-     *
-     * @param boolean $option
-     *
-     * @return self
-     */
-    public function cacheResolutions(bool $option = true) : ContainerInterface
-    {
-        $this->cacheResolutions = $option;
-
-        return $this;
     }
 }

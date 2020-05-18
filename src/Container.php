@@ -1,18 +1,16 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace League\Container;
 
 use League\Container\Definition\{DefinitionAggregate, DefinitionInterface, DefinitionAggregateInterface};
 use League\Container\Exception\{NotFoundException, ContainerException};
 use League\Container\Inflector\{InflectorAggregate, InflectorInterface, InflectorAggregateInterface};
-use League\Container\ServiceProvider\{
-    ServiceProviderAggregate,
-    ServiceProviderAggregateInterface,
-    ServiceProviderInterface
-};
+use League\Container\ServiceProvider\{ServiceProviderAggregate, ServiceProviderAggregateInterface};
 use Psr\Container\ContainerInterface;
 
-class Container implements ContainerInterface
+class Container implements DefinitionContainerInterface
 {
     /**
      * @var boolean
@@ -47,13 +45,13 @@ class Container implements ContainerInterface
      * @param InflectorAggregateInterface|null       $inflectors
      */
     public function __construct(
-        DefinitionAggregateInterface      $definitions = null,
+        DefinitionAggregateInterface $definitions = null,
         ServiceProviderAggregateInterface $providers = null,
-        InflectorAggregateInterface       $inflectors = null
+        InflectorAggregateInterface $inflectors = null
     ) {
-        $this->definitions = $definitions ?? new DefinitionAggregate;
-        $this->providers   = $providers   ?? new ServiceProviderAggregate;
-        $this->inflectors  = $inflectors  ?? new InflectorAggregate;
+        $this->definitions = $definitions ?? new DefinitionAggregate();
+        $this->providers   = $providers   ?? new ServiceProviderAggregate();
+        $this->inflectors  = $inflectors  ?? new InflectorAggregate();
 
         if ($this->definitions instanceof ContainerAwareInterface) {
             $this->definitions->setLeagueContainer($this);
@@ -69,15 +67,9 @@ class Container implements ContainerInterface
     }
 
     /**
-     * Add an item to the container.
-     *
-     * @param string  $id
-     * @param mixed   $concrete
-     * @param boolean $shared
-     *
-     * @return DefinitionInterface
+     * {@inheritdoc}
      */
-    public function add(string $id, $concrete = null, bool $shared = null) : DefinitionInterface
+    public function add(string $id, $concrete = null, bool $shared = null): DefinitionInterface
     {
         $concrete = $concrete ?? $id;
         $shared = $shared ?? $this->defaultToShared;
@@ -86,14 +78,9 @@ class Container implements ContainerInterface
     }
 
     /**
-     * Proxy to add with shared as true.
-     *
-     * @param string $id
-     * @param mixed  $concrete
-     *
-     * @return DefinitionInterface
+     * {@inheritdoc}
      */
-    public function share(string $id, $concrete = null) : DefinitionInterface
+    public function share(string $id, $concrete = null): DefinitionInterface
     {
         return $this->add($id, $concrete, true);
     }
@@ -105,7 +92,7 @@ class Container implements ContainerInterface
      *
      * @return self
      */
-    public function defaultToShared(bool $shared = true) : ContainerInterface
+    public function defaultToShared(bool $shared = true): ContainerInterface
     {
         $this->defaultToShared = $shared;
 
@@ -113,13 +100,9 @@ class Container implements ContainerInterface
     }
 
     /**
-     * Get a definition to extend.
-     *
-     * @param string $id [description]
-     *
-     * @return DefinitionInterface
+     * {@inheritdoc}
      */
-    public function extend(string $id) : DefinitionInterface
+    public function extend(string $id): DefinitionInterface
     {
         if ($this->providers->provides($id)) {
             $this->providers->register($id);
@@ -135,16 +118,11 @@ class Container implements ContainerInterface
     }
 
     /**
-     * Add a service provider.
-     *
-     * @param ServiceProviderInterface|string $provider
-     *
-     * @return self
+     * {@inheritdoc}
      */
-    public function addServiceProvider($provider) : self
+    public function addServiceProvider($provider): DefinitionContainerInterface
     {
         $this->providers->add($provider);
-
         return $this;
     }
 
@@ -191,7 +169,7 @@ class Container implements ContainerInterface
     /**
      * {@inheritdoc}
      */
-    public function has($id) : bool
+    public function has($id): bool
     {
         if ($this->definitions->has($id)) {
             return true;
@@ -215,14 +193,9 @@ class Container implements ContainerInterface
     }
 
     /**
-     * Allows for manipulation of specific types on resolution.
-     *
-     * @param string        $type
-     * @param callable|null $callback
-     *
-     * @return InflectorInterface
+     * {@inheritdoc}
      */
-    public function inflector(string $type, callable $callback = null) : InflectorInterface
+    public function inflector(string $type, callable $callback = null): InflectorInterface
     {
         return $this->inflectors->add($type, $callback);
     }
@@ -235,7 +208,7 @@ class Container implements ContainerInterface
      *
      * @return self
      */
-    public function delegate(ContainerInterface $container) : self
+    public function delegate(ContainerInterface $container): self
     {
         $this->delegates[] = $container;
 

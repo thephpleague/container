@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace League\Container\Test;
+namespace League\Container\Test\Argument;
 
-use League\Container\Argument\{ArgumentResolverInterface, ArgumentResolverTrait, RawArgument};
+use League\Container\Argument\{ArgumentResolverInterface, ArgumentResolverTrait, Argument};
 use League\Container\{Container, ContainerAwareTrait};
 use PHPUnit\Framework\TestCase;
 use Psr\Container\NotFoundExceptionInterface;
@@ -24,10 +24,17 @@ class ArgumentResolverTest extends TestCase
 
         $container = $this->getMockBuilder(Container::class)->getMock();
 
-        $container->expects($this->at(0))->method('has')->with($this->equalTo('alias1'))->willReturn(true);
+        $container
+            ->expects($this->at(0))
+            ->method('has')
+            ->with($this->equalTo('alias1'))
+            ->willReturn(true)
+        ;
+
         $container->expects($this->at(1))->method('get')->with($this->equalTo('alias1'))->willReturn($resolver);
         $container->expects($this->at(2))->method('has')->with($this->equalTo('alias2'))->willReturn(false);
 
+        /** @var Container $container */
         $resolver->setLeagueContainer($container);
 
         $args = $resolver->resolveArguments(['alias1', 'alias2']);
@@ -49,11 +56,12 @@ class ArgumentResolverTest extends TestCase
         $container = $this->getMockBuilder(Container::class)->getMock();
 
         $container->expects($this->at(0))->method('has')->with($this->equalTo('alias1'))->willReturn(true);
-        $container->expects($this->at(1))->method('get')->with($this->equalTo('alias1'))->willReturn(new RawArgument('value1'));
+        $container->expects($this->at(1))->method('get')->with($this->equalTo('alias1'))->willReturn(new Argument('value1'));
 
+        /** @var Container $container */
         $resolver->setLeagueContainer($container);
 
-        $args = $resolver->resolveArguments(['alias1', new RawArgument('value2')]);
+        $args = $resolver->resolveArguments(['alias1', new Argument('value2')]);
 
         $this->assertSame('value1', $args[0]);
         $this->assertSame('value2', $args[1]);
@@ -94,6 +102,7 @@ class ArgumentResolverTest extends TestCase
             use ContainerAwareTrait;
         };
 
+        /** @var Container $container */
         $resolver->setLeagueContainer($container);
 
         $args = $resolver->reflectArguments($method, ['param3' => 'value3']);
@@ -124,6 +133,7 @@ class ArgumentResolverTest extends TestCase
             use ContainerAwareTrait;
         };
 
+        /** @var ReflectionFunctionAbstract $method */
         $resolver->reflectArguments($method);
     }
 }

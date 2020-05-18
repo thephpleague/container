@@ -1,8 +1,10 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace League\Container\Argument;
 
-interface RawArgumentInterface
+interface ArgumentInterface
 {
     /**
      * Return the value of the raw argument.

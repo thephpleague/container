@@ -13,7 +13,7 @@ interface DefinitionInterface extends ContainerAwareInterface
      *
      * @return self
      */
-    public function addTag(string $tag) : DefinitionInterface;
+    public function addTag(string $tag): DefinitionInterface;
 
     /**
      * Does the definition have a tag?
@@ -22,7 +22,7 @@ interface DefinitionInterface extends ContainerAwareInterface
      *
      * @return boolean
      */
-    public function hasTag(string $tag) : bool;
+    public function hasTag(string $tag): bool;
 
     /**
      * Set the alias of the definition.
@@ -31,14 +31,14 @@ interface DefinitionInterface extends ContainerAwareInterface
      *
      * @return DefinitionInterface
      */
-    public function setAlias(string $id) : DefinitionInterface;
+    public function setAlias(string $id): DefinitionInterface;
 
     /**
      * Get the alias of the definition.
      *
      * @return string
      */
-    public function getAlias() : string;
+    public function getAlias(): string;
 
     /**
      * Set whether this is a shared definition.
@@ -47,14 +47,14 @@ interface DefinitionInterface extends ContainerAwareInterface
      *
      * @return self
      */
-    public function setShared(bool $shared) : DefinitionInterface;
+    public function setShared(bool $shared): DefinitionInterface;
 
     /**
      * Is this a shared definition?
      *
      * @return boolean
      */
-    public function isShared() : bool;
+    public function isShared(): bool;
 
     /**
      * Get the concrete of the definition.
@@ -70,7 +70,7 @@ interface DefinitionInterface extends ContainerAwareInterface
      *
      * @return DefinitionInterface
      */
-    public function setConcrete($concrete) : DefinitionInterface;
+    public function setConcrete($concrete): DefinitionInterface;
 
     /**
      * Add an argument to be injected.
@@ -79,7 +79,7 @@ interface DefinitionInterface extends ContainerAwareInterface
      *
      * @return self
      */
-    public function addArgument($arg) : DefinitionInterface;
+    public function addArgument($arg): DefinitionInterface;
 
     /**
      * Add multiple arguments to be injected.
@@ -88,7 +88,7 @@ interface DefinitionInterface extends ContainerAwareInterface
      *
      * @return self
      */
-    public function addArguments(array $args) : DefinitionInterface;
+    public function addArguments(array $args): DefinitionInterface;
 
     /**
      * Add a method to be invoked
@@ -98,7 +98,7 @@ interface DefinitionInterface extends ContainerAwareInterface
      *
      * @return self
      */
-    public function addMethodCall(string $method, array $args = []) : DefinitionInterface;
+    public function addMethodCall(string $method, array $args = []): DefinitionInterface;
 
     /**
      * Add multiple methods to be invoked
@@ -107,7 +107,7 @@ interface DefinitionInterface extends ContainerAwareInterface
      *
      * @return self
      */
-    public function addMethodCalls(array $methods = []) : DefinitionInterface;
+    public function addMethodCalls(array $methods = []): DefinitionInterface;
 
     /**
      * Handle instantiation and manipulation of value and return.

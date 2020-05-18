@@ -1,14 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace League\Container;
 
 use League\Container\Exception\ContainerException;
-use Psr\Container\ContainerInterface;
 
 trait ContainerAwareTrait
 {
     /**
-     * @var ContainerInterface
+     * @var DefinitionContainerInterface
      */
     protected $container;
 
@@ -20,55 +21,25 @@ trait ContainerAwareTrait
     /**
      * Set a container.
      *
-     * @param ContainerInterface $container
+     * @param DefinitionContainerInterface $container
      *
-     * @return self
+     * @return ContainerAwareInterface
      */
-    public function setContainer(ContainerInterface $container) : ContainerAwareInterface
+    public function setContainer(DefinitionContainerInterface $container): ContainerAwareInterface
     {
         $this->container = $container;
-
         return $this;
     }
 
     /**
      * Get the container.
      *
-     * @return ContainerInterface
+     * @return DefinitionContainerInterface
      */
-    public function getContainer() : ContainerInterface
+    public function getContainer(): DefinitionContainerInterface
     {
-        if ($this->container instanceof ContainerInterface) {
+        if ($this->container instanceof DefinitionContainerInterface) {
             return $this->container;
-        }
-
-        throw new ContainerException('No container implementation has been set.');
-    }
-
-    /**
-     * Set a container.
-     *
-     * @param Container $container
-     *
-     * @return self
-     */
-    public function setLeagueContainer(Container $container) : ContainerAwareInterface
-    {
-        $this->container = $container;
-        $this->leagueContainer = $container;
-
-        return $this;
-    }
-
-    /**
-     * Get the container.
-     *
-     * @return Container
-     */
-    public function getLeagueContainer() : Container
-    {
-        if ($this->leagueContainer instanceof Container) {
-            return $this->leagueContainer;
         }
 
         throw new ContainerException('No container implementation has been set.');

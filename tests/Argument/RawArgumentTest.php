@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace League\Container\Test;
+namespace League\Container\Test\Argument;
 
-use League\Container\Argument\RawArgument;
+use League\Container\Argument\Argument;
 use PHPUnit\Framework\TestCase;
 
 class RawArgumentTest extends TestCase
@@ -24,7 +24,7 @@ class RawArgumentTest extends TestCase
         ];
 
         foreach ($arguments as $expected) {
-            $argument = new RawArgument($expected);
+            $argument = new Argument($expected);
             $this->assertSame($expected, $argument->getValue());
         }
     }

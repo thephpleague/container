@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace League\Container\Test;
+namespace League\Container\Test\Argument;
 
 use League\Container\Argument\ClassName;
 use PHPUnit\Framework\TestCase;

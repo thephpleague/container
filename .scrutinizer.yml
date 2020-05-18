@@ -24,7 +24,7 @@ tools:
     php_code_coverage: false
     php_code_sniffer:
         config:
-            standard: PSR2
+            standard: PSR12
         filter:
             paths: ['src']
     php_loc:
