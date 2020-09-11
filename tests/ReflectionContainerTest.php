@@ -4,7 +4,7 @@ namespace League\Container\Test;
 
 use League\Container\Exception\NotFoundException;
 use League\Container\ReflectionContainer;
-use League\Container\Test\Asset\{Foo, FooCallable, Bar, Qux};
+use League\Container\Test\Asset\{Foo, FooCallable, Bar};
 use PHPUnit\Framework\TestCase;
 use League\Container\Container;
 

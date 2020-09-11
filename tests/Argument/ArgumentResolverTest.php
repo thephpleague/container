@@ -3,7 +3,8 @@
 namespace League\Container\Test;
 
 use League\Container\Argument\{ArgumentResolverInterface, ArgumentResolverTrait, RawArgument};
-use League\Container\{Container, ContainerAwareTrait, ReflectionContainer, Test\Asset\Qux};
+use League\Container\{Container, ContainerAwareTrait};
+use League\Container\Test\Asset\Qux;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\NotFoundExceptionInterface;
 use ReflectionClass;
