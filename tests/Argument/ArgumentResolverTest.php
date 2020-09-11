@@ -3,7 +3,7 @@
 namespace League\Container\Test;
 
 use League\Container\Argument\{ArgumentResolverInterface, ArgumentResolverTrait, RawArgument};
-use League\Container\{Container, ContainerAwareTrait};
+use League\Container\{Container, ContainerAwareTrait, ReflectionContainer, Test\Asset\Qux};
 use PHPUnit\Framework\TestCase;
 use Psr\Container\NotFoundExceptionInterface;
 use ReflectionClass;
@@ -125,5 +125,20 @@ class ArgumentResolverTest extends TestCase
         };
 
         $resolver->reflectArguments($method);
+    }
+
+    /**
+     * Asserts that null is given for a type argument which can't be resolved.
+     */
+    public function testResolvesClassWithOptionalTypedArgument()
+    {
+        $resolver = new class implements ArgumentResolverInterface {
+            use ArgumentResolverTrait;
+            use ContainerAwareTrait;
+        };
+
+        $result = $resolver->reflectArguments((new ReflectionClass(Qux::class))->getConstructor());
+
+        $this->assertSame([null], $result);
     }
 }

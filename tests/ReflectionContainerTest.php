@@ -4,7 +4,7 @@ namespace League\Container\Test;
 
 use League\Container\Exception\NotFoundException;
 use League\Container\ReflectionContainer;
-use League\Container\Test\Asset\{Foo, FooCallable, Bar};
+use League\Container\Test\Asset\{Foo, FooCallable, Bar, Qux};
 use PHPUnit\Framework\TestCase;
 use League\Container\Container;
 
@@ -73,7 +73,7 @@ class ReflectionContainerTest extends TestCase
     }
 
     /**
-     * Asserts that ReflectionContainer instantiates and cacheds a class that does not have a constructor.
+     * Asserts that ReflectionContainer instantiates and caches a class that does not have a constructor.
      */
     public function testContainerInstantiatesAndCachesClassWithoutConstructor()
     {

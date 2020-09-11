@@ -2,7 +2,7 @@
 
 namespace League\Container\Test\Asset;
 
-class Bar
+class Bar implements BarInterface
 {
     protected $something;
 
