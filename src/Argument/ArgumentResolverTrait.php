@@ -22,6 +22,15 @@ trait ArgumentResolverTrait
                 continue;
             }
 
+            if ($arg instanceof ClassNameWithOptionalValue) {
+                $optionalValue = $arg->getOptionalValue();
+                $optionalValueExists = true;
+                $arg = $arg->getValue();
+            } else {
+                $optionalValue = null;
+                $optionalValueExists = false;
+            }
+
             if ($arg instanceof ClassNameInterface) {
                 $arg = $arg->getValue();
             }
@@ -49,6 +58,8 @@ trait ArgumentResolverTrait
                 }
 
                 continue;
+            } elseif ($optionalValueExists) {
+                $arg = $optionalValue;
             }
         }
 
@@ -69,11 +80,16 @@ trait ArgumentResolverTrait
             }
 
             if ($class !== null) {
-                return $class->getName();
+                if ($param->isDefaultValueAvailable()) {
+                    return new ClassNameWithOptionalValue($class->getName(), $param->getDefaultValue());
+                }
+
+                return new ClassName($class->getName());
             }
 
             if ($param->isDefaultValueAvailable()) {
                 return $param->getDefaultValue();
+                //return new RawArgument($param->getDefaultValue());
             }
 
             throw new NotFoundException(sprintf(
