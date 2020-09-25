@@ -6,6 +6,7 @@ php:
     - 7.2
     - 7.3
     - 7.4
+    - 'nightly'
 
 matrix:
     fast_finish: true
@@ -16,11 +17,17 @@ cache:
 
 install:
     - |
-      if [ "$(phpenv version-name)" == 7.4 ]; then
+      if [ $TRAVIS_PHP_VERSION == 7.4 ]; then
           sed -e 's#^\s*\$this->assertInternalType(.array., \$arrayOf);$#$this->assertIsArray($arrayOf);#' -i tests/ContainerTest.php
           travis_retry composer require "phpunit/phpunit:^9.0"
       fi
-    - travis_retry composer install --no-interaction --prefer-dist
+    - |
+      if [ $TRAVIS_PHP_VERSION == 'nightly' ]; then
+          sed -e 's#^\s*\$this->assertInternalType(.array., \$arrayOf);$#$this->assertIsArray($arrayOf);#' -i tests/ContainerTest.php
+          travis_retry composer require "phpunit/phpunit:^9.3" --ignore-platform-reqs
+      else
+          travis_retry composer install --no-interaction --prefer-dist
+      fi
 
 script:
     - vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover

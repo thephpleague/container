@@ -7,9 +7,9 @@ use League\Container\{Container, ContainerAwareTrait};
 use League\Container\Test\Asset\Qux;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\NotFoundExceptionInterface;
-use ReflectionClass;
 use ReflectionFunctionAbstract;
 use ReflectionParameter;
+use ReflectionType;
 
 class ArgumentResolverTest extends TestCase
 {
@@ -69,16 +69,20 @@ class ArgumentResolverTest extends TestCase
         $param1    = $this->getMockBuilder(ReflectionParameter::class)->disableOriginalConstructor()->getMock();
         $param2    = $this->getMockBuilder(ReflectionParameter::class)->disableOriginalConstructor()->getMock();
         $param3    = $this->getMockBuilder(ReflectionParameter::class)->disableOriginalConstructor()->getMock();
-        $class     = $this->getMockBuilder(ReflectionClass::class)->disableOriginalConstructor()->getMock();
+        $class     = $this->getMockBuilder(ReflectionType::class)->disableOriginalConstructor()->getMock();
         $container = $this->getMockBuilder(Container::class)->getMock();
 
-        $class->expects($this->once())->method('getName')->willReturn('Class');
+        if (PHP_VERSION_ID >= 70400) {
+            $class->expects($this->once())->method('getName')->willReturn('Class');
+        } else {
+            $class->expects($this->once())->method('__toString')->willReturn('Class');
+        }
 
         $param1->expects($this->once())->method('getName')->willReturn('param1');
-        $param1->expects($this->once())->method('getClass')->willReturn($class);
+        $param1->expects($this->once())->method('getType')->willReturn($class);
 
         $param2->expects($this->once())->method('getName')->willReturn('param2');
-        $param2->expects($this->once())->method('getClass')->willReturn(null);
+        $param2->expects($this->once())->method('getType')->willReturn(null);
         $param2->expects($this->once())->method('isDefaultValueAvailable')->willReturn(true);
         $param2->expects($this->once())->method('getDefaultValue')->willReturn('value2');
 
@@ -114,7 +118,7 @@ class ArgumentResolverTest extends TestCase
         $param  = $this->getMockBuilder(ReflectionParameter::class)->disableOriginalConstructor()->getMock();
 
         $param->expects($this->once())->method('getName')->willReturn('param1');
-        $param->expects($this->once())->method('getClass')->willReturn(null);
+        $param->expects($this->once())->method('getType')->willReturn(null);
         $param->expects($this->once())->method('isDefaultValueAvailable')->willReturn(false);
 
         $method->expects($this->once())->method('getParameters')->willReturn([$param]);
