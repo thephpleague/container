@@ -16,18 +16,7 @@ cache:
         - $HOME/.composer/cache
 
 install:
-    - |
-      if [ $TRAVIS_PHP_VERSION == 7.4 ]; then
-          sed -e 's#^\s*\$this->assertInternalType(.array., \$arrayOf);$#$this->assertIsArray($arrayOf);#' -i tests/ContainerTest.php
-          travis_retry composer require "phpunit/phpunit:^9.0"
-      fi
-    - |
-      if [ $TRAVIS_PHP_VERSION == 'nightly' ]; then
-          sed -e 's#^\s*\$this->assertInternalType(.array., \$arrayOf);$#$this->assertIsArray($arrayOf);#' -i tests/ContainerTest.php
-          travis_retry composer require "phpunit/phpunit:^9.3" --ignore-platform-reqs
-      else
-          travis_retry composer install --no-interaction --prefer-dist
-      fi
+    - travis_retry composer install --no-interaction --prefer-dist
 
 script:
     - vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover

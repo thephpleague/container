@@ -141,7 +141,7 @@ class ArgumentResolverTest extends TestCase
             use ContainerAwareTrait;
         };
 
-        $result = $resolver->reflectArguments((new ReflectionClass(Qux::class))->getConstructor());
+        $result = $resolver->reflectArguments((new \ReflectionClass(Qux::class))->getConstructor());
 
         $this->assertSame([null], $result);
     }
