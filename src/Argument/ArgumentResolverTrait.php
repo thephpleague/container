@@ -62,14 +62,20 @@ trait ArgumentResolverTrait
     {
         $arguments = array_map(function (ReflectionParameter $param) use ($method, $args) {
             $name  = $param->getName();
-            $class = $param->getClass();
+            $type  = $param->getType();
 
             if (array_key_exists($name, $args)) {
                 return $args[$name];
             }
 
-            if ($class !== null) {
-                return $class->getName();
+            if ($type !== null) {
+                if (PHP_VERSION_ID >= 70400) {
+                    $typeName = $type->getName();
+                } else {
+                    $typeName = (string) $type;
+                }
+                // On PHP 8 nullable argument have "?" prefix
+                return ltrim($typeName, '?');
             }
 
             if ($param->isDefaultValueAvailable()) {
