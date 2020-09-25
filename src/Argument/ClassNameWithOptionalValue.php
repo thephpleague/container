@@ -7,7 +7,7 @@ class ClassNameWithOptionalValue implements ClassNameInterface
     /**
      * @var string
      */
-    private $value;
+    private $className;
 
     /**
      * @var mixed
@@ -15,23 +15,21 @@ class ClassNameWithOptionalValue implements ClassNameInterface
     private $optionalValue;
 
     /**
-     * Construct.
-     *
-     * @param string $value
+     * @param string $className
      * @param mixed $optionalValue
      */
-    public function __construct(string $value, $optionalValue)
+    public function __construct(string $className, $optionalValue)
     {
-        $this->value = $value;
+        $this->className = $className;
         $this->optionalValue = $optionalValue;
     }
 
     /**
      * @inheritDoc
      */
-    public function getValue(): string
+    public function getClassName(): string
     {
-        return $this->value;
+        return $this->className;
     }
 
     public function getOptionalValue()

@@ -22,7 +22,7 @@ class ClassName implements ClassNameInterface
     /**
      * {@inheritdoc}
      */
-    public function getValue() : string
+    public function getClassName() : string
     {
         return $this->value;
     }

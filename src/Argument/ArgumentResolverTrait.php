@@ -16,27 +16,15 @@ trait ArgumentResolverTrait
      */
     public function resolveArguments(array $arguments) : array
     {
-        foreach ($arguments as &$arg) {
-            if ($arg instanceof RawArgumentInterface) {
-                $arg = $arg->getValue();
-                continue;
-            }
-
-            if ($arg instanceof ClassNameWithOptionalValue) {
-                $optionalValue = $arg->getOptionalValue();
-                $optionalValueExists = true;
-                $arg = $arg->getValue();
+        return array_map(function ($argument) {
+            if ($argument instanceof RawArgumentInterface) {
+                return $argument->getValue();
+            } elseif ($argument instanceof ClassNameInterface) {
+                $id = $argument->getClassName();
+            } elseif (!is_string($argument)) {
+                return $argument;
             } else {
-                $optionalValue = null;
-                $optionalValueExists = false;
-            }
-
-            if ($arg instanceof ClassNameInterface) {
-                $arg = $arg->getValue();
-            }
-
-            if (! is_string($arg)) {
-                 continue;
+                $id = $argument;
             }
 
             $container = null;
@@ -49,21 +37,17 @@ trait ArgumentResolverTrait
                 }
             }
 
-
-            if ($container !== null && $container->has($arg)) {
-                $arg = $container->get($arg);
-
-                if ($arg instanceof RawArgumentInterface) {
-                    $arg = $arg->getValue();
-                }
-
-                continue;
-            } elseif ($optionalValueExists) {
-                $arg = $optionalValue;
+            if ($container !== null && $container->has($id)) {
+                return $container->get($id);
             }
-        }
 
-        return $arguments;
+            if ($argument instanceof ClassNameWithOptionalValue) {
+                return $argument->getOptionalValue();
+            }
+
+            // Just a string value.
+            return $argument;
+        }, $arguments);
     }
 
     /**
@@ -72,14 +56,14 @@ trait ArgumentResolverTrait
     public function reflectArguments(ReflectionFunctionAbstract $method, array $args = []) : array
     {
         $arguments = array_map(function (ReflectionParameter $param) use ($method, $args) {
-            $name  = $param->getName();
+            $name = $param->getName();
             $class = $param->getClass();
 
             if (array_key_exists($name, $args)) {
-                return $args[$name];
+                return new RawArgument($args[$name]);
             }
 
-            if ($class !== null) {
+            if ($class) {
                 if ($param->isDefaultValueAvailable()) {
                     return new ClassNameWithOptionalValue($class->getName(), $param->getDefaultValue());
                 }
@@ -88,8 +72,7 @@ trait ArgumentResolverTrait
             }
 
             if ($param->isDefaultValueAvailable()) {
-                return $param->getDefaultValue();
-                //return new RawArgument($param->getDefaultValue());
+                return new RawArgument($param->getDefaultValue());
             }
 
             throw new NotFoundException(sprintf(

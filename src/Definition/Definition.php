@@ -205,7 +205,7 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
         }
 
         if ($concrete instanceof ClassNameInterface) {
-            $concrete = $concrete->getValue();
+            $concrete = $concrete->getClassName();
         }
 
         if (is_string($concrete) && class_exists($concrete)) {
