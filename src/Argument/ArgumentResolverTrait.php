@@ -16,18 +16,15 @@ trait ArgumentResolverTrait
      */
     public function resolveArguments(array $arguments) : array
     {
-        foreach ($arguments as &$arg) {
-            if ($arg instanceof RawArgumentInterface) {
-                $arg = $arg->getValue();
-                continue;
-            }
-
-            if ($arg instanceof ClassNameInterface) {
-                $arg = $arg->getValue();
-            }
-
-            if (! is_string($arg)) {
-                 continue;
+        return array_map(function ($argument) {
+            if ($argument instanceof RawArgumentInterface) {
+                return $argument->getValue();
+            } elseif ($argument instanceof ClassNameInterface) {
+                $id = $argument->getClassName();
+            } elseif (!is_string($argument)) {
+                return $argument;
+            } else {
+                $id = $argument;
             }
 
             $container = null;
@@ -40,19 +37,17 @@ trait ArgumentResolverTrait
                 }
             }
 
-
-            if ($container !== null && $container->has($arg)) {
-                $arg = $container->get($arg);
-
-                if ($arg instanceof RawArgumentInterface) {
-                    $arg = $arg->getValue();
-                }
-
-                continue;
+            if ($container !== null && $container->has($id)) {
+                return $container->get($id);
             }
-        }
 
-        return $arguments;
+            if ($argument instanceof ClassNameWithOptionalValue) {
+                return $argument->getOptionalValue();
+            }
+
+            // Just a string value.
+            return $argument;
+        }, $arguments);
     }
 
     /**
@@ -61,19 +56,23 @@ trait ArgumentResolverTrait
     public function reflectArguments(ReflectionFunctionAbstract $method, array $args = []) : array
     {
         $arguments = array_map(function (ReflectionParameter $param) use ($method, $args) {
-            $name  = $param->getName();
+            $name = $param->getName();
             $class = $param->getClass();
 
             if (array_key_exists($name, $args)) {
-                return $args[$name];
+                return new RawArgument($args[$name]);
             }
 
-            if ($class !== null) {
-                return $class->getName();
+            if ($class) {
+                if ($param->isDefaultValueAvailable()) {
+                    return new ClassNameWithOptionalValue($class->getName(), $param->getDefaultValue());
+                }
+
+                return new ClassName($class->getName());
             }
 
             if ($param->isDefaultValueAvailable()) {
-                return $param->getDefaultValue();
+                return new RawArgument($param->getDefaultValue());
             }
 
             throw new NotFoundException(sprintf(

@@ -19,7 +19,7 @@ class ClassNameTest extends TestCase
 
         foreach ($arguments as $expected) {
             $argument = new ClassName($expected);
-            $this->assertSame($expected, $argument->getValue());
+            $this->assertSame($expected, $argument->getClassName());
         }
     }
 }

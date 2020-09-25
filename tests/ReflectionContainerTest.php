@@ -73,7 +73,7 @@ class ReflectionContainerTest extends TestCase
     }
 
     /**
-     * Asserts that ReflectionContainer instantiates and cacheds a class that does not have a constructor.
+     * Asserts that ReflectionContainer instantiates and caches a class that does not have a constructor.
      */
     public function testContainerInstantiatesAndCachesClassWithoutConstructor()
     {

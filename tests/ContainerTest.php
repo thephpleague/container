@@ -212,7 +212,7 @@ class ContainerTest extends TestCase
         $provider = new class extends AbstractServiceProvider
         {
             protected $provides = [
-                Foo::class
+                Foo::class,
             ];
 
             public function register()
@@ -221,7 +221,7 @@ class ContainerTest extends TestCase
             }
         };
 
-        $container = new Container;
+        $container = new Container();
 
         $container->addServiceProvider($provider);
 
@@ -237,7 +237,7 @@ class ContainerTest extends TestCase
     {
         $this->expectException(NotFoundException::class);
 
-        $container = new Container;
+        $container = new Container();
 
         $this->assertFalse($container->has(Foo::class));
 
@@ -249,7 +249,7 @@ class ContainerTest extends TestCase
      */
     public function testContainerAddsAndInvokesInflector()
     {
-        $container = new Container;
+        $container = new Container();
 
         $container->inflector(Foo::class)->setProperty('bar', Bar::class);
 
