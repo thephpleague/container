@@ -17,6 +17,16 @@ cache:
 
 install:
     - |
+        if [ $TRAVIS_PHP_VERSION == 7.2 ]; then
+            sed -e 's#^\s*\$this->assertInternalType(.array., \$arrayOf);$#$this->assertIsArray($arrayOf);#' -i tests/ContainerTest.php
+            travis_retry composer require "phpunit/phpunit:^9.0"
+        fi
+    - |
+        if [ $TRAVIS_PHP_VERSION == 7.3 ]; then
+            sed -e 's#^\s*\$this->assertInternalType(.array., \$arrayOf);$#$this->assertIsArray($arrayOf);#' -i tests/ContainerTest.php
+            travis_retry composer require "phpunit/phpunit:^9.0"
+        fi
+    - |
         if [ $TRAVIS_PHP_VERSION == 7.4 ]; then
             sed -e 's#^\s*\$this->assertInternalType(.array., \$arrayOf);$#$this->assertIsArray($arrayOf);#' -i tests/ContainerTest.php
             travis_retry composer require "phpunit/phpunit:^9.0"
