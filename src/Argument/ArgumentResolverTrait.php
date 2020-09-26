@@ -56,31 +56,27 @@ trait ArgumentResolverTrait
     public function reflectArguments(ReflectionFunctionAbstract $method, array $args = []) : array
     {
         $arguments = array_map(function (ReflectionParameter $param) use ($method, $args) {
-            $name  = $param->getName();
-            $type  = $param->getType();
-            $class = $param->getClass();
+            $name = $param->getName();
+            $type = $param->getType();
 
             if (array_key_exists($name, $args)) {
                 return new RawArgument($args[$name]);
             }
 
-            if ($class) {
-                if ($param->isDefaultValueAvailable()) {
-                    return new ClassNameWithOptionalValue($class->getName(), $param->getDefaultValue());
-                }
-
-                return new ClassName($class->getName());
-            }
-
-            if ($type && !$param->isDefaultValueAvailable()) {
-                if (PHP_VERSION_ID >= 70400) {
+            if ($type) {
+                if (PHP_VERSION_ID >= 70200) {
                     $typeName = $type->getName();
                 } else {
                     $typeName = (string) $type;
                 }
 
-                // in PHP 8 nullable argument have "?" prefix
-                return ltrim($typeName, '?');
+                $typeName = ltrim($typeName, '?');
+
+                if ($param->isDefaultValueAvailable()) {
+                    return new ClassNameWithOptionalValue($typeName, $param->getDefaultValue());
+                }
+
+                return new ClassName($typeName);
             }
 
             if ($param->isDefaultValueAvailable()) {
