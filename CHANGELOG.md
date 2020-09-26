@@ -2,6 +2,14 @@
 
 All Notable changes to `League\Container` will be documented in this file
 
+## 3.3.2
+
+### Added
+- Experimental support for PHP 8.
+
+### Fixed
+- Fix issue when preventing reflection from using default value for arguments.
+
 ## 3.3.1
 
 ### Fixed
