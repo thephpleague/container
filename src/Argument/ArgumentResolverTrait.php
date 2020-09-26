@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace League\Container\Argument;
 
-use League\Container\Exception\{ContainerException, NotFoundException};
 use League\Container\DefinitionContainerInterface;
+use League\Container\Exception\{ContainerException, NotFoundException};
 use League\Container\ReflectionContainer;
 use Psr\Container\ContainerInterface;
 use ReflectionFunctionAbstract;
+use ReflectionNamedType;
 use ReflectionParameter;
 
 trait ArgumentResolverTrait
@@ -30,7 +31,7 @@ trait ArgumentResolverTrait
                 continue;
             }
 
-            if (! is_string($arg)) {
+            if (!is_string($arg)) {
                  continue;
             }
 
@@ -52,15 +53,16 @@ trait ArgumentResolverTrait
     public function reflectArguments(ReflectionFunctionAbstract $method, array $args = []): array
     {
         $arguments = array_map(function (ReflectionParameter $param) use ($method, $args) {
-            $name  = $param->getName();
-            $class = $param->getClass();
+            $name = $param->getName();
+            $type = $param->getType();
 
             if (array_key_exists($name, $args)) {
                 return $args[$name];
             }
 
-            if ($class !== null) {
-                return $class->getName();
+            if ($type instanceof ReflectionNamedType) {
+                // in PHP 8, nullable argument have "?" prefix
+                return ltrim($type->getName(), '?');
             }
 
             if ($param->isDefaultValueAvailable()) {

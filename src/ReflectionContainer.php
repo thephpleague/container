@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace League\Container;
 
 use League\Container\Argument\{ArgumentResolverInterface, ArgumentResolverTrait};
+use League\Container\Exception\ContainerException;
 use League\Container\Exception\NotFoundException;
 use Psr\Container\ContainerInterface;
 use ReflectionClass;
@@ -95,7 +96,12 @@ class ReflectionContainer implements ArgumentResolverInterface, ContainerInterfa
 
         if (is_array($callable)) {
             if (is_string($callable[0])) {
-                $callable[0] = $this->getContainer()->get($callable[0]);
+                // if we have a definition container, try that first, otherwise, reflect
+                try {
+                    $callable[0] = $this->getContainer()->get($callable[0]);
+                } catch (ContainerException $e) {
+                    $callable[0] = $this->get($callable[0]);
+                }
             }
 
             $reflection = new ReflectionMethod($callable[0], $callable[1]);

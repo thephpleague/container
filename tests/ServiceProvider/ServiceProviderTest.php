@@ -1,8 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace League\Container\Test\ServiceProvider;
 
-use League\Container\ServiceProvider\{AbstractServiceProvider, BootableServiceProviderInterface, ServiceProviderInterface};
+use League\Container\ServiceProvider\{
+    AbstractServiceProvider,
+    BootableServiceProviderInterface,
+    ServiceProviderInterface
+};
 use PHPUnit\Framework\TestCase;
 
 class ServiceProviderTest extends TestCase
@@ -27,7 +33,7 @@ class ServiceProviderTest extends TestCase
 
             public function register()
             {
-                $this->getLeagueContainer()->add('SomeService', function ($arg) {
+                $this->getContainer()->add('SomeService', function ($arg) {
                     return $arg;
                 });
 
@@ -39,12 +45,11 @@ class ServiceProviderTest extends TestCase
     /**
      * Asserts that the service provider correctly determines what it provides.
      */
-    public function testServiceProviderCorrectlyDeterminesWhatIsProvided()
+    public function testServiceProviderCorrectlyDeterminesWhatIsProvided(): void
     {
         $provider = $this->getServiceProvider()->setIdentifier('something');
-
-        $this->assertTrue($provider->provides('SomeService'));
-        $this->assertTrue($provider->provides('AnotherService'));
-        $this->assertFalse($provider->provides('NonService'));
+        self::assertTrue($provider->provides('SomeService'));
+        self::assertTrue($provider->provides('AnotherService'));
+        self::assertFalse($provider->provides('NonService'));
     }
 }

@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace League\Container\Definition;
 
-use League\Container\Argument\{
-    ArgumentResolverInterface, ArgumentResolverTrait, ClassNameInterface, ArgumentInterface
-};
+use League\Container\Argument\{ArgumentResolverInterface, ArgumentResolverTrait, ArgumentInterface};
 use League\Container\ContainerAwareTrait;
 use ReflectionClass;
 use ReflectionException;
@@ -70,7 +68,7 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
      */
     public function addTag(string $tag): DefinitionInterface
     {
-        $this->tags[] = $tag;
+        $this->tags[$tag] = true;
         return $this;
     }
 
@@ -200,10 +198,6 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
             return $concrete->getValue();
         }
 
-        if ($concrete instanceof ClassNameInterface) {
-            $concrete = $concrete->getValue();
-        }
-
         if (is_string($concrete) && class_exists($concrete)) {
             $concrete = $this->resolveClass($concrete);
         }
@@ -253,7 +247,7 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
      *
      * @return object
      */
-    protected function invokeMethods($instance)
+    protected function invokeMethods(object $instance): object
     {
         foreach ($this->methods as $method) {
             $args = $this->resolveArguments($method['arguments']);

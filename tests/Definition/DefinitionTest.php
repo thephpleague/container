@@ -1,8 +1,10 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace League\Container\Test\Definition;
 
-use League\Container\Argument\{ClassName, Argument};
+use League\Container\Argument\Typed;
 use League\Container\Definition\Definition;
 use League\Container\Test\Asset\{Foo, FooCallable, Bar};
 use PHPUnit\Framework\TestCase;
@@ -13,7 +15,7 @@ class DefinitionTest extends TestCase
     /**
      * Asserts that the definition can resolve a closure with defined args.
      */
-    public function testDefinitionResolvesClosureWithDefinedArgs()
+    public function testDefinitionResolvesClosureWithDefinedArgs(): void
     {
         $definition = new Definition('callable', function (...$args) {
             return implode(' ', $args);
@@ -23,126 +25,97 @@ class DefinitionTest extends TestCase
 
         $actual = $definition->resolve();
 
-        $this->assertSame('hello world', $actual);
+        self::assertSame('hello world', $actual);
     }
 
     /**
      * Asserts that the definition can resolve a closure returning raw argument.
      */
-    public function testDefinitionResolvesClosureReturningRawArgument()
+    public function testDefinitionResolvesClosureReturningRawArgument(): void
     {
         $definition = new Definition('callable', function () {
-            return new Argument('hello world');
+            return new Typed\StringArgument('hello world');
         });
 
         $actual = $definition->resolve();
 
-        $this->assertSame('hello world', $actual);
+        self::assertSame('hello world', $actual);
     }
 
     /**
      * Asserts that the definition can resolve a callable class.
      */
-    public function testDefinitionResolvesCallableClass()
+    public function testDefinitionResolvesCallableClass(): void
     {
-        $definition = new Definition('callable', new FooCallable);
-
-        $definition->addArgument(new Bar);
-
+        $definition = new Definition('callable', new FooCallable());
+        $definition->addArgument(new Bar());
         $actual = $definition->resolve();
 
-        $this->assertInstanceOf(Foo::class, $actual);
+        self::assertInstanceOf(Foo::class, $actual);
     }
 
     /**
      * Asserts that the definition can resolve an array callable.
      */
-    public function testDefinitionResolvesArrayCallable()
+    public function testDefinitionResolvesArrayCallable(): void
     {
-        $definition = new Definition('callable', [new FooCallable, '__invoke']);
-
-        $definition->addArgument(new Bar);
-
+        $definition = new Definition('callable', [new FooCallable(), '__invoke']);
+        $definition->addArgument(new Bar());
         $actual = $definition->resolve();
 
-        $this->assertInstanceOf(Foo::class, $actual);
+        self::assertInstanceOf(Foo::class, $actual);
     }
 
     /**
      * Asserts that the definition can resolve a class method calls.
      */
-    public function testDefinitionResolvesClassWithMethodCalls()
+    public function testDefinitionResolvesClassWithMethodCalls(): void
     {
         $container = $this->getMockBuilder(Container::class)->getMock();
+        $bar = new Bar();
 
-        $bar = new Bar;
-
-        $container->expects($this->once())->method('has')->with($this->equalTo(Bar::class))->willReturn(true);
-        $container->expects($this->once())->method('get')->with($this->equalTo(Bar::class))->willReturn($bar);
+        $container->expects(self::once())->method('has')->with(self::equalTo(Bar::class))->willReturn(true);
+        $container->expects(self::once())->method('get')->with(self::equalTo(Bar::class))->willReturn($bar);
 
         $definition = new Definition('callable', Foo::class);
 
-        $definition->setLeagueContainer($container);
+        $definition->setContainer($container);
         $definition->addMethodCalls(['setBar' => [Bar::class]]);
 
         $actual = $definition->resolve();
 
-        $this->assertInstanceOf(Foo::class, $actual);
-        $this->assertInstanceOf(Bar::class, $actual->bar);
+        self::assertInstanceOf(Foo::class, $actual);
+        self::assertInstanceOf(Bar::class, $actual->bar);
     }
 
     /**
      * Asserts that the definition can resolve a class with defined args.
      */
-    public function testDefinitionResolvesClassWithDefinedArgs()
+    public function testDefinitionResolvesClassWithDefinedArgs(): void
     {
         $container = $this->getMockBuilder(Container::class)->getMock();
+        $bar = new Bar();
 
-        $bar = new Bar;
-
-        $container->expects($this->once())->method('has')->with($this->equalTo(Bar::class))->willReturn(true);
-        $container->expects($this->once())->method('get')->with($this->equalTo(Bar::class))->willReturn($bar);
+        $container->expects(self::once())->method('has')->with(self::equalTo(Bar::class))->willReturn(true);
+        $container->expects(self::once())->method('get')->with(self::equalTo(Bar::class))->willReturn($bar);
 
         $definition = new Definition('callable', Foo::class);
 
-        $definition->setLeagueContainer($container);
+        $definition->setContainer($container);
         $definition->addArgument(Bar::class);
 
         $actual = $definition->resolve();
 
-        $this->assertInstanceOf(Foo::class, $actual);
-        $this->assertInstanceOf(Bar::class, $actual->bar);
-    }
-
-    /**
-     * Asserts that the definition can resolve a class as class name.
-     */
-    public function testDefinitionResolvesClassAsClassName()
-    {
-        $container = $this->getMockBuilder(Container::class)->getMock();
-
-        $bar = new Bar;
-
-        $container->expects($this->once())->method('has')->with($this->equalTo(Bar::class))->willReturn(true);
-        $container->expects($this->once())->method('get')->with($this->equalTo(Bar::class))->willReturn($bar);
-
-        $definition = new Definition('callable', new ClassName(Foo::class));
-
-        $definition->setLeagueContainer($container);
-        $definition->addArgument(new ClassName(Bar::class));
-
-        $actual = $definition->resolve();
-
-        $this->assertInstanceOf(Foo::class, $actual);
-        $this->assertInstanceOf(Bar::class, $actual->bar);
+        self::assertInstanceOf(Foo::class, $actual);
+        self::assertInstanceOf(Bar::class, $actual->bar);
     }
 
     /**
      * Asserts that the definition resolves a shared item only once.
      */
-    public function testDefinitionResolvesSharedItemOnlyOnce()
+    public function testDefinitionResolvesSharedItemOnlyOnce(): void
     {
-        $definition = new Definition('callable', new ClassName(Foo::class));
+        $definition = new Definition('class', Foo::class);
 
         $definition->setShared(true);
 
@@ -150,45 +123,45 @@ class DefinitionTest extends TestCase
         $actual2 = $definition->resolve();
         $actual3 = $definition->resolve(true);
 
-        $this->assertSame($actual1, $actual2);
-        $this->assertNotSame($actual1, $actual3);
+        self::assertSame($actual1, $actual2);
+        self::assertNotSame($actual1, $actual3);
     }
 
     /**
      * Asserts that the definition can add tags.
      */
-    public function testDefinitionCanAddTags()
+    public function testDefinitionCanAddTags(): void
     {
-        $definition = new Definition('callable', new ClassName(Foo::class));
+        $definition = new Definition('class', Foo::class);
 
         $definition->addTag('tag1')->addTag('tag2');
 
-        $this->assertTrue($definition->hasTag('tag1'));
-        $this->assertTrue($definition->hasTag('tag2'));
-        $this->assertFalse($definition->hasTag('tag3'));
+        self::assertTrue($definition->hasTag('tag1'));
+        self::assertTrue($definition->hasTag('tag2'));
+        self::assertFalse($definition->hasTag('tag3'));
     }
 
     /**
      * Assert that the definition returns the concrete.
      */
-    public function testDefinitionCanGetConcrete()
+    public function testDefinitionCanGetConcrete(): void
     {
-        $concrete = new ClassName(Foo::class);
-        $definition = new Definition('callable', $concrete);
+        $concrete = new Typed\StringArgument(Foo::class);
+        $definition = new Definition('class', $concrete);
 
-        $this->assertSame($concrete, $definition->getConcrete());
+        self::assertSame($concrete, $definition->getConcrete());
     }
 
     /**
      * Assert that the definition set the concrete.
      */
-    public function testDefinitionCanSetConcrete()
+    public function testDefinitionCanSetConcrete(): void
     {
-        $definition = new Definition('callable', null);
+        $definition = new Definition('class', null);
 
-        $concrete = new ClassName(Foo::class);
+        $concrete = new Typed\StringArgument(Foo::class);
         $definition->setConcrete($concrete);
 
-        $this->assertSame($concrete, $definition->getConcrete());
+        self::assertSame($concrete, $definition->getConcrete());
     }
 }

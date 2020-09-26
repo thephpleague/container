@@ -54,15 +54,15 @@ class Container implements DefinitionContainerInterface
         $this->inflectors  = $inflectors  ?? new InflectorAggregate();
 
         if ($this->definitions instanceof ContainerAwareInterface) {
-            $this->definitions->setLeagueContainer($this);
+            $this->definitions->setContainer($this);
         }
 
         if ($this->providers instanceof ContainerAwareInterface) {
-            $this->providers->setLeagueContainer($this);
+            $this->providers->setContainer($this);
         }
 
         if ($this->inflectors instanceof ContainerAwareInterface) {
-            $this->inflectors->setLeagueContainer($this);
+            $this->inflectors->setContainer($this);
         }
     }
 
@@ -213,7 +213,7 @@ class Container implements DefinitionContainerInterface
         $this->delegates[] = $container;
 
         if ($container instanceof ContainerAwareInterface) {
-            $container->setLeagueContainer($this);
+            $container->setContainer($this);
         }
 
         return $this;

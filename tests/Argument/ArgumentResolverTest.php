@@ -1,13 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace League\Container\Test\Argument;
 
-use League\Container\Argument\{ArgumentResolverInterface, ArgumentResolverTrait, Argument};
+use League\Container\Argument\{ArgumentResolverInterface, ArgumentResolverTrait, Typed};
 use League\Container\{Container, ContainerAwareTrait};
 use PHPUnit\Framework\TestCase;
 use Psr\Container\NotFoundExceptionInterface;
-use ReflectionClass;
 use ReflectionFunctionAbstract;
+use ReflectionNamedType;
 use ReflectionParameter;
 
 class ArgumentResolverTest extends TestCase
@@ -15,7 +17,7 @@ class ArgumentResolverTest extends TestCase
     /**
      * Asserts that the resolver proxies to container for resolution.
      */
-    public function testResolverResolvesFromContainer()
+    public function testResolverResolvesFromContainer(): void
     {
         $resolver = new class implements ArgumentResolverInterface {
             use ArgumentResolverTrait;
@@ -25,17 +27,17 @@ class ArgumentResolverTest extends TestCase
         $container = $this->getMockBuilder(Container::class)->getMock();
 
         $container
-            ->expects($this->at(0))
+            ->expects(self::at(0))
             ->method('has')
-            ->with($this->equalTo('alias1'))
+            ->with(self::equalTo('alias1'))
             ->willReturn(true)
         ;
 
-        $container->expects($this->at(1))->method('get')->with($this->equalTo('alias1'))->willReturn($resolver);
-        $container->expects($this->at(2))->method('has')->with($this->equalTo('alias2'))->willReturn(false);
+        $container->expects(self::at(1))->method('get')->with(self::equalTo('alias1'))->willReturn($resolver);
+        $container->expects(self::at(2))->method('has')->with(self::equalTo('alias2'))->willReturn(false);
 
         /** @var Container $container */
-        $resolver->setLeagueContainer($container);
+        $resolver->setContainer($container);
 
         $args = $resolver->resolveArguments(['alias1', 'alias2']);
 
@@ -46,7 +48,7 @@ class ArgumentResolverTest extends TestCase
     /**
      * Asserts that the resolver resolves raw arguments.
      */
-    public function testResolverResolvesResolvesRawArguments()
+    public function testResolverResolvesResolvesRawArguments(): void
     {
         $resolver = new class implements ArgumentResolverInterface {
             use ArgumentResolverTrait;
@@ -55,47 +57,57 @@ class ArgumentResolverTest extends TestCase
 
         $container = $this->getMockBuilder(Container::class)->getMock();
 
-        $container->expects($this->at(0))->method('has')->with($this->equalTo('alias1'))->willReturn(true);
-        $container->expects($this->at(1))->method('get')->with($this->equalTo('alias1'))->willReturn(new Argument('value1'));
+        $container
+            ->expects(self::at(0))
+            ->method('has')
+            ->with(self::equalTo('alias1'))
+            ->willReturn(true)
+        ;
+
+        $container
+            ->expects(self::at(1))
+            ->method('get')
+            ->with(self::equalTo('alias1'))
+            ->willReturn(new Typed\StringArgument('value1'))
+        ;
 
         /** @var Container $container */
-        $resolver->setLeagueContainer($container);
+        $resolver->setContainer($container);
 
-        $args = $resolver->resolveArguments(['alias1', new Argument('value2')]);
+        $args = $resolver->resolveArguments(['alias1', new Typed\StringArgument('value2')]);
 
-        $this->assertSame('value1', $args[0]);
-        $this->assertSame('value2', $args[1]);
+        self::assertSame('value1', $args[0]);
+        self::assertSame('value2', $args[1]);
     }
 
     /**
      * Asserts that the resolver can resolve arguments via reflection.
      */
-    public function testResolverResolvesArgumentsViaReflection()
+    public function testResolverResolvesArgumentsViaReflection(): void
     {
         $method    = $this->getMockBuilder(ReflectionFunctionAbstract::class)->getMock();
         $param1    = $this->getMockBuilder(ReflectionParameter::class)->disableOriginalConstructor()->getMock();
         $param2    = $this->getMockBuilder(ReflectionParameter::class)->disableOriginalConstructor()->getMock();
         $param3    = $this->getMockBuilder(ReflectionParameter::class)->disableOriginalConstructor()->getMock();
-        $class     = $this->getMockBuilder(ReflectionClass::class)->disableOriginalConstructor()->getMock();
+        $class     = $this->getMockBuilder(ReflectionNamedType::class)->disableOriginalConstructor()->getMock();
         $container = $this->getMockBuilder(Container::class)->getMock();
 
-        $class->expects($this->once())->method('getName')->willReturn('Class');
+        $class->expects(self::once())->method('getName')->willReturn('Class');
+        $param1->expects(self::once())->method('getName')->willReturn('param1');
+        $param1->expects(self::once())->method('getType')->willReturn($class);
 
-        $param1->expects($this->once())->method('getName')->willReturn('param1');
-        $param1->expects($this->once())->method('getClass')->willReturn($class);
+        $param2->expects(self::once())->method('getName')->willReturn('param2');
+        $param2->expects(self::once())->method('getType')->willReturn(null);
+        $param2->expects(self::once())->method('isDefaultValueAvailable')->willReturn(true);
+        $param2->expects(self::once())->method('getDefaultValue')->willReturn('value2');
 
-        $param2->expects($this->once())->method('getName')->willReturn('param2');
-        $param2->expects($this->once())->method('getClass')->willReturn(null);
-        $param2->expects($this->once())->method('isDefaultValueAvailable')->willReturn(true);
-        $param2->expects($this->once())->method('getDefaultValue')->willReturn('value2');
+        $param3->expects(self::once())->method('getName')->willReturn('param3');
 
-        $param3->expects($this->once())->method('getName')->willReturn('param3');
+        $method->expects(self::once())->method('getParameters')->willReturn([$param1, $param2, $param3]);
 
-        $method->expects($this->once())->method('getParameters')->willReturn([$param1, $param2, $param3]);
-
-        $container->expects($this->at(0))->method('has')->with($this->equalTo('Class'))->willReturn(false);
-        $container->expects($this->at(1))->method('has')->with($this->equalTo('value2'))->willReturn(false);
-        $container->expects($this->at(2))->method('has')->with($this->equalTo('value3'))->willReturn(false);
+        $container->expects(self::at(0))->method('has')->with(self::equalTo('Class'))->willReturn(false);
+        $container->expects(self::at(1))->method('has')->with(self::equalTo('value2'))->willReturn(false);
+        $container->expects(self::at(2))->method('has')->with(self::equalTo('value3'))->willReturn(false);
 
         $resolver = new class implements ArgumentResolverInterface {
             use ArgumentResolverTrait;
@@ -103,30 +115,30 @@ class ArgumentResolverTest extends TestCase
         };
 
         /** @var Container $container */
-        $resolver->setLeagueContainer($container);
+        $resolver->setContainer($container);
 
         $args = $resolver->reflectArguments($method, ['param3' => 'value3']);
 
-        $this->assertSame('Class', $args[0]);
-        $this->assertSame('value2', $args[1]);
-        $this->assertSame('value3', $args[2]);
+        self::assertSame('Class', $args[0]);
+        self::assertSame('value2', $args[1]);
+        self::assertSame('value3', $args[2]);
     }
 
     /**
      * Asserts that the resolver throws an exception when reflection can't resolve a value.
      */
-    public function testResolverThrowsExceptionWhenReflectionDoesNotResolve()
+    public function testResolverThrowsExceptionWhenReflectionDoesNotResolve(): void
     {
         $this->expectException(NotFoundExceptionInterface::class);
 
         $method = $this->getMockBuilder(ReflectionFunctionAbstract::class)->getMock();
         $param  = $this->getMockBuilder(ReflectionParameter::class)->disableOriginalConstructor()->getMock();
 
-        $param->expects($this->once())->method('getName')->willReturn('param1');
-        $param->expects($this->once())->method('getClass')->willReturn(null);
-        $param->expects($this->once())->method('isDefaultValueAvailable')->willReturn(false);
+        $param->expects(self::once())->method('getName')->willReturn('param1');
+        $param->expects(self::once())->method('getType')->willReturn(null);
+        $param->expects(self::once())->method('isDefaultValueAvailable')->willReturn(false);
 
-        $method->expects($this->once())->method('getParameters')->willReturn([$param]);
+        $method->expects(self::once())->method('getParameters')->willReturn([$param]);
 
         $resolver = new class implements ArgumentResolverInterface {
             use ArgumentResolverTrait;

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace League\Container\Definition;
 
@@ -30,7 +32,7 @@ class DefinitionAggregate implements DefinitionAggregateInterface
     /**
      * {@inheritdoc}
      */
-    public function add(string $id, $definition, bool $shared = false) : DefinitionInterface
+    public function add(string $id, $definition, bool $shared = false): DefinitionInterface
     {
         if (false === ($definition instanceof DefinitionInterface)) {
             $definition = new Definition($id, $definition);
@@ -44,7 +46,7 @@ class DefinitionAggregate implements DefinitionAggregateInterface
     /**
      * {@inheritdoc}
      */
-    public function has(string $id) : bool
+    public function has(string $id): bool
     {
         foreach ($this->getIterator() as $definition) {
             if ($id === $definition->getAlias()) {
@@ -58,7 +60,7 @@ class DefinitionAggregate implements DefinitionAggregateInterface
     /**
      * {@inheritdoc}
      */
-    public function hasTag(string $tag) : bool
+    public function hasTag(string $tag): bool
     {
         foreach ($this->getIterator() as $definition) {
             if ($definition->hasTag($tag)) {
@@ -72,11 +74,11 @@ class DefinitionAggregate implements DefinitionAggregateInterface
     /**
      * {@inheritdoc}
      */
-    public function getDefinition(string $id) : DefinitionInterface
+    public function getDefinition(string $id): DefinitionInterface
     {
         foreach ($this->getIterator() as $definition) {
             if ($id === $definition->getAlias()) {
-                return $definition->setLeagueContainer($this->getLeagueContainer());
+                return $definition->setContainer($this->getContainer());
             }
         }
 
@@ -94,13 +96,13 @@ class DefinitionAggregate implements DefinitionAggregateInterface
     /**
      * {@inheritdoc}
      */
-    public function resolveTagged(string $tag, bool $new = false) : array
+    public function resolveTagged(string $tag, bool $new = false): array
     {
         $arrayOf = [];
 
         foreach ($this->getIterator() as $definition) {
             if ($definition->hasTag($tag)) {
-                $arrayOf[] = $definition->setLeagueContainer($this->getLeagueContainer())->resolve($new);
+                $arrayOf[] = $definition->setContainer($this->getContainer())->resolve($new);
             }
         }
 
@@ -110,7 +112,7 @@ class DefinitionAggregate implements DefinitionAggregateInterface
     /**
      * {@inheritdoc}
      */
-    public function getIterator() : Generator
+    public function getIterator(): Generator
     {
         yield from $this->definitions;
     }

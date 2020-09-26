@@ -1,22 +1,24 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace League\Container\Test\Inflector;
 
-use League\Container\Inflector\Inflector;
-use PHPUnit\Framework\TestCase;
 use League\Container\Container;
-use ReflectionClass;
+use League\Container\Inflector\Inflector;
 use League\Container\Test\Asset\Bar;
+use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 
 class InflectorTest extends TestCase
 {
     /**
      * Asserts that the inflector sets expected method calls.
      */
-    public function testInflectorSetsExpectedMethodCalls()
+    public function testInflectorSetsExpectedMethodCalls(): void
     {
         $container = $this->getMockBuilder(Container::class)->getMock();
-        $inflector = (new Inflector('Type'))->setLeagueContainer($container);
+        $inflector = (new Inflector('Type'))->setContainer($container);
 
         $inflector->invokeMethod('method1', ['arg1']);
 
@@ -28,7 +30,7 @@ class InflectorTest extends TestCase
         $methods = (new ReflectionClass($inflector))->getProperty('methods');
         $methods->setAccessible(true);
 
-        $this->assertSame($methods->getValue($inflector), [
+        self::assertSame($methods->getValue($inflector), [
             'method1' => ['arg1'],
             'method2' => ['arg1'],
             'method3' => ['arg1']
@@ -38,10 +40,10 @@ class InflectorTest extends TestCase
     /**
      * Asserts that the inflector sets expected properties.
      */
-    public function testInflectorSetsExpectedProperties()
+    public function testInflectorSetsExpectedProperties(): void
     {
         $container = $this->getMockBuilder(Container::class)->getMock();
-        $inflector = (new Inflector('Type'))->setLeagueContainer($container);
+        $inflector = (new Inflector('Type'))->setContainer($container);
 
         $inflector->setProperty('property1', 'value');
 
@@ -53,7 +55,7 @@ class InflectorTest extends TestCase
         $properties = (new ReflectionClass($inflector))->getProperty('properties');
         $properties->setAccessible(true);
 
-        $this->assertSame($properties->getValue($inflector), [
+        self::assertSame($properties->getValue($inflector), [
             'property1' => 'value',
             'property2' => 'value',
             'property3' => 'value'
@@ -63,18 +65,29 @@ class InflectorTest extends TestCase
     /**
      * Asserts that the inflector will inflect on an object with properties.
      */
-    public function testInflectorInflectsWithProperties()
+    public function testInflectorInflectsWithProperties(): void
     {
         $container = $this->getMockBuilder(Container::class)->getMock();
 
         $bar = new class {
         };
 
-        $container->expects($this->once())->method('has')->with($this->equalTo('League\Container\Test\Asset\Bar'))->willReturn(true);
-        $container->expects($this->once())->method('get')->with($this->equalTo('League\Container\Test\Asset\Bar'))->willReturn($bar);
+        $container
+            ->expects(self::once())
+            ->method('has')
+            ->with(self::equalTo(Bar::class))
+            ->willReturn(true)
+        ;
+
+        $container
+            ->expects(self::once())
+            ->method('get')
+            ->with(self::equalTo(Bar::class))
+            ->willReturn($bar)
+        ;
 
         $inflector = (new Inflector('Type'))
-            ->setLeagueContainer($container)
+            ->setContainer($container)
             ->setProperty('bar', Bar::class)
         ;
 
@@ -84,48 +97,58 @@ class InflectorTest extends TestCase
 
         $inflector->inflect($foo);
 
-        $this->assertSame($bar, $foo->bar);
+        self::assertSame($bar, $foo->bar);
     }
 
     /**
      * Asserts that the inflector will inflect on an object with method call.
      */
-    public function testInflectorInflectsWithMethodCall()
+    public function testInflectorInflectsWithMethodCall(): void
     {
         $container = $this->getMockBuilder(Container::class)->getMock();
 
         $bar = new class {
         };
 
-        $container->expects($this->once())->method('has')->with($this->equalTo('League\Container\Test\Asset\Bar'))->willReturn(true);
-        $container->expects($this->once())->method('get')->with($this->equalTo('League\Container\Test\Asset\Bar'))->willReturn($bar);
+        $container
+            ->expects(self::once())
+            ->method('has')
+            ->with(self::equalTo(Bar::class))
+            ->willReturn(true)
+        ;
+
+        $container
+            ->expects(self::once())
+            ->method('get')
+            ->with(self::equalTo(Bar::class))
+            ->willReturn($bar)
+        ;
 
         $inflector = (new Inflector('Type'))
-            ->setLeagueContainer($container)
-            ->invokeMethod('setBar', ['League\Container\Test\Asset\Bar'])
+            ->setContainer($container)
+            ->invokeMethod('setBar', [Bar::class])
         ;
 
         $foo = new class {
             public $bar;
-            public function setBar($bar)
+            public function setBar($bar): void
             {
                 $this->bar = $bar;
             }
         };
 
         $inflector->inflect($foo);
-
-        $this->assertSame($bar, $foo->bar);
+        self::assertSame($bar, $foo->bar);
     }
 
     /**
      * Asserts that the inflector will inflect on an object with a callback.
      */
-    public function testInflectorInflectsWithCallback()
+    public function testInflectorInflectsWithCallback(): void
     {
         $foo = new class {
             public $bar;
-            public function setBar($bar)
+            public function setBar($bar): void
             {
                 $this->bar = $bar;
             }
@@ -139,7 +162,6 @@ class InflectorTest extends TestCase
         });
 
         $inflector->inflect($foo);
-
-        $this->assertSame($bar, $foo->bar);
+        self::assertSame($bar, $foo->bar);
     }
 }

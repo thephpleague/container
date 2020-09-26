@@ -36,7 +36,7 @@ class ServiceProviderAggregate implements ServiceProviderAggregateInterface
         }
 
         if ($provider instanceof ContainerAwareInterface) {
-            $provider->setLeagueContainer($this->getLeagueContainer());
+            $provider->setContainer($this->getContainer());
         }
 
         if ($provider instanceof BootableServiceProviderInterface) {

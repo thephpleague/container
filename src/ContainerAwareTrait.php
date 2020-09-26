@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace League\Container;
 
+use BadMethodCallException;
 use League\Container\Exception\ContainerException;
 
 trait ContainerAwareTrait
@@ -28,7 +29,16 @@ trait ContainerAwareTrait
     public function setContainer(DefinitionContainerInterface $container): ContainerAwareInterface
     {
         $this->container = $container;
-        return $this;
+
+        if ($this instanceof ContainerAwareInterface) {
+            return $this;
+        }
+
+        throw new BadMethodCallException(sprintf(
+            'Attempt to use (%s) while not implementing (%s)',
+            ContainerAwareTrait::class,
+            ContainerAwareInterface::class
+        ));
     }
 
     /**

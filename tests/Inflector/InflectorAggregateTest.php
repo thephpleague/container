@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace League\Container\Test\Inflector;
 
@@ -12,20 +14,20 @@ class InflectorAggregateTest extends TestCase
     /**
      * Asserts that the aggregate can add an inflector.
      */
-    public function testAggregateAddsInflector()
+    public function testAggregateAddsInflector(): void
     {
-        $aggregate = new InflectorAggregate;
+        $aggregate = new InflectorAggregate();
         $inflector = $aggregate->add('Some\Type');
 
-        $this->assertSame('Some\Type', $inflector->getType());
+        self::assertSame('Some\Type', $inflector->getType());
     }
 
     /**
      * Asserts that the aggregate adds and iterates multiple inflectors.
      */
-    public function testAggregateAddsAndIteratesMultipleInflectors()
+    public function testAggregateAddsAndIteratesMultipleInflectors(): void
     {
-        $aggregate  = new InflectorAggregate;
+        $aggregate  = new InflectorAggregate();
         $inflectors = [];
 
         for ($i = 0; $i < 10; $i++) {
@@ -33,25 +35,23 @@ class InflectorAggregateTest extends TestCase
         }
 
         foreach ($aggregate->getIterator() as $key => $inflector) {
-            $this->assertSame($inflectors[$key], $inflector);
+            self::assertSame($inflectors[$key], $inflector);
         }
     }
 
     /**
      * Asserts that the aggregate iterates and inflects on an object.
      */
-    public function testAggregateIteratesAndInflectsOnObject()
+    public function testAggregateIteratesAndInflectsOnObject(): void
     {
-        $aggregate      = new InflectorAggregate;
+        $aggregate      = new InflectorAggregate();
         $containerAware = $this->getMockBuilder(ContainerAwareInterface::class)->getMock();
         $container      = $this->getMockBuilder(Container::class)->getMock();
 
-        $containerAware->expects($this->once())->method('setLeagueContainer')->with($this->equalTo($container));
-        $aggregate->add(ContainerAwareInterface::class)->invokeMethod('setLeagueContainer', [$container]);
+        $containerAware->expects(self::once())->method('setContainer')->with(self::equalTo($container));
+        $aggregate->add(ContainerAwareInterface::class)->invokeMethod('setContainer', [$container]);
         $aggregate->add('Ignored\Type');
-
-        $aggregate->setLeagueContainer($container);
-
+        $aggregate->setContainer($container);
         $aggregate->inflect($containerAware);
     }
 }

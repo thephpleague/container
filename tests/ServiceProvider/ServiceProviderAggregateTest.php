@@ -1,10 +1,17 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace League\Container\Test\ServiceProvider;
 
 use League\Container\{Container, ContainerAwareTrait};
 use League\Container\Exception\ContainerException;
-use League\Container\ServiceProvider\{AbstractServiceProvider, BootableServiceProviderInterface, ServiceProviderAggregate, ServiceProviderInterface};
+use League\Container\ServiceProvider\{
+    AbstractServiceProvider,
+    BootableServiceProviderInterface,
+    ServiceProviderAggregate,
+    ServiceProviderInterface
+};
 use PHPUnit\Framework\TestCase;
 
 class ServiceProviderAggregateTest extends TestCase
@@ -30,7 +37,6 @@ class ServiceProviderAggregateTest extends TestCase
             public function boot()
             {
                 $this->booted++;
-
                 return true;
             }
 
@@ -38,7 +44,7 @@ class ServiceProviderAggregateTest extends TestCase
             {
                 $this->registered++;
 
-                $this->getLeagueContainer()->add('SomeService', function ($arg) {
+                $this->getContainer()->add('SomeService', function ($arg) {
                     return $arg;
                 });
 
@@ -50,27 +56,27 @@ class ServiceProviderAggregateTest extends TestCase
     /**
      * Asserts that the aggregate adds a class name service provider.
      */
-    public function testAggregateAddsClassNameServiceProvider()
+    public function testAggregateAddsClassNameServiceProvider(): void
     {
         $container = $this->getMockBuilder(Container::class)->getMock();
-        $aggregate = (new ServiceProviderAggregate)->setLeagueContainer($container);
+        $aggregate = (new ServiceProviderAggregate())->setContainer($container);
 
         $aggregate->add($this->getServiceProvider());
 
-        $this->assertTrue($aggregate->provides('SomeService'));
-        $this->assertTrue($aggregate->provides('AnotherService'));
+        self::assertTrue($aggregate->provides('SomeService'));
+        self::assertTrue($aggregate->provides('AnotherService'));
     }
 
     /**
      * Asserts that an exception is thrown when adding a service provider that
      * does not exist.
      */
-    public function testAggregateThrowsWhenCannotResolveServiceProvider()
+    public function testAggregateThrowsWhenCannotResolveServiceProvider(): void
     {
         $this->expectException(ContainerException::class);
 
         $container = $this->getMockBuilder(Container::class)->getMock();
-        $aggregate = (new ServiceProviderAggregate)->setLeagueContainer($container);
+        $aggregate = (new ServiceProviderAggregate())->setContainer($container);
 
         $aggregate->add('NonExistentClass');
     }
@@ -79,23 +85,23 @@ class ServiceProviderAggregateTest extends TestCase
      * Asserts that an exception is thrown when attempting to invoke the register
      * method of a service provider that has not been provided.
      */
-    public function testAggregateThrowsWhenRegisteringForServiceThatIsNotAdded()
+    public function testAggregateThrowsWhenRegisteringForServiceThatIsNotAdded(): void
     {
         $this->expectException(ContainerException::class);
 
         $container = $this->getMockBuilder(Container::class)->getMock();
-        $aggregate = (new ServiceProviderAggregate)->setLeagueContainer($container);
+        $aggregate = (new ServiceProviderAggregate())->setContainer($container);
 
         $aggregate->register('SomeService');
     }
 
     /**
-     * Asserts that resgister method is only invoked once per service provider.
+     * Asserts that register method is only invoked once per service provider.
      */
-    public function testAggregateInvokesCorrectRegisterMethodOnlyOnce()
+    public function testAggregateInvokesCorrectRegisterMethodOnlyOnce(): void
     {
         $container = $this->getMockBuilder(Container::class)->getMock();
-        $aggregate = (new ServiceProviderAggregate)->setLeagueContainer($container);
+        $aggregate = (new ServiceProviderAggregate())->setContainer($container);
         $provider  = $this->getServiceProvider();
 
         $aggregate->add($provider);
@@ -103,7 +109,7 @@ class ServiceProviderAggregateTest extends TestCase
         $aggregate->register('SomeService');
         $aggregate->register('AnotherService');
 
-        $this->assertSame(1, $provider->registered);
+        self::assertSame(1, $provider->registered);
     }
 
 
@@ -111,10 +117,10 @@ class ServiceProviderAggregateTest extends TestCase
      * Asserts that adding a provider that has already been aggregated
      * will skip subsequent attempts to add the provider
      */
-    public function testAggregateSkipsExistingProviders()
+    public function testAggregateSkipsExistingProviders(): void
     {
         $container = $this->getMockBuilder(Container::class)->getMock();
-        $aggregate = (new ServiceProviderAggregate)->setLeagueContainer($container);
+        $aggregate = (new ServiceProviderAggregate())->setContainer($container);
         $provider  = $this->getServiceProvider();
 
         $aggregate->add($provider);
@@ -122,10 +128,10 @@ class ServiceProviderAggregateTest extends TestCase
 
         // assert after adding provider multiple times, that it
         // was only aggregated and booted once
-        $this->assertSame(
+        self::assertSame(
             [$provider],
             iterator_to_array($aggregate->getIterator())
         );
-        $this->assertSame(1, $provider->booted);
+        self::assertSame(1, $provider->booted);
     }
 }

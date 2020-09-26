@@ -49,7 +49,7 @@ class InflectorAggregate implements InflectorAggregateInterface
                 continue;
             }
 
-            $inflector->setLeagueContainer($this->getLeagueContainer());
+            $inflector->setContainer($this->getContainer());
             $inflector->inflect($object);
         }
 
