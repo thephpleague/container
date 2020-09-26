@@ -10,6 +10,8 @@ php:
 
 matrix:
     fast_finish: true
+    allow_failures:
+        - php: nightly
 
 cache:
     directories:
@@ -29,7 +31,7 @@ install:
     - |
         if [ $TRAVIS_PHP_VERSION == 7.4 ]; then
             sed -e 's#^\s*\$this->assertInternalType(.array., \$arrayOf);$#$this->assertIsArray($arrayOf);#' -i tests/ContainerTest.php
-            travis_retry composer require "phpunit/phpunit:^9.0"
+            travis_retry composer require "phpunit/phpunit:^8.0"
         fi
     - |
         if [ $TRAVIS_PHP_VERSION == 'nightly' ]; then
