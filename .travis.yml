@@ -19,6 +19,11 @@ cache:
 
 install:
     - |
+        echo Debug CI...
+        echo PHP="${TRAVIS_PHP_VERSION}"
+        if dpkg --validate-version "${TRAVIS_PHP_VERSION}"; then echo OK; else echo NOK; fi
+        if dpkg --compare-versions "${TRAVIS_PHP_VERSION}" ge 7.2; then echo OK; else echo NOK; fi
+        echo ___DBG__
         if dpkg --validate-version "${TRAVIS_PHP_VERSION}" 2>/dev/null && dpkg --compare-versions "${TRAVIS_PHP_VERSION}" ge 7.2; then
             sed -i -e 's#^\s*\$this->assertInternalType(.array., \$arrayOf);$#$this->assertIsArray($arrayOf);#' tests/ContainerTest.php
             travis_retry composer require --no-interaction --prefer-dist --dev "phpunit/phpunit:^8.0"
