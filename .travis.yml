@@ -27,13 +27,14 @@ install:
         if [ "${TRAVIS_PHP_VERSION}" == nightly ]; then
             sed -i -e 's#^\s*\$this->assertInternalType(.array., \$arrayOf);$#$this->assertIsArray($arrayOf);#' tests/ContainerTest.php
             travis_retry composer require --no-interaction --prefer-dist --dev --ignore-platform-reqs "phpunit/phpunit:^9.3"
-        # Install PHPUnit v8 on PHP 7.2+
-        elif dpkg --compare-versions "${TRAVIS_PHP_VERSION}" ge 7.2; then
-            sed -i -e 's#^\s*\$this->assertInternalType(.array., \$arrayOf);$#$this->assertIsArray($arrayOf);#' tests/ContainerTest.php
-            travis_retry composer require --no-interaction --prefer-dist --dev "phpunit/phpunit:^8.0"
+      # Enable test on PHP 7.4+
         elif dpkg --compare-versions "${TRAVIS_PHP_VERSION}" ge 7.4; then
             sed -i -e 's#^\s*\$this->assertInternalType(.array., \$arrayOf);$#$this->assertIsArray($arrayOf);#' tests/ContainerTest.php
             sed -i -e 's#^\s*\\/\/ \$foo = $container->call(fn (Foo \$foo) => \$foo);$#\$foo = $container->call(fn (Foo \$foo) => \$foo);#' tests/ReflectionContainerTest.php
+            travis_retry composer require --no-interaction --prefer-dist --dev "phpunit/phpunit:^8.0"
+        # Install PHPUnit v8 on PHP 7.2+
+        elif dpkg --compare-versions "${TRAVIS_PHP_VERSION}" ge 7.2; then
+            sed -i -e 's#^\s*\$this->assertInternalType(.array., \$arrayOf);$#$this->assertIsArray($arrayOf);#' tests/ContainerTest.php
             travis_retry composer require --no-interaction --prefer-dist --dev "phpunit/phpunit:^8.0"
         # Keep PHPUnit v6 on PHP 7.1-
         else
