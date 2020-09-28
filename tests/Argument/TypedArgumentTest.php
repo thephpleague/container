@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace League\Container\Test\Argument;
 
-use League\Container\Argument\{Typed, TypedArgument};
+use League\Container\Argument\{Literal, LiteralArgument};
 use PHPUnit\Framework\TestCase;
 
 class TypedArgumentTest extends TestCase
@@ -15,14 +15,14 @@ class TypedArgumentTest extends TestCase
     public function testRawArgumentSetsAndGetsArgument(): void
     {
         $arguments = [
-            Typed\StringArgument::class   => 'string',
-            Typed\ObjectArgument::class   => new class {
+            Literal\StringArgument::class   => 'string',
+            Literal\ObjectArgument::class   => new class {
             },
-            Typed\CallableArgument::class => function () {
+            Literal\CallableArgument::class => function () {
             },
-            Typed\BooleanArgument::class  => true,
-            Typed\IntegerArgument::class  => 1,
-            Typed\FloatArgument::class    => 1.23
+            Literal\BooleanArgument::class  => true,
+            Literal\IntegerArgument::class  => 1,
+            Literal\FloatArgument::class    => 1.23
         ];
 
         foreach ($arguments as $type => $expected) {

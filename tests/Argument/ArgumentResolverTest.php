@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace League\Container\Test\Argument;
 
-use League\Container\Argument\{ArgumentResolverInterface, ArgumentResolverTrait, Typed};
+use League\Container\Argument\{ArgumentResolverInterface, ArgumentResolverTrait, Literal};
+use League\Container\Test\Asset\Baz;
 use League\Container\{Container, ContainerAwareTrait};
 use PHPUnit\Framework\TestCase;
 use Psr\Container\NotFoundExceptionInterface;
+use ReflectionClass;
 use ReflectionFunctionAbstract;
 use ReflectionNamedType;
 use ReflectionParameter;
@@ -48,7 +50,7 @@ class ArgumentResolverTest extends TestCase
     /**
      * Asserts that the resolver resolves raw arguments.
      */
-    public function testResolverResolvesResolvesRawArguments(): void
+    public function testResolverResolvesLiteralArguments(): void
     {
         $resolver = new class implements ArgumentResolverInterface {
             use ArgumentResolverTrait;
@@ -68,13 +70,13 @@ class ArgumentResolverTest extends TestCase
             ->expects(self::at(1))
             ->method('get')
             ->with(self::equalTo('alias1'))
-            ->willReturn(new Typed\StringArgument('value1'))
+            ->willReturn(new Literal\StringArgument('value1'))
         ;
 
         /** @var Container $container */
         $resolver->setContainer($container);
 
-        $args = $resolver->resolveArguments(['alias1', new Typed\StringArgument('value2')]);
+        $args = $resolver->resolveArguments(['alias1', new Literal\StringArgument('value2')]);
 
         self::assertSame('value1', $args[0]);
         self::assertSame('value2', $args[1]);
@@ -105,9 +107,8 @@ class ArgumentResolverTest extends TestCase
 
         $method->expects(self::once())->method('getParameters')->willReturn([$param1, $param2, $param3]);
 
-        $container->expects(self::at(0))->method('has')->with(self::equalTo('Class'))->willReturn(false);
-        $container->expects(self::at(1))->method('has')->with(self::equalTo('value2'))->willReturn(false);
-        $container->expects(self::at(2))->method('has')->with(self::equalTo('value3'))->willReturn(false);
+        $container->expects(self::once())->method('has')->with($this->equalTo('Class'))->willReturn(true);
+        $container->expects(self::once())->method('get')->with($this->equalTo('Class'))->willReturn('classObject');
 
         $resolver = new class implements ArgumentResolverInterface {
             use ArgumentResolverTrait;
@@ -119,9 +120,20 @@ class ArgumentResolverTest extends TestCase
 
         $args = $resolver->reflectArguments($method, ['param3' => 'value3']);
 
-        self::assertSame('Class', $args[0]);
+        self::assertSame('classObject', $args[0]);
         self::assertSame('value2', $args[1]);
         self::assertSame('value3', $args[2]);
+    }
+
+    public function testResolvesDefaultValueArgument(): void
+    {
+        $resolver = new class implements ArgumentResolverInterface {
+            use ArgumentResolverTrait;
+            use ContainerAwareTrait;
+        };
+
+        $result = $resolver->reflectArguments((new ReflectionClass(Baz::class))->getConstructor());
+        self::assertSame([null], $result);
     }
 
     /**

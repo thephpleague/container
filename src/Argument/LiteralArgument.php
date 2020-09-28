@@ -6,7 +6,7 @@ namespace League\Container\Argument;
 
 use InvalidArgumentException;
 
-class TypedArgument implements ArgumentInterface
+class LiteralArgument implements LiteralArgumentInterface
 {
     public const TYPE_ARRAY    = 'array';
     public const TYPE_BOOL     = 'boolean';
@@ -24,16 +24,11 @@ class TypedArgument implements ArgumentInterface
      */
     protected $value;
 
-    /**
-     * Construct.
-     *
-     * @param mixed  $value
-     * @param string $type
-     */
-    public function __construct($value, string $type)
+    public function __construct($value, string $type = null)
     {
         if (
-            ($type === self::TYPE_CALLABLE && is_callable($value))
+            null === $type
+            || ($type === self::TYPE_CALLABLE && is_callable($value))
             || ($type === self::TYPE_OBJECT && is_object($value))
             || gettype($value) === $type
         ) {

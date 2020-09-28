@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace League\Container\Argument;
 
-interface ArgumentInterface
+interface DefaultValueInterface extends ArgumentInterface
 {
     /**
      * @return mixed
      */
-    public function getValue();
+    public function getDefaultValue();
 }

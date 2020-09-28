@@ -10,13 +10,9 @@ use League\Container\ReflectionContainer;
 use Psr\Container\ContainerInterface;
 use ReflectionFunctionAbstract;
 use ReflectionNamedType;
-use ReflectionParameter;
 
 trait ArgumentResolverTrait
 {
-    /**
-     * {@inheritdoc}
-     */
     public function resolveArguments(array $arguments): array
     {
         try {
@@ -26,47 +22,77 @@ trait ArgumentResolverTrait
         }
 
         foreach ($arguments as &$arg) {
-            if ($arg instanceof ArgumentInterface) {
+            // if we have a literal, we don't want to do anything more with it
+            if ($arg instanceof LiteralArgumentInterface) {
                 $arg = $arg->getValue();
                 continue;
             }
 
-            if (!is_string($arg)) {
+            if ($arg instanceof ArgumentInterface) {
+                $argValue = $arg->getValue();
+            } else {
+                $argValue = $arg;
+            }
+
+            if (!is_string($argValue)) {
                  continue;
             }
 
-            if ($container instanceof ContainerInterface && $container->has($arg)) {
-                $arg = $container->get($arg);
+            // resolve the argument from the container, if it happens to be another
+            // argument wrapper, use that value
+            if ($container instanceof ContainerInterface && $container->has($argValue)) {
+                $arg = $container->get($argValue);
 
                 if ($arg instanceof ArgumentInterface) {
                     $arg = $arg->getValue();
                 }
+
+                continue;
+            }
+
+            // if we have a default value, we use that, no more resolution as
+            // we expect a default/optional argument value to be literal
+            if ($arg instanceof DefaultValueInterface) {
+                $arg = $arg->getDefaultValue();
+                continue;
             }
         }
 
         return $arguments;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function reflectArguments(ReflectionFunctionAbstract $method, array $args = []): array
     {
-        $arguments = array_map(function (ReflectionParameter $param) use ($method, $args) {
-            $name = $param->getName();
-            $type = $param->getType();
+        $params    = $method->getParameters();
+        $arguments = [];
 
+        foreach ($params as $param) {
+            $name = $param->getName();
+
+            // if we've been given a value for the argument, treat as literal
             if (array_key_exists($name, $args)) {
-                return $args[$name];
+                $arguments[] = new LiteralArgument($args[$name]);
+                continue;
             }
 
+            $type = $param->getType();
+
             if ($type instanceof ReflectionNamedType) {
-                // in PHP 8, nullable argument have "?" prefix
-                return ltrim($type->getName(), '?');
+                // in PHP 8, nullable arguments have "?" prefix
+                $typeHint = ltrim($type->getName(), '?');
+
+                if ($param->isDefaultValueAvailable()) {
+                    $arguments[] = new DefaultValueArgument($typeHint, $param->getDefaultValue());
+                    continue;
+                }
+
+                $arguments[] = new ResolvableArgument($typeHint);
+                continue;
             }
 
             if ($param->isDefaultValueAvailable()) {
-                return $param->getDefaultValue();
+                $arguments[] = new LiteralArgument($param->getDefaultValue());
+                continue;
             }
 
             throw new NotFoundException(sprintf(
@@ -74,15 +100,10 @@ trait ArgumentResolverTrait
                 $name,
                 $method->getName()
             ));
-        }, $method->getParameters());
+        }
 
         return $this->resolveArguments($arguments);
     }
 
-    /**
-     * Get the container.
-     *
-     * @return DefinitionContainerInterface
-     */
     abstract public function getContainer(): DefinitionContainerInterface;
 }

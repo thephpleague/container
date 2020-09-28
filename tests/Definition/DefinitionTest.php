@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace League\Container\Test\Definition;
 
-use League\Container\Argument\Typed;
+use League\Container\Argument\Literal;
 use League\Container\Definition\Definition;
 use League\Container\Test\Asset\{Foo, FooCallable, Bar};
 use PHPUnit\Framework\TestCase;
@@ -34,7 +34,7 @@ class DefinitionTest extends TestCase
     public function testDefinitionResolvesClosureReturningRawArgument(): void
     {
         $definition = new Definition('callable', function () {
-            return new Typed\StringArgument('hello world');
+            return new Literal\StringArgument('hello world');
         });
 
         $actual = $definition->resolve();
@@ -146,7 +146,7 @@ class DefinitionTest extends TestCase
      */
     public function testDefinitionCanGetConcrete(): void
     {
-        $concrete = new Typed\StringArgument(Foo::class);
+        $concrete = new Literal\StringArgument(Foo::class);
         $definition = new Definition('class', $concrete);
 
         self::assertSame($concrete, $definition->getConcrete());
@@ -159,7 +159,7 @@ class DefinitionTest extends TestCase
     {
         $definition = new Definition('class', null);
 
-        $concrete = new Typed\StringArgument(Foo::class);
+        $concrete = new Literal\StringArgument(Foo::class);
         $definition->setConcrete($concrete);
 
         self::assertSame($concrete, $definition->getConcrete());
