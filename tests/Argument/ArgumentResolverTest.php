@@ -93,7 +93,6 @@ class ArgumentResolverTest extends TestCase
 
         $method->expects($this->once())->method('getParameters')->willReturn([$param1, $param2, $param3]);
 
-        $container->expects($this->once())->method('has')->with($this->equalTo('Class'))->willReturn(true);
         $container->expects($this->once())->method('get')->with($this->equalTo('Class'))->willReturn('classObject');
 
         $resolver = new class implements ArgumentResolverInterface {
