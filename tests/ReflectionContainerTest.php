@@ -212,6 +212,7 @@ class ReflectionContainerTest extends TestCase
         }
 
         $container = new ReflectionContainer;
+        // commented line is uncommented in PHP 7.4+ tests via .travis.yml
         // $foo = $container->call(fn (Foo $foo) => $foo);
         $this->assertInstanceOf(Foo::class, $foo);
         $this->assertInstanceOf(Bar::class, $foo->bar);
