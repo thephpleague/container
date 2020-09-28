@@ -77,7 +77,6 @@ class DefinitionTest extends TestCase
 
         $bar = new Bar;
 
-        $container->expects($this->once())->method('has')->with($this->equalTo(Bar::class))->willReturn(true);
         $container->expects($this->once())->method('get')->with($this->equalTo(Bar::class))->willReturn($bar);
 
         $definition = new Definition('callable', Foo::class);
@@ -100,7 +99,6 @@ class DefinitionTest extends TestCase
 
         $bar = new Bar;
 
-        $container->expects($this->once())->method('has')->with($this->equalTo(Bar::class))->willReturn(true);
         $container->expects($this->once())->method('get')->with($this->equalTo(Bar::class))->willReturn($bar);
 
         $definition = new Definition('callable', Foo::class);
@@ -123,7 +121,6 @@ class DefinitionTest extends TestCase
 
         $bar = new Bar;
 
-        $container->expects($this->once())->method('has')->with($this->equalTo(Bar::class))->willReturn(true);
         $container->expects($this->once())->method('get')->with($this->equalTo(Bar::class))->willReturn($bar);
 
         $definition = new Definition('callable', new ClassName(Foo::class));

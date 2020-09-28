@@ -3,7 +3,7 @@
 namespace League\Container\Test;
 
 use League\Container\Argument\{ArgumentResolverInterface, ArgumentResolverTrait, RawArgument};
-use League\Container\{Container, ContainerAwareTrait};
+use League\Container\{Container, ContainerAwareTrait, Exception\NotFoundException};
 use League\Container\Test\Asset\{Qux, BarInterface};
 use PHPUnit\Framework\TestCase;
 use Psr\Container\NotFoundExceptionInterface;
@@ -25,16 +25,17 @@ class ArgumentResolverTest extends TestCase
         };
 
         $container = $this->getMockBuilder(Container::class)->getMock();
+        $exception = new NotFoundException();
 
-        $container->expects($this->at(0))->method('has')->with($this->equalTo('alias1'))->willReturn(true);
-        $container->expects($this->at(1))->method('get')->with($this->equalTo('alias1'))->willReturn($resolver);
-        $container->expects($this->at(2))->method('has')->with($this->equalTo('alias2'))->willReturn(false);
+        //$container->expects($this->at(0))->method('has')->with($this->equalTo('alias1'))->willReturn(true);
+        $container->expects($this->at(0))->method('get')->with($this->equalTo('alias1'))->willReturn('concrete1');
+        $container->expects($this->at(1))->method('get')->with($this->equalTo('alias2'))->willThrowException($exception);
 
         $resolver->setLeagueContainer($container);
 
         $args = $resolver->resolveArguments(['alias1', 'alias2']);
 
-        $this->assertSame($resolver, $args[0]);
+        $this->assertSame('concrete1', $args[0]);
         $this->assertSame('alias2', $args[1]);
     }
 
@@ -50,8 +51,7 @@ class ArgumentResolverTest extends TestCase
 
         $container = $this->getMockBuilder(Container::class)->getMock();
 
-        $container->expects($this->at(0))->method('has')->with($this->equalTo('alias1'))->willReturn(true);
-        $container->expects($this->at(1))->method('get')->with($this->equalTo('alias1'))->willReturn('value1');
+        $container->expects($this->once())->method('get')->with($this->equalTo('alias1'))->willReturn('value1');
 
         $resolver->setLeagueContainer($container);
 
