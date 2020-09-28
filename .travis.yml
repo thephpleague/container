@@ -16,7 +16,13 @@ cache:
         - $HOME/.composer/cache
 
 install:
-    - travis_retry composer install --no-interaction --prefer-dist
+    - |
+        # Instal PHPUnit v9 on PHP 8
+        if [ "${TRAVIS_PHP_VERSION}" == nightly ]; then
+            travis_retry composer require --no-interaction --prefer-dist --dev --ignore-platform-reqs "phpunit/phpunit:^9.3"
+        else
+            travis_retry composer install --no-interaction --prefer-dist
+        fi
 
 script:
     - vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
