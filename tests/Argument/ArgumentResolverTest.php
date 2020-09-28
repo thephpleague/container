@@ -4,9 +4,10 @@ namespace League\Container\Test;
 
 use League\Container\Argument\{ArgumentResolverInterface, ArgumentResolverTrait, RawArgument};
 use League\Container\{Container, ContainerAwareTrait};
-use League\Container\Test\Asset\Qux;
+use League\Container\Test\Asset\{Qux, BarInterface};
 use PHPUnit\Framework\TestCase;
 use Psr\Container\NotFoundExceptionInterface;
+use ReflectionFunction;
 use ReflectionFunctionAbstract;
 use ReflectionParameter;
 use ReflectionType;
@@ -146,5 +147,18 @@ class ArgumentResolverTest extends TestCase
         $result = $resolver->reflectArguments((new \ReflectionClass(Qux::class))->getConstructor());
 
         $this->assertSame([null], $result);
+    }
+
+    public function testThrowsExceptionWhenUnresolvable()
+    {
+        $resolver = new class implements ArgumentResolverInterface {
+            use ArgumentResolverTrait;
+            use ContainerAwareTrait;
+        };
+
+        $resolver->setLeagueContainer(new Container());
+        $this->expectException(NotFoundExceptionInterface::class);
+
+        $resolver->reflectArguments(new ReflectionFunction(function (BarInterface $bar) {}));
     }
 }
