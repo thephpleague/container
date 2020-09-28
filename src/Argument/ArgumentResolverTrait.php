@@ -17,6 +17,8 @@ trait ArgumentResolverTrait
     public function resolveArguments(array $arguments) : array
     {
         return array_map(function ($argument) {
+            $justStringValue = false;
+
             if ($argument instanceof RawArgumentInterface) {
                 return $argument->getValue();
             } elseif ($argument instanceof ClassNameInterface) {
@@ -24,6 +26,7 @@ trait ArgumentResolverTrait
             } elseif (!is_string($argument)) {
                 return $argument;
             } else {
+                $justStringValue = true;
                 $id = $argument;
             }
 
@@ -37,8 +40,20 @@ trait ArgumentResolverTrait
                 }
             }
 
-            if ($container !== null && $container->has($id)) {
-                return $container->get($id);
+            if ($container !== null) {
+                try {
+                    return $container->get($id);
+                } catch (NotFoundException $exception) {
+                    if ($argument instanceof ClassNameWithOptionalValue) {
+                        return $argument->getOptionalValue();
+                    }
+
+                    if ($justStringValue) {
+                        return $id;
+                    }
+
+                    throw $exception;
+                }
             }
 
             if ($argument instanceof ClassNameWithOptionalValue) {
@@ -46,7 +61,7 @@ trait ArgumentResolverTrait
             }
 
             // Just a string value.
-            return $argument;
+            return $id;
         }, $arguments);
     }
 
