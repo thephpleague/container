@@ -5,7 +5,7 @@ namespace League\Container\Test;
 use League\Container\Definition\DefinitionInterface;
 use League\Container\Exception\{ContainerException, NotFoundException};
 use League\Container\ServiceProvider\AbstractServiceProvider;
-use League\Container\Test\Asset\{Foo, Bar};
+use League\Container\Test\Asset\{BarInterface, Foo, Bar, QuxInterface};
 use League\Container\{Container, ReflectionContainer};
 use PHPUnit\Framework\TestCase;
 
@@ -260,5 +260,19 @@ class ContainerTest extends TestCase
 
         $this->assertInstanceOf(Foo::class, $foo);
         $this->assertInstanceOf(Bar::class, $foo->bar);
+    }
+
+    public function testAliases()
+    {
+        $container = new Container();
+
+        $container->add(QuxInterface::class, BarInterface::class);
+        $container->add(BarInterface::class, function () {
+            return new Bar();
+        });
+
+        $bar = $container->get(QuxInterface::class);
+
+        $this->assertInstanceOf(Bar::class, $bar);
     }
 }
