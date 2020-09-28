@@ -12,9 +12,6 @@ use ReflectionClass;
 
 class InflectorTest extends TestCase
 {
-    /**
-     * Asserts that the inflector sets expected method calls.
-     */
     public function testInflectorSetsExpectedMethodCalls(): void
     {
         $container = $this->getMockBuilder(Container::class)->getMock();
@@ -37,9 +34,6 @@ class InflectorTest extends TestCase
         ]);
     }
 
-    /**
-     * Asserts that the inflector sets expected properties.
-     */
     public function testInflectorSetsExpectedProperties(): void
     {
         $container = $this->getMockBuilder(Container::class)->getMock();
@@ -62,9 +56,6 @@ class InflectorTest extends TestCase
         ]);
     }
 
-    /**
-     * Asserts that the inflector will inflect on an object with properties.
-     */
     public function testInflectorInflectsWithProperties(): void
     {
         $container = $this->getMockBuilder(Container::class)->getMock();
@@ -100,9 +91,6 @@ class InflectorTest extends TestCase
         self::assertSame($bar, $foo->bar);
     }
 
-    /**
-     * Asserts that the inflector will inflect on an object with method call.
-     */
     public function testInflectorInflectsWithMethodCall(): void
     {
         $container = $this->getMockBuilder(Container::class)->getMock();
@@ -141,9 +129,6 @@ class InflectorTest extends TestCase
         self::assertSame($bar, $foo->bar);
     }
 
-    /**
-     * Asserts that the inflector will inflect on an object with a callback.
-     */
     public function testInflectorInflectsWithCallback(): void
     {
         $foo = new class {

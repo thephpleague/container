@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace League\Container\ServiceProvider;
 
 use Generator;
-use League\Container\{ContainerAwareInterface, ContainerAwareTrait};
 use League\Container\Exception\ContainerException;
+use League\Container\{ContainerAwareInterface, ContainerAwareTrait};
 
 class ServiceProviderAggregate implements ServiceProviderAggregateInterface
 {
@@ -20,15 +22,12 @@ class ServiceProviderAggregate implements ServiceProviderAggregateInterface
      */
     protected $registered = [];
 
-    /**
-     * {@inheritdoc}
-     */
-    public function add($provider) : ServiceProviderAggregateInterface
+    public function add($provider): ServiceProviderAggregateInterface
     {
         if (is_string($provider) && $this->getContainer()->has($provider)) {
             $provider = $this->getContainer()->get($provider);
         } elseif (is_string($provider) && class_exists($provider)) {
-            $provider = new $provider;
+            $provider = new $provider();
         }
 
         if (in_array($provider, $this->providers, true)) {
@@ -49,16 +48,13 @@ class ServiceProviderAggregate implements ServiceProviderAggregateInterface
             return $this;
         }
 
-        throw new ContainerException(
-            'A service provider must be a fully qualified class name or instance ' .
-            'of (\League\Container\ServiceProvider\ServiceProviderInterface)'
-        );
+        throw new ContainerException(sprintf(
+            'A service provider must be a fully qualified class name or instance of (%s) ',
+            ServiceProviderInterface::class
+        ));
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function provides(string $service) : bool
+    public function provides(string $service): bool
     {
         foreach ($this->getIterator() as $provider) {
             if ($provider->provides($service)) {
@@ -69,22 +65,12 @@ class ServiceProviderAggregate implements ServiceProviderAggregateInterface
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getIterator() : Generator
+    public function getIterator(): Generator
     {
-        $count = count($this->providers);
-
-        for ($i = 0; $i < $count; $i++) {
-            yield $this->providers[$i];
-        }
+        yield from $this->providers;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function register(string $service)
+    public function register(string $service): void
     {
         if (false === $this->provides($service)) {
             throw new ContainerException(

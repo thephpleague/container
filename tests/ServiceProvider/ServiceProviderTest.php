@@ -13,11 +13,6 @@ use PHPUnit\Framework\TestCase;
 
 class ServiceProviderTest extends TestCase
 {
-    /**
-     * Return a service provider fake
-     *
-     * @return ServiceProviderInterface
-     */
     protected function getServiceProvider(): ServiceProviderInterface
     {
         return new class extends AbstractServiceProvider implements BootableServiceProviderInterface {
@@ -26,25 +21,19 @@ class ServiceProviderTest extends TestCase
                 'AnotherService'
             ];
 
-            public function boot()
+            public function boot(): void
             {
-                return true;
             }
 
-            public function register()
+            public function register(): void
             {
                 $this->getContainer()->add('SomeService', function ($arg) {
                     return $arg;
                 });
-
-                return true;
             }
         };
     }
 
-    /**
-     * Asserts that the service provider correctly determines what it provides.
-     */
     public function testServiceProviderCorrectlyDeterminesWhatIsProvided(): void
     {
         $provider = $this->getServiceProvider()->setIdentifier('something');

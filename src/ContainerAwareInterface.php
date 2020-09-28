@@ -6,19 +6,6 @@ namespace League\Container;
 
 interface ContainerAwareInterface
 {
-    /**
-     * Set a container
-     *
-     * @param DefinitionContainerInterface $container
-     *
-     * @return self
-     */
-    public function setContainer(DefinitionContainerInterface $container): ContainerAwareInterface;
-
-    /**
-     * Get the container
-     *
-     * @return DefinitionContainerInterface
-     */
     public function getContainer(): DefinitionContainerInterface;
+    public function setContainer(DefinitionContainerInterface $container): ContainerAwareInterface;
 }

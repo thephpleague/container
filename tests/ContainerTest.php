@@ -13,9 +13,6 @@ use PHPUnit\Framework\TestCase;
 
 class ContainerTest extends TestCase
 {
-    /**
-     * Asserts that the container can add and get a service.
-     */
     public function testContainerAddsAndGets(): void
     {
         $container = new Container();
@@ -25,13 +22,10 @@ class ContainerTest extends TestCase
         self::assertInstanceOf(Foo::class, $foo);
     }
 
-    /**
-     * Asserts that the container can add and get a service defined as shared.
-     */
     public function testContainerAddsAndGetsShared(): void
     {
         $container = new Container();
-        $container->share(Foo::class);
+        $container->addShared(Foo::class);
         self::assertTrue($container->has(Foo::class));
 
         $fooOne = $container->get(Foo::class);
@@ -42,9 +36,6 @@ class ContainerTest extends TestCase
         self::assertSame($fooOne, $fooTwo);
     }
 
-    /**
-     * Asserts that the container can add and get a service defined as shared.
-     */
     public function testContainerAddsAndGetsSharedByDefault(): void
     {
         $container = (new Container())->defaultToShared();
@@ -59,26 +50,6 @@ class ContainerTest extends TestCase
         self::assertSame($fooOne, $fooTwo);
     }
 
-    /**
-     * Asserts that the container can add and get a service defined as non-shared with defaultToShared enabled.
-     */
-    public function testContainerAddsNonSharedWithSharedByDefault(): void
-    {
-        $container = (new Container())->defaultToShared();
-        $container->add(Foo::class, null, false);
-        self::assertTrue($container->has(Foo::class));
-
-        $fooOne = $container->get(Foo::class);
-        $fooTwo = $container->get(Foo::class);
-
-        self::assertInstanceOf(Foo::class, $fooOne);
-        self::assertInstanceOf(Foo::class, $fooTwo);
-        self::assertNotSame($fooOne, $fooTwo);
-    }
-
-    /**
-     * Asserts that the container can add and get services by tag.
-     */
     public function testContainerAddsAndGetsFromTag(): void
     {
         $container = new Container();
@@ -95,9 +66,6 @@ class ContainerTest extends TestCase
         self::assertInstanceOf(Bar::class, $arrayOf[1]);
     }
 
-    /**
-     * Asserts that the container can add and get a service from service provider.
-     */
     public function testContainerAddsAndGetsWithServiceProvider(): void
     {
         $provider = new class extends AbstractServiceProvider
@@ -106,7 +74,7 @@ class ContainerTest extends TestCase
                 Foo::class
             ];
 
-            public function register()
+            public function register(): void
             {
                 $this->getContainer()->add(Foo::class);
             }
@@ -121,10 +89,6 @@ class ContainerTest extends TestCase
         self::assertInstanceOf(Foo::class, $foo);
     }
 
-    /**
-     * Expect an exception to be thrown if a service provider lies
-     * about providing a specific service.
-     */
     public function testThrowsWhenServiceProviderLies(): void
     {
         $liar = new class extends AbstractServiceProvider
@@ -133,7 +97,7 @@ class ContainerTest extends TestCase
                 'lie'
             ];
 
-            public function register()
+            public function register(): void
             {
             }
         };
@@ -147,9 +111,6 @@ class ContainerTest extends TestCase
         $container->get('lie');
     }
 
-    /**
-     * Asserts that the container can add and get a service from a delegate.
-     */
     public function testContainerAddsAndGetsFromDelegate(): void
     {
         $delegate  = new ReflectionContainer();
@@ -159,9 +120,6 @@ class ContainerTest extends TestCase
         self::assertInstanceOf(Foo::class, $foo);
     }
 
-    /**
-     * Asserts that the container throws an exception when cannot find service.
-     */
     public function testContainerThrowsWhenCannotGetService(): void
     {
         $this->expectException(NotFoundException::class);
@@ -170,20 +128,13 @@ class ContainerTest extends TestCase
         $container->get(Foo::class);
     }
 
-    /**
-     * Asserts that the container can find a definition to extend.
-     */
     public function testContainerCanExtendDefinition(): void
     {
         $container = new Container();
         $container->add(Foo::class);
-        $definition = $container->extend(Foo::class);
-        self::assertInstanceOf(DefinitionInterface::class, $definition);
+        $container->extend(Foo::class);
     }
 
-    /**
-     * Asserts that the container can find a definition to extend from service provider.
-     */
     public function testContainerCanExtendDefinitionFromServiceProvider(): void
     {
         $provider = new class extends AbstractServiceProvider
@@ -192,7 +143,7 @@ class ContainerTest extends TestCase
                 Foo::class
             ];
 
-            public function register()
+            public function register(): void
             {
                 $this->getContainer()->add(Foo::class);
             }
@@ -200,13 +151,9 @@ class ContainerTest extends TestCase
 
         $container = new Container();
         $container->addServiceProvider($provider);
-        $definition = $container->extend(Foo::class);
-        self::assertInstanceOf(DefinitionInterface::class, $definition);
+        $container->extend(Foo::class);
     }
 
-    /**
-     * Asserts that the container throws an exception when can't find definition to extend.
-     */
     public function testContainerThrowsWhenCannotGetDefinitionToExtend(): void
     {
         $this->expectException(NotFoundException::class);
@@ -215,9 +162,6 @@ class ContainerTest extends TestCase
         $container->extend(Foo::class);
     }
 
-    /**
-     * Asserts that the container adds and invokes an inflector.
-     */
     public function testContainerAddsAndInvokesInflector(): void
     {
         $container = new Container();

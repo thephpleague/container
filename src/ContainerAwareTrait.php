@@ -14,18 +14,6 @@ trait ContainerAwareTrait
      */
     protected $container;
 
-    /**
-     * @var Container
-     */
-    protected $leagueContainer;
-
-    /**
-     * Set a container.
-     *
-     * @param DefinitionContainerInterface $container
-     *
-     * @return ContainerAwareInterface
-     */
     public function setContainer(DefinitionContainerInterface $container): ContainerAwareInterface
     {
         $this->container = $container;
@@ -41,11 +29,6 @@ trait ContainerAwareTrait
         ));
     }
 
-    /**
-     * Get the container.
-     *
-     * @return DefinitionContainerInterface
-     */
     public function getContainer(): DefinitionContainerInterface
     {
         if ($this->container instanceof DefinitionContainerInterface) {

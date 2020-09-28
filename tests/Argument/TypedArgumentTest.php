@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace League\Container\Test\Argument;
 
-use League\Container\Argument\{Literal, LiteralArgument};
+use League\Container\Argument\Literal;
 use PHPUnit\Framework\TestCase;
 
 class TypedArgumentTest extends TestCase
 {
-    /**
-     * Asserts that a raw argument object can set and get a value.
-     */
-    public function testRawArgumentSetsAndGetsArgument(): void
+    public function testLiteralArgumentSetsAndGetsArgument(): void
     {
         $arguments = [
             Literal\StringArgument::class   => 'string',

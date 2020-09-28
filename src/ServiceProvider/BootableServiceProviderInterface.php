@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace League\Container\ServiceProvider;
 
@@ -10,5 +12,5 @@ interface BootableServiceProviderInterface extends ServiceProviderInterface
      *
      * @return void
      */
-    public function boot();
+    public function boot(): void;
 }

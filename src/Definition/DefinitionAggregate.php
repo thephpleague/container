@@ -17,11 +17,6 @@ class DefinitionAggregate implements DefinitionAggregateInterface
      */
     protected $definitions = [];
 
-    /**
-     * Construct.
-     *
-     * @param DefinitionInterface[] $definitions
-     */
     public function __construct(array $definitions = [])
     {
         $this->definitions = array_filter($definitions, static function ($definition) {
@@ -29,23 +24,23 @@ class DefinitionAggregate implements DefinitionAggregateInterface
         });
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function add(string $id, $definition, bool $shared = false): DefinitionInterface
+    public function add(string $id, $definition): DefinitionInterface
     {
         if (false === ($definition instanceof DefinitionInterface)) {
             $definition = new Definition($id, $definition);
         }
 
-        $this->definitions[] = $definition->setAlias($id)->setShared($shared);
+        $this->definitions[] = $definition->setAlias($id);
 
         return $definition;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    public function addShared(string $id, $definition): DefinitionInterface
+    {
+        $definition = $this->add($id, $definition);
+        return $definition->setShared(true);
+    }
+
     public function has(string $id): bool
     {
         foreach ($this->getIterator() as $definition) {
@@ -57,9 +52,6 @@ class DefinitionAggregate implements DefinitionAggregateInterface
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasTag(string $tag): bool
     {
         foreach ($this->getIterator() as $definition) {
@@ -71,9 +63,6 @@ class DefinitionAggregate implements DefinitionAggregateInterface
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDefinition(string $id): DefinitionInterface
     {
         foreach ($this->getIterator() as $definition) {
@@ -85,33 +74,42 @@ class DefinitionAggregate implements DefinitionAggregateInterface
         throw new NotFoundException(sprintf('Alias (%s) is not being handled as a definition.', $id));
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function resolve(string $id, bool $new = false)
+    public function resolve(string $id)
     {
-        return $this->getDefinition($id)->resolve($new);
+        return $this->getDefinition($id)->resolve();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function resolveTagged(string $tag, bool $new = false): array
+    public function resolveNew(string $id)
+    {
+        return $this->getDefinition($id)->resolveNew();
+    }
+
+    public function resolveTagged(string $tag): array
     {
         $arrayOf = [];
 
         foreach ($this->getIterator() as $definition) {
             if ($definition->hasTag($tag)) {
-                $arrayOf[] = $definition->setContainer($this->getContainer())->resolve($new);
+                $arrayOf[] = $definition->setContainer($this->getContainer())->resolve();
             }
         }
 
         return $arrayOf;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    public function resolveTaggedNew(string $tag): array
+    {
+        $arrayOf = [];
+
+        foreach ($this->getIterator() as $definition) {
+            if ($definition->hasTag($tag)) {
+                $arrayOf[] = $definition->setContainer($this->getContainer())->resolveNew();
+            }
+        }
+
+        return $arrayOf;
+    }
+
     public function getIterator(): Generator
     {
         yield from $this->definitions;

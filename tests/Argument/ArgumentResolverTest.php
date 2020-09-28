@@ -16,9 +16,6 @@ use ReflectionParameter;
 
 class ArgumentResolverTest extends TestCase
 {
-    /**
-     * Asserts that the resolver proxies to container for resolution.
-     */
     public function testResolverResolvesFromContainer(): void
     {
         $resolver = new class implements ArgumentResolverInterface {
@@ -43,13 +40,10 @@ class ArgumentResolverTest extends TestCase
 
         $args = $resolver->resolveArguments(['alias1', 'alias2']);
 
-        $this->assertSame($resolver, $args[0]);
-        $this->assertSame('alias2', $args[1]);
+        self::assertSame($resolver, $args[0]);
+        self::assertSame('alias2', $args[1]);
     }
 
-    /**
-     * Asserts that the resolver resolves raw arguments.
-     */
     public function testResolverResolvesLiteralArguments(): void
     {
         $resolver = new class implements ArgumentResolverInterface {
@@ -82,9 +76,6 @@ class ArgumentResolverTest extends TestCase
         self::assertSame('value2', $args[1]);
     }
 
-    /**
-     * Asserts that the resolver can resolve arguments via reflection.
-     */
     public function testResolverResolvesArgumentsViaReflection(): void
     {
         $method    = $this->getMockBuilder(ReflectionFunctionAbstract::class)->getMock();
@@ -136,9 +127,6 @@ class ArgumentResolverTest extends TestCase
         self::assertSame([null], $result);
     }
 
-    /**
-     * Asserts that the resolver throws an exception when reflection can't resolve a value.
-     */
     public function testResolverThrowsExceptionWhenReflectionDoesNotResolve(): void
     {
         $this->expectException(NotFoundExceptionInterface::class);

@@ -7,7 +7,9 @@ namespace League\Container;
 use League\Container\Definition\{DefinitionAggregate, DefinitionInterface, DefinitionAggregateInterface};
 use League\Container\Exception\{NotFoundException, ContainerException};
 use League\Container\Inflector\{InflectorAggregate, InflectorInterface, InflectorAggregateInterface};
-use League\Container\ServiceProvider\{ServiceProviderAggregate, ServiceProviderAggregateInterface};
+use League\Container\ServiceProvider\{ServiceProviderAggregate,
+    ServiceProviderAggregateInterface,
+    ServiceProviderInterface};
 use Psr\Container\ContainerInterface;
 
 class Container implements DefinitionContainerInterface
@@ -37,13 +39,6 @@ class Container implements DefinitionContainerInterface
      */
     protected $delegates = [];
 
-    /**
-     * Construct.
-     *
-     * @param DefinitionAggregateInterface|null      $definitions
-     * @param ServiceProviderAggregateInterface|null $providers
-     * @param InflectorAggregateInterface|null       $inflectors
-     */
     public function __construct(
         DefinitionAggregateInterface $definitions = null,
         ServiceProviderAggregateInterface $providers = null,
@@ -66,42 +61,29 @@ class Container implements DefinitionContainerInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function add(string $id, $concrete = null, bool $shared = null): DefinitionInterface
+    public function add(string $id, $concrete = null): DefinitionInterface
     {
         $concrete = $concrete ?? $id;
-        $shared = $shared ?? $this->defaultToShared;
 
-        return $this->definitions->add($id, $concrete, $shared);
+        if (true === $this->defaultToShared) {
+            return $this->addShared($id, $concrete);
+        }
+
+        return $this->definitions->add($id, $concrete);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function share(string $id, $concrete = null): DefinitionInterface
+    public function addShared(string $id, $concrete = null): DefinitionInterface
     {
-        return $this->add($id, $concrete, true);
+        $concrete = $concrete ?? $id;
+        return $this->definitions->addShared($id, $concrete);
     }
 
-    /**
-     * Whether the container should default to defining shared definitions.
-     *
-     * @param boolean $shared
-     *
-     * @return self
-     */
     public function defaultToShared(bool $shared = true): ContainerInterface
     {
         $this->defaultToShared = $shared;
-
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function extend(string $id): DefinitionInterface
     {
         if ($this->providers->provides($id)) {
@@ -112,23 +94,18 @@ class Container implements DefinitionContainerInterface
             return $this->definitions->getDefinition($id);
         }
 
-        throw new NotFoundException(
-            sprintf('Unable to extend alias (%s) as it is not being managed as a definition', $id)
-        );
+        throw new NotFoundException(sprintf(
+            'Unable to extend alias (%s) as it is not being managed as a definition',
+            $id
+        ));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function addServiceProvider($provider): DefinitionContainerInterface
     {
         $this->providers->add($provider);
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function get($id, bool $new = false)
     {
         if ($this->definitions->has($id)) {
@@ -166,9 +143,6 @@ class Container implements DefinitionContainerInterface
         throw new NotFoundException(sprintf('Alias (%s) is not being managed by the container or delegates', $id));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function has($id): bool
     {
         if ($this->definitions->has($id)) {
@@ -192,22 +166,11 @@ class Container implements DefinitionContainerInterface
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function inflector(string $type, callable $callback = null): InflectorInterface
     {
         return $this->inflectors->add($type, $callback);
     }
 
-    /**
-     * Delegate a backup container to be checked for services if it
-     * cannot be resolved via this container.
-     *
-     * @param ContainerInterface $container
-     *
-     * @return self
-     */
     public function delegate(ContainerInterface $container): self
     {
         $this->delegates[] = $container;

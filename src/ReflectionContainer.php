@@ -9,7 +9,6 @@ use League\Container\Exception\ContainerException;
 use League\Container\Exception\NotFoundException;
 use Psr\Container\ContainerInterface;
 use ReflectionClass;
-use ReflectionException;
 use ReflectionFunction;
 use ReflectionMethod;
 
@@ -28,21 +27,11 @@ class ReflectionContainer implements ArgumentResolverInterface, ContainerInterfa
      */
     protected $cache = [];
 
-    /**
-     * Construct.
-     *
-     * @param boolean $cacheResolutions
-     */
     public function __construct(bool $cacheResolutions = false)
     {
         $this->cacheResolutions = $cacheResolutions;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @throws ReflectionException
-     */
     public function get($id, array $args = [])
     {
         if ($this->cacheResolutions === true && array_key_exists($id, $this->cache)) {
@@ -70,24 +59,11 @@ class ReflectionContainer implements ArgumentResolverInterface, ContainerInterfa
         return $resolution;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function has($id): bool
     {
         return class_exists($id);
     }
 
-    /**
-     * Invoke a callable via the container.
-     *
-     * @param callable $callable
-     * @param array    $args
-     *
-     * @return mixed
-     *
-     * @throws ReflectionException
-     */
     public function call(callable $callable, array $args = [])
     {
         if (is_string($callable) && strpos($callable, '::') !== false) {
