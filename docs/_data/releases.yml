@@ -1,8 +1,8 @@
 -
   version: unstable
-  name: League\Container (dev-master)
+  name: League\Container (dev-4.x)
   type: Unstable
-  requires: PHP >= 7.0.0
+  requires: PHP >= 7.2.0
   release: None
   support: Own Risk
   url: /unstable/
@@ -20,7 +20,7 @@
   name: League\Container 3.x
   type: Current
   requires: PHP >= 7.0.0
-  release: 3.3.0 - 2019-06
+  release: 3.3.3 - 2020-09
   support: Ongoing
   url: /3.x/
   menu:

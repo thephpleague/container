@@ -2,6 +2,11 @@
 
 All Notable changes to `League\Container` will be documented in this file
 
+## 3.3.3
+
+### Fixed
+- Fixed bug relating to `ReflectionContainer::call` on arrow functions.
+
 ## 3.3.2
 
 ### Added
