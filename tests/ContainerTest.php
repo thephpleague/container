@@ -142,7 +142,9 @@ class ContainerTest extends TestCase
     {
         $container = new Container();
         $container->add(Foo::class);
-        $container->extend(Foo::class);
+        $definition = $container->extend(Foo::class);
+        self::assertSame(Foo::class, $definition->getAlias());
+        self::assertSame(Foo::class, $definition->getConcrete());
     }
 
     public function testContainerCanExtendDefinitionFromServiceProvider(): void
@@ -161,7 +163,9 @@ class ContainerTest extends TestCase
 
         $container = new Container();
         $container->addServiceProvider($provider);
-        $container->extend(Foo::class);
+        $definition = $container->extend(Foo::class);
+        self::assertSame(Foo::class, $definition->getAlias());
+        self::assertSame(Foo::class, $definition->getConcrete());
     }
 
     public function testContainerThrowsWhenCannotGetDefinitionToExtend(): void

@@ -11,6 +11,8 @@ use League\Container\Argument\{
     LiteralArgumentInterface
 };
 use League\Container\ContainerAwareTrait;
+use League\Container\Exception\ContainerException;
+use Psr\Container\ContainerInterface;
 use ReflectionClass;
 
 class Definition implements ArgumentResolverInterface, DefinitionInterface
@@ -177,10 +179,16 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
             $concrete = $this->invokeMethods($concrete);
         }
 
+        try {
+            $container = $this->getContainer();
+        } catch (ContainerException $e) {
+            $container = null;
+        }
+
         // if we still have a string, try to pull it from the container
         // this allows for `alias -> alias -> ... -> concrete
-        if (is_string($concrete) && $this->getContainer()->has($concrete)) {
-            $concrete = $this->getContainer()->get($concrete);
+        if (is_string($concrete) && $container instanceof ContainerInterface && $container->has($concrete)) {
+            $concrete = $container->get($concrete);
         }
 
         $this->resolved = $concrete;
