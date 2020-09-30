@@ -22,6 +22,16 @@ class ContainerTest extends TestCase
         self::assertInstanceOf(Foo::class, $foo);
     }
 
+    public function testContainerAddsAndGetsRecursively(): void
+    {
+        $container = new Container();
+        $container->add(Bar::class, Foo::class);
+        $container->add(Foo::class);
+        self::assertTrue($container->has(Foo::class));
+        $foo = $container->get(Bar::class);
+        self::assertInstanceOf(Foo::class, $foo);
+    }
+
     public function testContainerAddsAndGetsShared(): void
     {
         $container = new Container();

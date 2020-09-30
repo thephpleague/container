@@ -177,8 +177,13 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
             $concrete = $this->invokeMethods($concrete);
         }
 
-        $this->resolved = $concrete;
+        // if we still have a string, try to pull it from the container
+        // this allows for `alias -> alias -> ... -> concrete
+        if (is_string($concrete) && $this->getContainer()->has($concrete)) {
+            $concrete = $this->getContainer()->get($concrete);
+        }
 
+        $this->resolved = $concrete;
         return $concrete;
     }
 
