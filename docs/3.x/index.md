@@ -92,7 +92,7 @@ I recommend reading the links below for further information about what problems 
 - [Dependency Injection Wikipedia Entry](https://en.wikipedia.org/wiki/Dependency_injection).
 - [Inversion of Control Wikipedia Entry](https://en.wikipedia.org/wiki/Inversion_of_control).
 - [Dependency Injection on PHP The Right Way](https://www.phptherightway.com/#dependency_injection) initially written by Phil Bennett.
-- [Learning About Dependency Injection and PHP](http://ralphschindler.com/2011/05/18/learning-about-dependency-injection-and-php) by Ralph Schindler.
+- ~~[Learning About Dependency Injection and PHP]~~(http://ralphschindler.com/2011/05/18/learning-about-dependency-injection-and-php) by Ralph Schindler.
 - [Dependency Injection as a Tool for Testing](https://medium.com/philipobenito/dependency-injection-as-a-tool-for-testing-902c21c147f1) by Phil Bennett.
 - [The 'D' Doesn't Stand for Dependency Injection](https://www.brandonsavage.net/the-d-doesnt-stand-for-dependency-injection/) by Brandon Savage.
 
