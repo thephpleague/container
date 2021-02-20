@@ -21,10 +21,11 @@
         }
     ],
     "require": {
-        "php": "^5.4.0 || ^7.0",
+        "php": "^5.4.0 || ^7.0 || ^8.0",
         "container-interop/container-interop": "^1.2"
     },
     "require-dev": {
+        "cweagans/composer-patches": "^1.7",
         "phpunit/phpunit" : "4.*"
     },
     "provide": {
@@ -48,6 +49,19 @@
         "branch-alias": {
             "dev-2.x": "2.x-dev",
             "dev-1.x": "1.x-dev"
+        },
+        "enable-patching": true,
+        "composer-exit-on-patch-failure": true,
+        "patches": {
+            "phpunit/php-code-coverage": {
+                "1.x - PHP 8.x support": "https://patch-diff.githubusercontent.com/raw/Sweetchuck/php-code-coverage/pull/1.patch"
+            },
+            "phpunit/php-token-stream": {
+                "2.x - PHP 8.x support": "https://patch-diff.githubusercontent.com/raw/Sweetchuck/php-token-stream/pull/1.patch"
+            },
+            "phpunit/phpunit": {
+                "4.x - PHP 8.x support": "https://patch-diff.githubusercontent.com/raw/Sweetchuck/phpunit/pull/1.patch"
+            }
         }
     }
 }

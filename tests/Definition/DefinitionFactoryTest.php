@@ -4,6 +4,7 @@ namespace League\Container\Test\Definition;
 
 use League\Container\Definition\DefinitionFactory;
 use League\Container\Test\Asset;
+use League\Container\Test\Asset\FooWithNamedConstructor;
 
 class DefinitionFactoryTest extends \PHPUnit_Framework_TestCase
 {
@@ -37,10 +38,18 @@ class DefinitionFactoryTest extends \PHPUnit_Framework_TestCase
             $factory->getDefinition('foo', [new Asset\FooWithNamedConstructor, 'namedConstructor'])
         );
 
-        $this->assertInstanceOf(
-            'League\Container\Definition\CallableDefinition',
-            $factory->getDefinition('foo', ['League\Container\Test\Asset\FooWithNamedConstructor', 'namedConstructor'])
-        );
+        if (version_compare(PHP_VERSION, '8.0.0', '<')) {
+            $this->assertInstanceOf(
+                'League\Container\Definition\CallableDefinition',
+                $factory->getDefinition('foo', ['League\Container\Test\Asset\FooWithNamedConstructor', 'namedConstructor'])
+            );
+        }
+        else {
+            $this->assertInstanceOf(
+                'League\Container\Definition\CallableDefinition',
+                $factory->getDefinition('foo', [new FooWithNamedConstructor(), 'namedConstructor'])
+            );
+        }
 
         $this->assertInstanceOf(
             'League\Container\Definition\CallableDefinition',
