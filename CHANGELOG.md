@@ -2,6 +2,11 @@
 
 All Notable changes to `League\Container` will be documented in this file
 
+## 2.5.0
+
+### Added
+- Support for PHP 7.1+ and 8.0
+
 ## 2.4.1
 
 ### Fixed

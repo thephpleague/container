@@ -35,7 +35,10 @@ The following versions of PHP are supported by this version.
 * PHP 5.6
 * PHP 7.0
 * PHP 7.1
-* HHVM
+* PHP 7.2
+* PHP 7.3
+* PHP 7.4
+* PHP 8.0 (Note: not included in build process, but can be installed, just be sure to test your application thoroughly)
 
 ## Documentation
 
