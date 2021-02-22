@@ -2,6 +2,12 @@
 
 All Notable changes to `League\Container` will be documented in this file
 
+## 3.3.4
+
+### Fixed
+- Fixed an issue that caused a recursive `register` call. @pcoutinho
+- Fixed a return type declaration. @orbex
+
 ## 3.3.3
 
 ### Fixed

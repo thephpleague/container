@@ -32,7 +32,7 @@ The following versions of PHP are supported by this version.
 * PHP 7.2
 * PHP 7.3
 * PHP 7.4
-* PHP Nightly (8.0) (Experimental)
+* PHP 8.0
 
 ## Documentation
 
