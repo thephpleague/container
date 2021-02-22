@@ -1,4 +1,4 @@
-name: Tests
+name: Tests PHP5
 
 on:
   push: ~
@@ -46,6 +46,10 @@ jobs:
           tools: composer:v2
 
       - run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
+
+      - name: "Use PHPUnit 5.0+ on PHP 5.6"
+        run: composer require --no-update --dev phpunit/phpunit:^5.0
+        if: "matrix.php == '5.6'"
 
       - run: composer update --no-progress ${{ matrix.composer-flags }}
 
