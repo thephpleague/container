@@ -99,7 +99,7 @@ class ContainerTest extends TestCase
         $arrayOf = $container->get('foobar');
 
         $this->assertTrue($container->has('foobar'));
-        $this->assertInternalType('array', $arrayOf);
+        $this->assertTrue(is_array($arrayOf));
         $this->assertCount(2, $arrayOf);
         $this->assertInstanceOf(Foo::class, $arrayOf[0]);
         $this->assertInstanceOf(Bar::class, $arrayOf[1]);
