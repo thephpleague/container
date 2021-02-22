@@ -109,12 +109,14 @@ class Container implements DefinitionContainerInterface
     public function get($id, bool $new = false)
     {
         if ($this->definitions->has($id)) {
-            $resolved = $this->definitions->resolve($id, $new);
+            $resolved = (true === $new) ? $this->definitions->resolveNew($id) : $this->definitions->resolve($id);
             return $this->inflectors->inflect($resolved);
         }
 
         if ($this->definitions->hasTag($id)) {
-            $arrayOf = $this->definitions->resolveTagged($id, $new);
+            $arrayOf = (true === $new)
+                ? $this->definitions->resolveTaggedNew($id)
+                : $this->definitions->resolveTagged($id);
 
             array_walk($arrayOf, function (&$resolved) {
                 $resolved = $this->inflectors->inflect($resolved);

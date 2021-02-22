@@ -24,10 +24,12 @@
         "psr/container": "^1.0"
     },
     "require-dev": {
+        "nette/php-generator": "^3.4",
+        "nikic/php-parser": "^4.10",
+        "phpstan/phpstan": "^0.12.47",
+        "phpunit/phpunit": "^8.5.8",
         "roave/security-advisories": "dev-master",
-        "phpunit/phpunit" : "^8.5.8",
-        "squizlabs/php_codesniffer": "^3.3",
-        "phpstan/phpstan": "^0.11.8"
+        "squizlabs/php_codesniffer": "^3.3"
     },
     "provide": {
         "psr/container-implementation": "^1.0"
@@ -57,7 +59,7 @@
     "scripts": {
         "test": [
             "phpunit",
-            "phpstan analyse --level 7 src"
+            "phpstan analyse --level 5 src"
         ]
     }
 }

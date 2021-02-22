@@ -24,10 +24,12 @@ class ServiceProviderAggregate implements ServiceProviderAggregateInterface
 
     public function add($provider): ServiceProviderAggregateInterface
     {
-        if (is_string($provider) && $this->getContainer()->has($provider)) {
-            $provider = $this->getContainer()->get($provider);
-        } elseif (is_string($provider) && class_exists($provider)) {
-            $provider = new $provider();
+        if (is_string($provider)) {
+            if ($this->getContainer()->has($provider)) {
+                $provider = $this->getContainer()->get($provider);
+            } elseif (class_exists($provider)) {
+                $provider = new $provider();
+            }
         }
 
         if (in_array($provider, $this->providers, true)) {
@@ -44,7 +46,6 @@ class ServiceProviderAggregate implements ServiceProviderAggregateInterface
 
         if ($provider instanceof ServiceProviderInterface) {
             $this->providers[] = $provider;
-
             return $this;
         }
 

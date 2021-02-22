@@ -10,7 +10,7 @@ use League\Container\Exception\ContainerException;
 trait ContainerAwareTrait
 {
     /**
-     * @var DefinitionContainerInterface
+     * @var ?DefinitionContainerInterface
      */
     protected $container;
 
