@@ -202,23 +202,6 @@ class ReflectionContainerTest extends TestCase
     }
 
     /**
-     * Asserts that call reflects on an arrow function and reflects arguments.
-     */
-    public function testCallReflectsOnArrowFunctionArguments()
-    {
-        if (PHP_VERSION_ID < 70400) {
-            $this->markTestSkipped('Test for feature only on PHP 7.4');
-            return;
-        }
-
-        $container = new ReflectionContainer;
-        // commented line is uncommented in PHP 7.4+ tests via .travis.yml
-        // $foo = $container->call(fn (Foo $foo) => $foo);
-        $this->assertInstanceOf(Foo::class, $foo);
-        $this->assertInstanceOf(Bar::class, $foo->bar);
-    }
-
-    /**
      * Asserts that call reflects on an instance method and injects arguments.
      */
     public function testCallReflectsOnInstanceMethodArguments()
