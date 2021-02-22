@@ -70,11 +70,15 @@ class ArgumentResolverTest extends TestCase
         $param1    = $this->getMockBuilder(ReflectionParameter::class)->disableOriginalConstructor()->getMock();
         $param2    = $this->getMockBuilder(ReflectionParameter::class)->disableOriginalConstructor()->getMock();
         $param3    = $this->getMockBuilder(ReflectionParameter::class)->disableOriginalConstructor()->getMock();
-        $class     = $this->getMockBuilder(ReflectionType::class)->disableOriginalConstructor();
+        if (PHP_VERSION_ID >= 70100) {
+            $class = $this->getMockBuilder(\ReflectionNamedType::class)->disableOriginalConstructor();
+        } else {
+            $class = $this->getMockBuilder(ReflectionType::class)->disableOriginalConstructor();
+        }
         $container = $this->getMockBuilder(Container::class)->getMock();
 
-        if (PHP_VERSION_ID >= 70200) {
-            $class = $class->addMethods(['getName'])->getMock();
+        if (PHP_VERSION_ID >= 70100) {
+            $class = $class->setMethods(['getName'])->getMock();
             $class->expects($this->once())->method('getName')->willReturn('Class');
         } else {
             $class = $class->getMock();

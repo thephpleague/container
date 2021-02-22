@@ -19,6 +19,7 @@ class DefinitionTest extends TestCase
             return implode(' ', $args);
         });
 
+        $definition->setContainer(new Container());
         $definition->addArguments(['hello', 'world']);
 
         $actual = $definition->resolve();

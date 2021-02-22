@@ -79,7 +79,7 @@ trait ArgumentResolverTrait
             }
 
             if ($type) {
-                if (PHP_VERSION_ID >= 70200) {
+                if (PHP_VERSION_ID >= 70100) {
                     $typeName = $type->getName();
                 } else {
                     $typeName = (string) $type;
