@@ -28,11 +28,6 @@ jobs:
         strategy:
             matrix:
                 php: ['7.0', '7.1', '7.2', '7.3', '7.4']
-                coverage: [true]
-                composer-flags: ['']
-                include:
-                    - php: '8.0'
-                      composer-flags: '--ignore-platform-req=php'
 
         steps:
             - uses: actions/checkout@v2
@@ -45,9 +40,6 @@ jobs:
                   tools: composer:v2
 
             - run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
-
-            - name: "Use PHPUnit 5.7+ on PHP 7+"
-              run: composer require --no-update --dev phpunit/phpunit:^5.7
 
             - run: composer update --no-progress ${{ matrix.composer-flags }}
 
