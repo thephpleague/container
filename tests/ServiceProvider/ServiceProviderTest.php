@@ -4,7 +4,7 @@ namespace League\Container\Test\ServiceProvider;
 
 use League\Container\Test\Asset;
 
-class ServiceProviderTest extends \PHPUnit_Framework_TestCase
+class ServiceProviderTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * Asserts that the service provider correctly determines what it provides.

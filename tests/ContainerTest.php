@@ -7,7 +7,7 @@ use League\Container\Container;
 use League\Container\ImmutableContainerInterface;
 use League\Container\ReflectionContainer;
 
-class ContainerTest extends \PHPUnit_Framework_TestCase
+class ContainerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * Asserts that the container can set and get a simple closure with args.
@@ -27,7 +27,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($container->get('test', [true]), true);
         $this->assertEquals($container->get('test', [false]), false);
     }
-    
+
     /**
      * Asserts that the container sets and gets an instance as shared.
      */

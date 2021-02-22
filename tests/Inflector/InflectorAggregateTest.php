@@ -5,7 +5,7 @@ namespace League\Container\Test\Inflector;
 use League\Container\Argument\RawArgument;
 use League\Container\Inflector\InflectorAggregate;
 
-class InflectorAggregateTest extends \PHPUnit_Framework_TestCase
+class InflectorAggregateTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * Asserts that the aggregate adds an inflector without a callback.

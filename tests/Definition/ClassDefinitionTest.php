@@ -6,7 +6,7 @@ use League\Container\Argument\RawArgument;
 use League\Container\Definition\ClassDefinition;
 use League\Container\Test\Asset;
 
-class ClassDefinitionTest extends \PHPUnit_Framework_TestCase
+class ClassDefinitionTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * Asserts that the class definition sets expected arguments.

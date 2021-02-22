@@ -5,7 +5,7 @@ namespace League\Container\Test\Definition;
 use League\Container\Definition\DefinitionFactory;
 use League\Container\Test\Asset;
 
-class DefinitionFactoryTest extends \PHPUnit_Framework_TestCase
+class DefinitionFactoryTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * Asserts that the correct definition is returned by the factory based on arguments passed.

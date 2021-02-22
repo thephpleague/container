@@ -5,7 +5,7 @@ namespace League\Container\Test\Definition;
 use League\Container\Definition\CallableDefinition;
 use League\Container\Test\Asset;
 
-class CallableDefinitionTest extends \PHPUnit_Framework_TestCase
+class CallableDefinitionTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * Asserts that a definition will invoke a callable with defined class alias dependencies.

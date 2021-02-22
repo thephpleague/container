@@ -32,7 +32,6 @@ jobs:
                 composer-flags: ['']
                 include:
                     - php: '8.0'
-                      coverage: false
                       composer-flags: '--ignore-platform-req=php'
 
         steps:
@@ -47,13 +46,10 @@ jobs:
 
             - run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
 
+            - name: "Use PHPUnit 5.7+ on PHP 7+"
+              run: composer require --no-update --dev phpunit/phpunit:^5.7
+
             - run: composer update --no-progress ${{ matrix.composer-flags }}
 
             - run: vendor/bin/phpunit --no-coverage
               if: ${{ !matrix.coverage }}
-
-            - run: vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
-              if: ${{ matrix.coverage }}
-
-            - run: php vendor/bin/ocular code-coverage:upload --format=php-clover coverage.clover
-              if: ${{ matrix.coverage }}

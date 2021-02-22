@@ -5,7 +5,7 @@ namespace League\Container\Test\Inflector;
 use League\Container\Inflector\Inflector;
 use League\Container\Test\Asset;
 
-class InflectorTest extends \PHPUnit_Framework_TestCase
+class InflectorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * Asserts that the inflector sets expected method calls.

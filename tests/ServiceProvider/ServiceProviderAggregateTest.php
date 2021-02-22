@@ -4,7 +4,7 @@ namespace League\Container\Test\ServiceProvider;
 
 use League\Container\ServiceProvider\ServiceProviderAggregate;
 
-class ServiceProviderAggregateTest extends \PHPUnit_Framework_TestCase
+class ServiceProviderAggregateTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * Asserts that the aggregate adds a class name service provider.

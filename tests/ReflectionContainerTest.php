@@ -6,7 +6,7 @@ use League\Container\ImmutableContainerInterface;
 use League\Container\ReflectionContainer;
 use League\Container\Test\Asset;
 
-class ReflectionContainerTest extends \PHPUnit_Framework_TestCase
+class ReflectionContainerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * Asserts that ReflectionContainer claims it has an item if a class exists for the alias.
