@@ -169,17 +169,25 @@ class ReflectionContainerTest extends TestCase
         self::assertEquals('hello world', Asset\Foo::$staticHello);
     }
 
-    public function testThrowsWhenArgumentCannotBeResolved(): void
+    public function testCallThrowsWhenArgumentCannotBeResolved(): void
     {
         $this->expectException(NotFoundException::class);
         $container = new ReflectionContainer();
         $container->call([new Bar(), 'setSomething']);
     }
 
-    public function testInvokableClass(): void
+    public function testCallResolvesInvokableClass(): void
     {
         $container = new ReflectionContainer();
         $foo = $container->call(new FooCallable(), [new Bar()]);
+        self::assertInstanceOf(Foo::class, $foo);
+        self::assertInstanceOf(Bar::class, $foo->bar);
+    }
+
+    public function testCallResolvesFunction(): void
+    {
+        $container = new ReflectionContainer();
+        $foo = $container->call(Asset\test::class, [new Bar()]);
         self::assertInstanceOf(Foo::class, $foo);
         self::assertInstanceOf(Bar::class, $foo->bar);
     }

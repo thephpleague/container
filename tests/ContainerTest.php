@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace League\Container\Test;
 
+use BadMethodCallException;
 use League\Container\Definition\DefinitionInterface;
 use League\Container\Exception\{ContainerException, NotFoundException};
 use League\Container\ServiceProvider\AbstractServiceProvider;
 use League\Container\Test\Asset\{Foo, Bar};
-use League\Container\{Container, ReflectionContainer};
+use League\Container\{Container, ContainerAwareTrait, ReflectionContainer};
 use PHPUnit\Framework\TestCase;
 
 class ContainerTest extends TestCase
@@ -76,13 +77,33 @@ class ContainerTest extends TestCase
         self::assertInstanceOf(Bar::class, $arrayOf[1]);
     }
 
+    public function testContainerAddsAndGetsNewFromTag(): void
+    {
+        $container = new Container();
+        $container->add(Foo::class)->addTag('foobar');
+        $container->add(Bar::class)->addTag('foobar');
+        self::assertTrue($container->has(Foo::class));
+
+        $arrayOf = $container->get('foobar');
+
+        self::assertTrue($container->has('foobar'));
+        self::assertIsArray($arrayOf);
+        self::assertCount(2, $arrayOf);
+        self::assertInstanceOf(Foo::class, $arrayOf[0]);
+        self::assertInstanceOf(Bar::class, $arrayOf[1]);
+
+        $arrayOfTwo = $container->getNew('foobar');
+        self::assertNotSame($arrayOfTwo, $arrayOf);
+    }
+
     public function testContainerAddsAndGetsWithServiceProvider(): void
     {
         $provider = new class extends AbstractServiceProvider
         {
-            protected $provides = [
-                Foo::class
-            ];
+            public function provides(string $id): bool
+            {
+                return $id === Foo::class;
+            }
 
             public function register(): void
             {
@@ -103,9 +124,10 @@ class ContainerTest extends TestCase
     {
         $liar = new class extends AbstractServiceProvider
         {
-            protected $provides = [
-                'lie'
-            ];
+            public function provides(string $id): bool
+            {
+                return true;
+            }
 
             public function register(): void
             {
@@ -151,9 +173,10 @@ class ContainerTest extends TestCase
     {
         $provider = new class extends AbstractServiceProvider
         {
-            protected $provides = [
-                Foo::class
-            ];
+            public function provides(string $id): bool
+            {
+                return $id === Foo::class;
+            }
 
             public function register(): void
             {
@@ -185,5 +208,17 @@ class ContainerTest extends TestCase
         $foo = $container->get(Foo::class);
         self::assertInstanceOf(Foo::class, $foo);
         self::assertInstanceOf(Bar::class, $foo->bar);
+    }
+
+    public function testContainerAwareCannotBeUsedWithoutImplementingInterface(): void
+    {
+        $this->expectException(BadMethodCallException::class);
+
+        $class = new class {
+            use ContainerAwareTrait;
+        };
+
+        $container = $this->getMockBuilder(Container::class)->getMock();
+        $class->setContainer($container);
     }
 }

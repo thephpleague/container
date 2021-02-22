@@ -100,49 +100,20 @@ class Container implements DefinitionContainerInterface
         ));
     }
 
-    public function addServiceProvider($provider): DefinitionContainerInterface
+    public function addServiceProvider(ServiceProviderInterface $provider): DefinitionContainerInterface
     {
         $this->providers->add($provider);
         return $this;
     }
 
-    public function get($id, bool $new = false)
+    public function get($id)
     {
-        if ($this->definitions->has($id)) {
-            $resolved = (true === $new) ? $this->definitions->resolveNew($id) : $this->definitions->resolve($id);
-            return $this->inflectors->inflect($resolved);
-        }
+        return $this->resolve($id);
+    }
 
-        if ($this->definitions->hasTag($id)) {
-            $arrayOf = (true === $new)
-                ? $this->definitions->resolveTaggedNew($id)
-                : $this->definitions->resolveTagged($id);
-
-            array_walk($arrayOf, function (&$resolved) {
-                $resolved = $this->inflectors->inflect($resolved);
-            });
-
-            return $arrayOf;
-        }
-
-        if ($this->providers->provides($id)) {
-            $this->providers->register($id);
-
-            if (!$this->definitions->has($id) && !$this->definitions->hasTag($id)) {
-                throw new ContainerException(sprintf('Service provider lied about providing (%s) service', $id));
-            }
-
-            return $this->get($id, $new);
-        }
-
-        foreach ($this->delegates as $delegate) {
-            if ($delegate->has($id)) {
-                $resolved = $delegate->get($id);
-                return $this->inflectors->inflect($resolved);
-            }
-        }
-
-        throw new NotFoundException(sprintf('Alias (%s) is not being managed by the container or delegates', $id));
+    public function getNew($id)
+    {
+        return $this->resolve($id, true);
     }
 
     public function has($id): bool
@@ -182,5 +153,44 @@ class Container implements DefinitionContainerInterface
         }
 
         return $this;
+    }
+
+    protected function resolve($id, bool $new = false)
+    {
+        if ($this->definitions->has($id)) {
+            $resolved = (true === $new) ? $this->definitions->resolveNew($id) : $this->definitions->resolve($id);
+            return $this->inflectors->inflect($resolved);
+        }
+
+        if ($this->definitions->hasTag($id)) {
+            $arrayOf = (true === $new)
+                ? $this->definitions->resolveTaggedNew($id)
+                : $this->definitions->resolveTagged($id);
+
+            array_walk($arrayOf, function (&$resolved) {
+                $resolved = $this->inflectors->inflect($resolved);
+            });
+
+            return $arrayOf;
+        }
+
+        if ($this->providers->provides($id)) {
+            $this->providers->register($id);
+
+            if (!$this->definitions->has($id) && !$this->definitions->hasTag($id)) {
+                throw new ContainerException(sprintf('Service provider lied about providing (%s) service', $id));
+            }
+
+            return $this->resolve($id, $new);
+        }
+
+        foreach ($this->delegates as $delegate) {
+            if ($delegate->has($id)) {
+                $resolved = $delegate->get($id);
+                return $this->inflectors->inflect($resolved);
+            }
+        }
+
+        throw new NotFoundException(sprintf('Alias (%s) is not being managed by the container or delegates', $id));
     }
 }

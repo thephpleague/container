@@ -19,13 +19,16 @@ class ServiceProviderAggregateTest extends TestCase
     protected function getServiceProvider(): ServiceProviderInterface
     {
         return new class extends AbstractServiceProvider implements BootableServiceProviderInterface {
-            protected $provides = [
-                'SomeService',
-                'AnotherService'
-            ];
-
             public $booted     = 0;
             public $registered = 0;
+
+            public function provides(string $id): bool
+            {
+                return in_array($id, [
+                    'SomeService',
+                    'AnotherService',
+                ], true);
+            }
 
             public function boot(): void
             {
@@ -46,18 +49,11 @@ class ServiceProviderAggregateTest extends TestCase
     public function testAggregateAddsClassNameServiceProvider(): void
     {
         $container = $this->getMockBuilder(Container::class)->getMock();
-        $aggregate = (new ServiceProviderAggregate())->setContainer($container);
+        $aggregate = new ServiceProviderAggregate();
+        $aggregate->setContainer($container);
         $aggregate->add($this->getServiceProvider());
         self::assertTrue($aggregate->provides('SomeService'));
         self::assertTrue($aggregate->provides('AnotherService'));
-    }
-
-    public function testAggregateThrowsWhenCannotResolveServiceProvider(): void
-    {
-        $this->expectException(ContainerException::class);
-        $container = $this->getMockBuilder(Container::class)->getMock();
-        $aggregate = (new ServiceProviderAggregate())->setContainer($container);
-        $aggregate->add('NonExistentClass');
     }
 
     public function testAggregateThrowsWhenRegisteringForServiceThatIsNotAdded(): void

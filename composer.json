@@ -41,7 +41,10 @@
     "autoload": {
         "psr-4": {
             "League\\Container\\": "src"
-        }
+        },
+        "files": [
+            "tests/Asset/function.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
@@ -60,7 +63,7 @@
     "scripts": {
         "test": [
             "phpunit",
-            "phpstan analyse --level 5 src"
+            "phpstan analyse"
         ]
     }
 }

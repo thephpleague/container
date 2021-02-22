@@ -226,6 +226,6 @@ class DefinitionAggregateTest extends TestCase
         $aggregate->add('alias1', $definition1);
         $aggregate->addShared('alias2', $definition2);
 
-        $aggregate->resolve('alias');
+        $aggregate->resolveNew('alias');
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace League\Container\Test\Definition;
 
 use League\Container\Argument\Literal;
+use League\Container\Argument\ResolvableArgument;
 use League\Container\Container;
 use League\Container\Definition\Definition;
 use League\Container\Test\Asset\{Foo, FooCallable, Bar};
@@ -94,6 +95,22 @@ class DefinitionTest extends TestCase
         $actual3 = $definition->resolveNew();
         self::assertSame($actual1, $actual2);
         self::assertNotSame($actual1, $actual3);
+    }
+
+    public function testDefinitionResolvesNestedAlias(): void
+    {
+        $aliasDefinition = new Definition('alias', new ResolvableArgument('class'));
+        $definition = new Definition('class', Foo::class);
+        $container = $this->getMockBuilder(Container::class)->getMock();
+
+        $expected = $definition->resolve();
+
+        $container->expects(self::once())->method('has')->with(self::equalTo('class'))->willReturn(true);
+        $container->expects(self::once())->method('get')->with(self::equalTo('class'))->willReturn($expected);
+
+        $aliasDefinition->setContainer($container);
+        $actual = $aliasDefinition->resolve();
+        self::assertSame($expected, $actual);
     }
 
     public function testDefinitionCanAddTags(): void

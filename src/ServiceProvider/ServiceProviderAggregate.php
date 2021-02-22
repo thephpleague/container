@@ -22,16 +22,8 @@ class ServiceProviderAggregate implements ServiceProviderAggregateInterface
      */
     protected $registered = [];
 
-    public function add($provider): ServiceProviderAggregateInterface
+    public function add(ServiceProviderInterface $provider): ServiceProviderAggregateInterface
     {
-        if (is_string($provider)) {
-            if ($this->getContainer()->has($provider)) {
-                $provider = $this->getContainer()->get($provider);
-            } elseif (class_exists($provider)) {
-                $provider = new $provider();
-            }
-        }
-
         if (in_array($provider, $this->providers, true)) {
             return $this;
         }
@@ -44,15 +36,8 @@ class ServiceProviderAggregate implements ServiceProviderAggregateInterface
             $provider->boot();
         }
 
-        if ($provider instanceof ServiceProviderInterface) {
-            $this->providers[] = $provider;
-            return $this;
-        }
-
-        throw new ContainerException(sprintf(
-            'A service provider must be a fully qualified class name or instance of (%s) ',
-            ServiceProviderInterface::class
-        ));
+        $this->providers[] = $provider;
+        return $this;
     }
 
     public function provides(string $service): bool
