@@ -58,9 +58,9 @@ class Container implements ContainerInterface
      * @param \League\Container\Definition\DefinitionFactoryInterface|null             $definitionFactory
      */
     public function __construct(
-        ServiceProviderAggregateInterface $providers         = null,
-        InflectorAggregateInterface       $inflectors        = null,
-        DefinitionFactoryInterface        $definitionFactory = null
+        ServiceProviderAggregateInterface $providers = null,
+        InflectorAggregateInterface $inflectors = null,
+        DefinitionFactoryInterface $definitionFactory = null
     ) {
         // set required dependencies
         $this->providers         = (is_null($providers))
@@ -266,7 +266,6 @@ class Container implements ContainerInterface
         throw new NotFoundException(
             sprintf('Alias (%s) is not being managed by the container', $alias)
         );
-
     }
 
     /**
