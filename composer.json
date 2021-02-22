@@ -21,11 +21,12 @@
         }
     ],
     "require": {
-        "php": "^5.4.0 || ^7.0",
+        "php": "^5.4 || ^7.0 || ^8.0",
         "container-interop/container-interop": "^1.2"
     },
     "require-dev": {
-        "phpunit/phpunit" : "4.*"
+        "phpunit/phpunit" : "^5.0",
+        "scrutinizer/ocular": "^1.8"
     },
     "provide": {
         "container-interop/container-interop-implementation": "^1.2",
