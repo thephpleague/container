@@ -230,6 +230,44 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(DefinitionInterface::class, $definition);
     }
 
+    public function testContainerCanExtendDefinitionInServiceProviderFromAnotherServiceProvider()
+    {
+        $providerA = new class extends AbstractServiceProvider
+        {
+            protected $provides = [
+                Foo::class,
+            ];
+
+            public function register()
+            {
+                $this->getLeagueContainer()->add(Foo::class);
+            }
+        };
+
+        $providerB = new class extends AbstractServiceProvider
+        {
+            protected $provides = [
+                Foo::class,
+            ];
+
+            public function register()
+            {
+                $this->getLeagueContainer()
+                    ->extend(Foo::class)
+                    ->addMethodCall('setBar', [new Bar()]);
+            }
+        };
+
+        $container = new Container();
+
+        $container->addServiceProvider($providerA);
+        $container->addServiceProvider($providerB);
+
+        $instance = $container->get(Foo::class);
+
+        $this->assertNotNull($instance->bar);
+    }
+
     /**
      * Asserts that the container throws an exception when can't find definition to extend.
      */

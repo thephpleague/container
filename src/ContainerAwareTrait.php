@@ -22,7 +22,7 @@ trait ContainerAwareTrait
      *
      * @param ContainerInterface $container
      *
-     * @return self
+     * @return ContainerAwareInterface
      */
     public function setContainer(ContainerInterface $container) : ContainerAwareInterface
     {
