@@ -47,6 +47,12 @@ class ReflectionContainer implements ArgumentResolverInterface, ContainerInterfa
         $reflector = new ReflectionClass($id);
         $construct = $reflector->getConstructor();
 
+        if ($construct && !$construct->isPublic()) {
+            throw new NotFoundException(
+                sprintf('Alias (%s) has a non-public constructor and therefore cannot be instantiated', $id)
+            );
+        }
+
         $resolution = $construct === null
             ? new $id
             : $resolution = $reflector->newInstanceArgs($this->reflectArguments($construct, $args))
