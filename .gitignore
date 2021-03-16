@@ -4,3 +4,5 @@ vendor
 .sass-cache
 .phpunit.result.cache
 .phpcs-cache
+docs/_site
+docs/.jekyll-cache
