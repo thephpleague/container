@@ -2,6 +2,11 @@
 
 All Notable changes to `League\Container` will be documented in this file
 
+## 4.1.1
+
+### Changed
+- Move files autoload directive to dev (@ADmad)
+
 ## 4.1.0
 
 ### Added
