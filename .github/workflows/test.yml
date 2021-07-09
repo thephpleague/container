@@ -50,16 +50,16 @@ jobs:
                   coverage: pcov
                   tools: composer:v2
 
-            - name: Setup PCOV
-              run: |
-                composer require pcov/clobber
-                vendor/bin/pcov clobber
-
             - run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
 
             - name: "Use PHPUnit 9.3+ on PHP 8"
               run: composer require --no-update --dev phpunit/phpunit:^9.3
               if: "matrix.php == '8.0'"
+
+            - name: "Setup PCOV"
+              run: |
+                composer require pcov/clobber
+                vendor/bin/pcov clobber
 
             - run: composer update --no-progress ${{ matrix.composer-flags }}
 
