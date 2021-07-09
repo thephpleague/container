@@ -2,6 +2,11 @@
 
 All Notable changes to `League\Container` will be documented in this file
 
+## 4.1.0
+
+### Added
+- Way to handle non-public controllers safely (@beryllium)
+
 ## 4.0.0
 
 ### Added
@@ -15,6 +20,12 @@ All Notable changes to `League\Container` will be documented in this file
 - Removed third argument `$shared` from `Container::add`, use `Container::addShared`
 - `ServiceProviderInterface` now defines return types
 - Service providers now require implementation of a `provides` method rather than relying on a class property.
+
+## 3.4.1
+
+### Added
+- Way to handle non-public controllers safely (@beryllium)
+- PHPUnit ^7.0 for PHP versions that support it (@beryllium)
 
 ## 3.4.0
 

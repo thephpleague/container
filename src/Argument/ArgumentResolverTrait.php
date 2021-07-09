@@ -41,20 +41,22 @@ trait ArgumentResolverTrait
             // resolve the argument from the container, if it happens to be another
             // argument wrapper, use that value
             if ($container instanceof ContainerInterface && $container->has($argValue)) {
-                $arg = $container->get($argValue);
+                try {
+                    $arg = $container->get($argValue);
 
-                if ($arg instanceof ArgumentInterface) {
-                    $arg = $arg->getValue();
+                    if ($arg instanceof ArgumentInterface) {
+                        $arg = $arg->getValue();
+                    }
+
+                    continue;
+                } catch (NotFoundException $e) {
                 }
-
-                continue;
             }
 
             // if we have a default value, we use that, no more resolution as
             // we expect a default/optional argument value to be literal
             if ($arg instanceof DefaultValueInterface) {
                 $arg = $arg->getDefaultValue();
-                continue;
             }
         }
 

@@ -7,7 +7,7 @@ namespace League\Container\Test;
 use League\Container\Container;
 use League\Container\Exception\NotFoundException;
 use League\Container\ReflectionContainer;
-use League\Container\Test\Asset\{Foo, FooCallable, Bar};
+use League\Container\Test\Asset\{Foo, FooCallable, Bar, ProFoo, ProBar};
 use PHPUnit\Framework\TestCase;
 
 class ReflectionContainerTest extends TestCase
@@ -190,5 +190,34 @@ class ReflectionContainerTest extends TestCase
         $foo = $container->call(Asset\test::class, [new Bar()]);
         self::assertInstanceOf(Foo::class, $foo);
         self::assertInstanceOf(Bar::class, $foo->bar);
+    }
+
+    public function testGetInstantiatesClassWithConstructorAndSkipsProtectedConstructor(): void
+    {
+        $classWithConstructor = ProFoo::class;
+
+        $container = new Container();
+        $container->delegate(new ReflectionContainer());
+
+        $item = $container->get($classWithConstructor);
+
+        $this->assertInstanceOf($classWithConstructor, $item);
+        $this->assertNull($item->bar);
+    }
+
+    public function testGetInstantiatesClassWithConstructorAndUsesFactory(): void
+    {
+        $classWithConstructor = ProFoo::class;
+        $dependencyClass = ProBar::class;
+
+        $container = new Container();
+        $container->delegate(new ReflectionContainer());
+
+        $container->add($dependencyClass, [$dependencyClass, 'factory']);
+
+        $item = $container->get($classWithConstructor);
+
+        $this->assertInstanceOf($classWithConstructor, $item);
+        $this->assertInstanceOf($dependencyClass, $item->bar);
     }
 }
