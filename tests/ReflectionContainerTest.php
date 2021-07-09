@@ -4,7 +4,7 @@ namespace League\Container\Test;
 
 use League\Container\Exception\NotFoundException;
 use League\Container\ReflectionContainer;
-use League\Container\Test\Asset\{Foo, FooCallable, Bar};
+use League\Container\Test\Asset\{Foo, FooCallable, Bar, ProBar, ProFoo};
 use PHPUnit\Framework\TestCase;
 use League\Container\Container;
 
@@ -152,6 +152,43 @@ class ReflectionContainerTest extends TestCase
 
         $this->assertInstanceOf($classWithConstructor, $item);
         $this->assertSame($dependency, $item->bar);
+    }
+
+    /**
+     * Asserts that ReflectionContainer instantiates a class that has a constructor with a type-hinted argument, and
+     * skips fetching that dependency from the ReflectionContainer due to a protected constructor.
+     */
+    public function testGetInstantiatesClassWithConstructorAndSkipsProtectedConstructor()
+    {
+        $classWithConstructor = ProFoo::class;
+
+        $container = new Container();
+        $container->delegate(new ReflectionContainer());
+
+        $item = $container->get($classWithConstructor);
+
+        $this->assertInstanceOf($classWithConstructor, $item);
+        $this->assertNull($item->bar);
+    }
+
+    /**
+     * Asserts that ReflectionContainer instantiates a class that has a constructor with a type-hinted argument, and
+     * uses the specified factory method due to the protected constructor.
+     */
+    public function testGetInstantiatesClassWithConstructorAndUsesFactory()
+    {
+        $classWithConstructor = ProFoo::class;
+        $dependencyClass      = ProBar::class;
+
+        $container = new Container();
+        $container->delegate(new ReflectionContainer());
+
+        $container->add($dependencyClass, [$dependencyClass, 'factory']);
+
+        $item = $container->get($classWithConstructor);
+
+        $this->assertInstanceOf($classWithConstructor, $item);
+        $this->assertInstanceOf($dependencyClass, $item->bar);
     }
 
     /**
