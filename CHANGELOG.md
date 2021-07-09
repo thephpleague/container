@@ -2,6 +2,49 @@
 
 All Notable changes to `League\Container` will be documented in this file
 
+## 4.0.0
+
+### Added
+- New definition interface that extends psr/container
+- Literal and resolvable argument wrappers for better explicitness in definitions
+
+### Changed
+- PHP requirement now `>=7.2`
+- Updated `psr/container` to ^2.0.0
+- `Container::shared` convenience method is now explicit `Container::addShared` method
+- Removed third argument `$shared` from `Container::add`, use `Container::addShared`
+- `ServiceProviderInterface` now defines return types
+- Service providers now require implementation of a `provides` method rather than relying on a class property.
+
+## 3.4.0
+
+### Removed
+- Support for `psr/container` ^2.0.0 as the interface cannot be reconciled between versions
+
+## 3.3.5
+
+### Added
+- Support for `psr/container` ^2.0.0
+
+## 3.3.4
+
+### Fixed
+- Fixed an issue that caused a recursive `register` call. @pcoutinho
+- Fixed a return type declaration. @orbex
+
+## 3.3.3
+
+### Fixed
+- Fixed bug relating to `ReflectionContainer::call` on arrow functions.
+
+## 3.3.2
+
+### Added
+- Experimental support for PHP 8.
+
+### Fixed
+- Fix issue when preventing reflection from using default value for arguments.
+
 ## 3.3.1
 
 ### Fixed
