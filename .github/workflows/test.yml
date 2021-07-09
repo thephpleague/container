@@ -47,7 +47,6 @@ jobs:
               with:
                   php-version: ${{ matrix.php }}
                   extensions: curl, mbstring, pcov
-                  coverage: pcov
                   tools: composer:v2
 
             - run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
@@ -60,6 +59,7 @@ jobs:
               run: |
                 composer require pcov/clobber
                 vendor/bin/pcov clobber
+              if: "matrix.php != '7.0'"
 
             - run: composer update --no-progress ${{ matrix.composer-flags }}
 
