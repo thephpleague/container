@@ -2,6 +2,11 @@
 
 All Notable changes to `League\Container` will be documented in this file
 
+## 3.4.0
+
+### Removed
+- Support for `psr/container` ^2.0.0 as the interface cannot be reconciled between versions
+
 ## 3.3.5
 
 ### Added
