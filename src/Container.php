@@ -191,7 +191,7 @@ class Container implements ContainerInterface
     /**
      * {@inheritdoc}
      */
-    public function has($id) : bool
+    public function has($id)
     {
         if ($this->definitions->has($id)) {
             return true;

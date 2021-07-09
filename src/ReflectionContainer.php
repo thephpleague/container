@@ -62,7 +62,7 @@ class ReflectionContainer implements ArgumentResolverInterface, ContainerInterfa
     /**
      * {@inheritdoc}
      */
-    public function has($id) : bool
+    public function has($id)
     {
         return class_exists($id);
     }
