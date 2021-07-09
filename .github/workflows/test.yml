@@ -46,7 +46,7 @@ jobs:
             - uses: shivammathur/setup-php@v2
               with:
                   php-version: ${{ matrix.php }}
-                  extensions: curl, mbstring
+                  extensions: curl, mbstring, pcov
                   coverage: pcov
                   tools: composer:v2
 
