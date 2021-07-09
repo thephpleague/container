@@ -41,15 +41,15 @@
     "autoload": {
         "psr-4": {
             "League\\Container\\": "src"
-        },
-        "files": [
-            "tests/Asset/function.php"
-        ]
+        }
     },
     "autoload-dev": {
         "psr-4": {
             "League\\Container\\Test\\": "tests"
-        }
+        },
+        "files": [
+            "tests/Asset/function.php"
+        ]        
     },
     "extra": {
         "branch-alias": {
