@@ -2,6 +2,11 @@
 
 All Notable changes to `League\Container` will be documented in this file
 
+## 4.1.2
+
+### Fixed
+- Fix bug that was causing an error on inflection due to introduced type hint.
+
 ## 4.1.1
 
 ### Changed
