@@ -55,12 +55,17 @@ class InflectorAggregateTest extends TestCase
             'my-generated-array' => [\DateTimeZone::class, 'listIdentifiers'],
             'my-generated-number' => 'time',
             'my-generated-string' => function (): string {
-                return bin2hex(random_bytes(8));
+                return 'blahblahblah';
             },
         ];
 
         foreach ($types as $alias => $concrete) {
             $container->add($alias, $concrete);
+
+            if (is_callable($concrete)) {
+                $concrete = $concrete();
+            }
+
             self::assertSame($container->get($alias), $concrete);
         }
     }
