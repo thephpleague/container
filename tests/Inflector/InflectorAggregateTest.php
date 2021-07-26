@@ -43,4 +43,25 @@ class InflectorAggregateTest extends TestCase
         $aggregate->setContainer($container);
         $aggregate->inflect($containerAware);
     }
+
+    public function testNoInflectionIsAttemptedOnNonObjects(): void
+    {
+        $container = new \League\Container\Container();
+
+        $types = [
+            'my-array' => [1, 2, 3],
+            'my-number' => 123,
+            'my-string' => 'foo bar',
+            'my-generated-array' => [\DateTimeZone::class, 'listIdentifiers'],
+            'my-generated-number' => 'time',
+            'my-generated-string' => function (): string {
+                return bin2hex(random_bytes(8));
+            },
+        ];
+
+        foreach ($types as $alias => $concrete) {
+            $container->add($alias, $concrete);
+            self::assertSame($container->get($alias), $concrete);
+        }
+    }
 }
