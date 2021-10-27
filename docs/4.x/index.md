@@ -88,7 +88,7 @@ Dependency injection at it's core is as simple as that, and Container allows you
 
 ## Further Reading
 
-I recommend reading the links below for further information about what problems dependncy injection solve.
+I recommend reading the links below for further information about what problems dependency injection solve.
 
 - [Dependency Injection Wikipedia Entry](https://en.wikipedia.org/wiki/Dependency_injection).
 - [Inversion of Control Wikipedia Entry](https://en.wikipedia.org/wiki/Inversion_of_control).
