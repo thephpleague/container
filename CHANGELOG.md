@@ -2,6 +2,11 @@
 
 All Notable changes to `League\Container` will be documented in this file
 
+## 4.2.0
+
+### Added
+- Support for psr/container 1.1.0.
+
 ## 4.1.2
 
 ### Fixed
