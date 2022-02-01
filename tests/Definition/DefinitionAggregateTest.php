@@ -242,4 +242,18 @@ class DefinitionAggregateTest extends TestCase
 
         self::assertInstanceOf(Definition::class, $definition);
     }
+
+    public function testGetPreceedingSlash(): void
+    {
+        $container   = $this->getMockBuilder(Container::class)->getMock();
+        $aggregate   = new DefinitionAggregate();
+        $aggregate->setContainer($container);
+
+        $some_class = Foo::class;
+        $aggregate->add($some_class, null);
+
+        $definition = $aggregate->getDefinition("\\League\\Container\\Test\\Asset\\Foo");
+
+        self::assertInstanceOf(Definition::class, $definition);
+    }
 }
