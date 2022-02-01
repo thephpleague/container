@@ -26,8 +26,6 @@ class DefinitionAggregate implements DefinitionAggregateInterface
 
     public function add(string $id, $definition): DefinitionInterface
     {
-		$id = Util::normalizeAlias($id);
-
         if (false === ($definition instanceof DefinitionInterface)) {
             $definition = new Definition($id, $definition);
         }
