@@ -221,4 +221,44 @@ class ContainerTest extends TestCase
         $container = $this->getMockBuilder(Container::class)->getMock();
         $class->setContainer($container);
     }
+
+    public function testContainerCanExtendDefinitionInServiceProviderFromAnotherServiceProvider()
+    {
+        $providerA = new class extends AbstractServiceProvider
+        {
+            public function provides(string $id): bool
+            {
+                return $id === Foo::class;
+            }
+
+            public function register(): void
+            {
+                $this->getContainer()->add(Foo::class);
+            }
+        };
+
+        $providerB = new class extends AbstractServiceProvider
+        {
+            public function provides(string $id): bool
+            {
+                return $id === Foo::class;
+            }
+
+            public function register(): void
+            {
+                $this->getContainer()
+                    ->extend(Foo::class)
+                    ->addMethodCall('setBar', [new Bar()]);
+            }
+        };
+
+        $container = new Container();
+
+        $container->addServiceProvider($providerA);
+        $container->addServiceProvider($providerB);
+
+        $instance = $container->get(Foo::class);
+
+        $this->assertNotNull($instance->bar);
+    }
 }
