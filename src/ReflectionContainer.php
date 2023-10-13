@@ -32,7 +32,7 @@ class ReflectionContainer implements ArgumentResolverInterface, ContainerInterfa
         $this->cacheResolutions = $cacheResolutions;
     }
 
-    public function get($id, array $args = [])
+    public function get($id, array $args = []): mixed
     {
         if ($this->cacheResolutions === true && array_key_exists($id, $this->cache)) {
             return $this->cache[$id];

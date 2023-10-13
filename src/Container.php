@@ -113,7 +113,7 @@ class Container implements DefinitionContainerInterface
      *
      * @return RequestedType|mixed
      */
-    public function get($id)
+    public function get($id): mixed
     {
         return $this->resolve($id);
     }
