@@ -221,4 +221,15 @@ class ContainerTest extends TestCase
         $container = $this->getMockBuilder(Container::class)->getMock();
         $class->setContainer($container);
     }
+
+    public function testNonExistentClassCausesException(): void
+    {
+        $container = new Container();
+        $container->add(NonExistent::class);
+
+        self::assertTrue($container->has(NonExistent::class));
+
+        $this->expectException(NotFoundException::class);
+        $container->get(NonExistent::class); // causes Fatal error: Allowed memory size of 134217728 bytes exhausted
+    }
 }
