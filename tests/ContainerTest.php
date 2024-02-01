@@ -230,6 +230,6 @@ class ContainerTest extends TestCase
         self::assertTrue($container->has(NonExistent::class));
 
         $this->expectException(NotFoundException::class);
-        $container->get(NonExistent::class); // causes Fatal error: Allowed memory size of 134217728 bytes exhausted
+        $container->get(NonExistent::class);
     }
 }

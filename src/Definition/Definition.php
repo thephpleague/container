@@ -12,6 +12,7 @@ use League\Container\Argument\{
 };
 use League\Container\ContainerAwareTrait;
 use League\Container\Exception\ContainerException;
+use League\Container\Exception\NotFoundException;
 use Psr\Container\ContainerInterface;
 use ReflectionClass;
 
@@ -19,6 +20,8 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
 {
     use ArgumentResolverTrait;
     use ContainerAwareTrait;
+
+    private const RECURSIVE_RESOLVE_MAX = 10;
 
     /**
      * @var string
@@ -54,6 +57,11 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
      * @var mixed
      */
     protected $resolved;
+
+    /**
+     * @var int
+     */
+    protected $recursiveResolveCount = 0;
 
     /**
      * @param string     $id
@@ -188,6 +196,12 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
         // if we still have a string, try to pull it from the container
         // this allows for `alias -> alias -> ... -> concrete
         if (is_string($concrete) && $container instanceof ContainerInterface && $container->has($concrete)) {
+            if ($this->recursiveResolveCount++ > self::RECURSIVE_RESOLVE_MAX) {
+                throw new NotFoundException(
+                    sprintf('Alias "%s" did not found or alias too deep.', $concrete)
+                );
+            }
+
             $concrete = $container->get($concrete);
         }
 
