@@ -12,6 +12,7 @@ use League\Container\Argument\{
 };
 use League\Container\ContainerAwareTrait;
 use League\Container\Exception\ContainerException;
+use League\Container\Exception\NotFoundException;
 use Psr\Container\ContainerInterface;
 use ReflectionClass;
 
@@ -54,6 +55,11 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
      * @var mixed
      */
     protected $resolved;
+
+    /**
+     * @var bool
+     */
+    protected $isAlreadySearched = false;
 
     /**
      * @param string     $id
@@ -185,9 +191,17 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
             $container = null;
         }
 
+        // stop recursive resolving
+        if ($this->isAlreadySearched) {
+            throw new NotFoundException(
+                sprintf('Alias or class "%s" did not found.', $concrete)
+            );
+        }
+
         // if we still have a string, try to pull it from the container
         // this allows for `alias -> alias -> ... -> concrete
         if (is_string($concrete) && $container instanceof ContainerInterface && $container->has($concrete)) {
+            $this->isAlreadySearched = true;
             $concrete = $container->get($concrete);
         }
 
