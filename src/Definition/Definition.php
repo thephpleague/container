@@ -55,14 +55,10 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
      */
     protected $resolved;
 
-    /**
-     * @param string     $id
-     * @param mixed|null $concrete
-     */
-    public function __construct(string $id, $concrete = null)
+    public function __construct(string $id, mixed $concrete = null)
     {
         $concrete ??= $id;
-        $this->alias    = $id;
+        $this->alias = $id;
         $this->concrete = $concrete;
     }
 

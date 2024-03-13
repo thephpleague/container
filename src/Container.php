@@ -106,31 +106,17 @@ class Container implements DefinitionContainerInterface
         return $this;
     }
 
-    /**
-     * @template RequestedType
-     *
-     * @param class-string<RequestedType>|string $id
-     *
-     * @return RequestedType|mixed
-     */
-    public function get($id)
+    public function get(string $id)
     {
         return $this->resolve($id);
     }
 
-    /**
-     * @template RequestedType
-     *
-     * @param class-string<RequestedType>|string $id
-     *
-     * @return RequestedType|mixed
-     */
-    public function getNew($id)
+    public function getNew(string $id): mixed
     {
         return $this->resolve($id, true);
     }
 
-    public function has($id): bool
+    public function has(string $id): bool
     {
         if ($this->definitions->has($id)) {
             return true;
@@ -169,7 +155,7 @@ class Container implements DefinitionContainerInterface
         return $this;
     }
 
-    protected function resolve($id, bool $new = false)
+    protected function resolve(string $id, bool $new = false)
     {
         if ($this->definitions->has($id)) {
             $resolved = (true === $new) ? $this->definitions->resolveNew($id) : $this->definitions->resolve($id);
@@ -191,7 +177,7 @@ class Container implements DefinitionContainerInterface
         if ($this->providers->provides($id)) {
             $this->providers->register($id);
 
-            if (!$this->definitions->has($id) && !$this->definitions->hasTag($id)) {
+            if (false === $this->definitions->has($id) && false === $this->definitions->hasTag($id)) {
                 throw new ContainerException(sprintf('Service provider lied about providing (%s) service', $id));
             }
 

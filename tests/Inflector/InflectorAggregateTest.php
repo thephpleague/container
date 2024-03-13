@@ -15,7 +15,7 @@ class InflectorAggregateTest extends TestCase
     {
         $aggregate = new InflectorAggregate();
         $inflector = $aggregate->add('Some\Type');
-        self::assertSame('Some\Type', $inflector->getType());
+        $this->assertSame('Some\Type', $inflector->getType());
     }
 
     public function testAggregateAddsAndIteratesMultipleInflectors(): void
@@ -28,7 +28,7 @@ class InflectorAggregateTest extends TestCase
         }
 
         foreach ($aggregate->getIterator() as $key => $inflector) {
-            self::assertSame($inflectors[$key], $inflector);
+            $this->assertSame($inflectors[$key], $inflector);
         }
     }
 
@@ -37,7 +37,7 @@ class InflectorAggregateTest extends TestCase
         $aggregate = new InflectorAggregate();
         $containerAware = $this->getMockBuilder(ContainerAwareInterface::class)->getMock();
         $container = $this->getMockBuilder(Container::class)->getMock();
-        $containerAware->expects(self::once())->method('setContainer')->with(self::equalTo($container));
+        $containerAware->expects($this->once())->method('setContainer')->with($this->equalTo($container));
         $aggregate->add(ContainerAwareInterface::class)->invokeMethod('setContainer', [$container]);
         $aggregate->add('Ignored\Type');
         $aggregate->setContainer($container);
@@ -66,7 +66,7 @@ class InflectorAggregateTest extends TestCase
                 $concrete = $concrete();
             }
 
-            self::assertSame($container->get($alias), $concrete);
+            $this->assertSame($container->get($alias), $concrete);
         }
     }
 }

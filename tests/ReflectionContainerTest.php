@@ -38,20 +38,20 @@ class ReflectionContainerTest extends TestCase
     public function testHasReturnsTrueIfClassExists(): void
     {
         $container = new ReflectionContainer();
-        self::assertTrue($container->has(ReflectionContainer::class));
+        $this->assertTrue($container->has(ReflectionContainer::class));
     }
 
     public function testHasReturnsFalseIfClassDoesNotExist(): void
     {
         $container = new ReflectionContainer();
-        self::assertFalse($container->has('blah'));
+        $this->assertFalse($container->has('blah'));
     }
 
     public function testContainerInstantiatesClassWithoutConstructor(): void
     {
         $classWithoutConstructor = \stdClass::class;
         $container = new ReflectionContainer();
-        self::assertInstanceOf($classWithoutConstructor, $container->get($classWithoutConstructor));
+        $this->assertInstanceOf($classWithoutConstructor, $container->get($classWithoutConstructor));
     }
 
     public function testContainerInstantiatesAndCachesClassWithoutConstructor(): void
@@ -62,9 +62,9 @@ class ReflectionContainerTest extends TestCase
         $classWithoutConstructorOne = $container->get($classWithoutConstructor);
         $classWithoutConstructorTwo = $container->get($classWithoutConstructor);
 
-        self::assertInstanceOf($classWithoutConstructor, $classWithoutConstructorOne);
-        self::assertInstanceOf($classWithoutConstructor, $classWithoutConstructorTwo);
-        self::assertSame($classWithoutConstructorOne, $classWithoutConstructorTwo);
+        $this->assertInstanceOf($classWithoutConstructor, $classWithoutConstructorOne);
+        $this->assertInstanceOf($classWithoutConstructor, $classWithoutConstructorTwo);
+        $this->assertSame($classWithoutConstructorOne, $classWithoutConstructorTwo);
     }
 
     public function testGetInstantiatesClassWithConstructor(): void
@@ -75,8 +75,8 @@ class ReflectionContainerTest extends TestCase
         $container = new ReflectionContainer();
         $item = $container->get($classWithConstructor);
 
-        self::assertInstanceOf($classWithConstructor, $item);
-        self::assertInstanceOf($dependencyClass, $item->bar);
+        $this->assertInstanceOf($classWithConstructor, $item);
+        $this->assertInstanceOf($dependencyClass, $item->bar);
     }
 
     public function testGetInstantiatesAndCachedClassWithConstructor(): void
@@ -89,14 +89,14 @@ class ReflectionContainerTest extends TestCase
         $itemOne = $container->get($classWithConstructor);
         $itemTwo = $container->get($classWithConstructor);
 
-        self::assertInstanceOf($classWithConstructor, $itemOne);
-        self::assertInstanceOf($dependencyClass, $itemOne->bar);
+        $this->assertInstanceOf($classWithConstructor, $itemOne);
+        $this->assertInstanceOf($dependencyClass, $itemOne->bar);
 
-        self::assertInstanceOf($classWithConstructor, $itemTwo);
-        self::assertInstanceOf($dependencyClass, $itemTwo->bar);
+        $this->assertInstanceOf($classWithConstructor, $itemTwo);
+        $this->assertInstanceOf($dependencyClass, $itemTwo->bar);
 
-        self::assertSame($itemOne, $itemTwo);
-        self::assertSame($itemOne->bar, $itemTwo->bar);
+        $this->assertSame($itemOne, $itemTwo);
+        $this->assertSame($itemOne->bar, $itemTwo->bar);
     }
 
     public function testGetInstantiatesClassWithConstructorAndUsesContainer(): void
@@ -113,8 +113,8 @@ class ReflectionContainerTest extends TestCase
 
         $item = $container->get($classWithConstructor);
 
-        self::assertInstanceOf($classWithConstructor, $item);
-        self::assertSame($dependency, $item->bar);
+        $this->assertInstanceOf($classWithConstructor, $item);
+        $this->assertSame($dependency, $item->bar);
     }
 
     public function testGetInstantiatesClassWithConstructorAndUsesArguments(): void
@@ -129,8 +129,8 @@ class ReflectionContainerTest extends TestCase
             'bar' => $dependency
         ]);
 
-        self::assertInstanceOf($classWithConstructor, $item);
-        self::assertSame($dependency, $item->bar);
+        $this->assertInstanceOf($classWithConstructor, $item);
+        $this->assertSame($dependency, $item->bar);
     }
 
     public function testThrowsWhenGettingNonExistentClass(): void
@@ -148,8 +148,8 @@ class ReflectionContainerTest extends TestCase
             return $foo;
         });
 
-        self::assertInstanceOf(Foo::class, $foo);
-        self::assertInstanceOf(Bar::class, $foo->bar);
+        $this->assertInstanceOf(Foo::class, $foo);
+        $this->assertInstanceOf(Bar::class, $foo->bar);
     }
 
     public function testCallReflectsOnInstanceMethodArguments(): void
@@ -157,16 +157,16 @@ class ReflectionContainerTest extends TestCase
         $container = new ReflectionContainer();
         $foo       = new Foo();
         $container->call([$foo, 'setBar']);
-        self::assertInstanceOf(Foo::class, $foo);
-        self::assertInstanceOf(Bar::class, $foo->bar);
+        $this->assertInstanceOf(Foo::class, $foo);
+        $this->assertInstanceOf(Bar::class, $foo->bar);
     }
 
     public function testCallReflectsOnStaticMethodArguments(): void
     {
         $container = new ReflectionContainer();
         $container->call('League\Container\Test\Asset\Foo::staticSetBar');
-        self::assertInstanceOf(Bar::class, Asset\Foo::$staticBar);
-        self::assertEquals('hello world', Asset\Foo::$staticHello);
+        $this->assertInstanceOf(Bar::class, Asset\Foo::$staticBar);
+        $this->assertEquals('hello world', Asset\Foo::$staticHello);
     }
 
     public function testCallThrowsWhenArgumentCannotBeResolved(): void
@@ -180,16 +180,16 @@ class ReflectionContainerTest extends TestCase
     {
         $container = new ReflectionContainer();
         $foo = $container->call(new FooCallable(), [new Bar()]);
-        self::assertInstanceOf(Foo::class, $foo);
-        self::assertInstanceOf(Bar::class, $foo->bar);
+        $this->assertInstanceOf(Foo::class, $foo);
+        $this->assertInstanceOf(Bar::class, $foo->bar);
     }
 
     public function testCallResolvesFunction(): void
     {
         $container = new ReflectionContainer();
         $foo = $container->call(Asset\test::class, [new Bar()]);
-        self::assertInstanceOf(Foo::class, $foo);
-        self::assertInstanceOf(Bar::class, $foo->bar);
+        $this->assertInstanceOf(Foo::class, $foo);
+        $this->assertInstanceOf(Bar::class, $foo->bar);
     }
 
     public function testGetInstantiatesClassWithConstructorAndSkipsProtectedConstructor(): void

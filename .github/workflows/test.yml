@@ -10,7 +10,7 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-            - uses: actions/checkout@v2
+            - uses: actions/checkout@v3
 
             - uses: shivammathur/setup-php@v2
               with:
@@ -32,7 +32,7 @@ jobs:
                 composer-flags: ['']
 
         steps:
-            - uses: actions/checkout@v2
+            - uses: actions/checkout@v3
               with:
                   fetch-depth: 0
 
@@ -44,10 +44,6 @@ jobs:
                   tools: composer:v2
 
             - run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
-
-            - name: "Use PHPUnit 9.3+ on PHP 8"
-              run: composer require --no-update --dev phpunit/phpunit:^9.3
-              if: "matrix.php == '8.0'"
 
             - run: composer update --no-progress ${{ matrix.composer-flags }}
 
@@ -65,7 +61,7 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-            - uses: actions/checkout@v2
+            - uses: actions/checkout@v3
 
             - uses: shivammathur/setup-php@v2
               with:

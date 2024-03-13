@@ -27,7 +27,7 @@ class TypedArgumentTest extends TestCase
 
         foreach ($arguments as $type => $expected) {
             $argument = new $type($expected);
-            self::assertSame($expected, $argument->getValue());
+            $this->assertSame($expected, $argument->getValue());
         }
     }
 

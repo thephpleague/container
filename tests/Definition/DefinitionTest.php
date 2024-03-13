@@ -21,7 +21,7 @@ class DefinitionTest extends TestCase
 
         $definition->addArguments(['hello', 'world']);
         $actual = $definition->resolve();
-        self::assertSame('hello world', $actual);
+        $this->assertSame('hello world', $actual);
     }
 
     public function testDefinitionResolvesClosureReturningRawArgument(): void
@@ -31,7 +31,7 @@ class DefinitionTest extends TestCase
         });
 
         $actual = $definition->resolve();
-        self::assertSame('hello world', $actual);
+        $this->assertSame('hello world', $actual);
     }
 
     public function testDefinitionResolvesCallableClass(): void
@@ -39,7 +39,7 @@ class DefinitionTest extends TestCase
         $definition = new Definition('callable', new FooCallable());
         $definition->addArgument(new Bar());
         $actual = $definition->resolve();
-        self::assertInstanceOf(Foo::class, $actual);
+        $this->assertInstanceOf(Foo::class, $actual);
     }
 
     public function testDefinitionResolvesArrayCallable(): void
@@ -47,7 +47,7 @@ class DefinitionTest extends TestCase
         $definition = new Definition('callable', [new FooCallable(), '__invoke']);
         $definition->addArgument(new Bar());
         $actual = $definition->resolve();
-        self::assertInstanceOf(Foo::class, $actual);
+        $this->assertInstanceOf(Foo::class, $actual);
     }
 
     public function testDefinitionResolvesClassWithMethodCalls(): void
@@ -55,8 +55,8 @@ class DefinitionTest extends TestCase
         $container = $this->getMockBuilder(Container::class)->getMock();
         $bar = new Bar();
 
-        $container->expects(self::once())->method('has')->with(self::equalTo(Bar::class))->willReturn(true);
-        $container->expects(self::once())->method('get')->with(self::equalTo(Bar::class))->willReturn($bar);
+        $container->expects($this->once())->method('has')->with($this->equalTo(Bar::class))->willReturn(true);
+        $container->expects($this->once())->method('get')->with($this->equalTo(Bar::class))->willReturn($bar);
 
         $definition = new Definition('callable', Foo::class);
 
@@ -64,8 +64,8 @@ class DefinitionTest extends TestCase
         $definition->addMethodCalls(['setBar' => [Bar::class]]);
 
         $actual = $definition->resolve();
-        self::assertInstanceOf(Foo::class, $actual);
-        self::assertInstanceOf(Bar::class, $actual->bar);
+        $this->assertInstanceOf(Foo::class, $actual);
+        $this->assertInstanceOf(Bar::class, $actual->bar);
     }
 
     public function testDefinitionResolvesClassWithDefinedArgs(): void
@@ -73,8 +73,8 @@ class DefinitionTest extends TestCase
         $container = $this->getMockBuilder(Container::class)->getMock();
         $bar = new Bar();
 
-        $container->expects(self::once())->method('has')->with(self::equalTo(Bar::class))->willReturn(true);
-        $container->expects(self::once())->method('get')->with(self::equalTo(Bar::class))->willReturn($bar);
+        $container->expects($this->once())->method('has')->with($this->equalTo(Bar::class))->willReturn(true);
+        $container->expects($this->once())->method('get')->with($this->equalTo(Bar::class))->willReturn($bar);
 
         $definition = new Definition('callable', Foo::class);
 
@@ -82,8 +82,8 @@ class DefinitionTest extends TestCase
         $definition->addArgument(Bar::class);
 
         $actual = $definition->resolve();
-        self::assertInstanceOf(Foo::class, $actual);
-        self::assertInstanceOf(Bar::class, $actual->bar);
+        $this->assertInstanceOf(Foo::class, $actual);
+        $this->assertInstanceOf(Bar::class, $actual->bar);
     }
 
     public function testDefinitionResolvesSharedItemOnlyOnce(): void
@@ -93,8 +93,8 @@ class DefinitionTest extends TestCase
         $actual1 = $definition->resolve();
         $actual2 = $definition->resolve();
         $actual3 = $definition->resolveNew();
-        self::assertSame($actual1, $actual2);
-        self::assertNotSame($actual1, $actual3);
+        $this->assertSame($actual1, $actual2);
+        $this->assertNotSame($actual1, $actual3);
     }
 
     public function testDefinitionResolvesNestedAlias(): void
@@ -105,28 +105,28 @@ class DefinitionTest extends TestCase
 
         $expected = $definition->resolve();
 
-        $container->expects(self::once())->method('has')->with(self::equalTo('class'))->willReturn(true);
-        $container->expects(self::once())->method('get')->with(self::equalTo('class'))->willReturn($expected);
+        $container->expects($this->once())->method('has')->with($this->equalTo('class'))->willReturn(true);
+        $container->expects($this->once())->method('get')->with($this->equalTo('class'))->willReturn($expected);
 
         $aliasDefinition->setContainer($container);
         $actual = $aliasDefinition->resolve();
-        self::assertSame($expected, $actual);
+        $this->assertSame($expected, $actual);
     }
 
     public function testDefinitionCanAddTags(): void
     {
         $definition = new Definition('class', Foo::class);
         $definition->addTag('tag1')->addTag('tag2');
-        self::assertTrue($definition->hasTag('tag1'));
-        self::assertTrue($definition->hasTag('tag2'));
-        self::assertFalse($definition->hasTag('tag3'));
+        $this->assertTrue($definition->hasTag('tag1'));
+        $this->assertTrue($definition->hasTag('tag2'));
+        $this->assertFalse($definition->hasTag('tag3'));
     }
 
     public function testDefinitionCanGetConcrete(): void
     {
         $concrete = new Literal\StringArgument(Foo::class);
         $definition = new Definition('class', $concrete);
-        self::assertSame($concrete, $definition->getConcrete());
+        $this->assertSame($concrete, $definition->getConcrete());
     }
 
     public function testDefinitionCanSetConcrete(): void
@@ -134,6 +134,6 @@ class DefinitionTest extends TestCase
         $definition = new Definition('class', null);
         $concrete = new Literal\StringArgument(Foo::class);
         $definition->setConcrete($concrete);
-        self::assertSame($concrete, $definition->getConcrete());
+        $this->assertSame($concrete, $definition->getConcrete());
     }
 }

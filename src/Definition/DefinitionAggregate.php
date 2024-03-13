@@ -15,7 +15,7 @@ class DefinitionAggregate implements DefinitionAggregateInterface
     /**
      * @var DefinitionInterface[]
      */
-    protected $definitions = [];
+    protected array $definitions = [];
 
     public function __construct(array $definitions = [])
     {

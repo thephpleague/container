@@ -27,7 +27,7 @@ class InflectorTest extends TestCase
         $methods = (new ReflectionClass($inflector))->getProperty('methods');
         $methods->setAccessible(true);
 
-        self::assertSame($methods->getValue($inflector), [
+        $this->assertSame($methods->getValue($inflector), [
             'method1' => ['arg1'],
             'method2' => ['arg1'],
             'method3' => ['arg1']
@@ -49,7 +49,7 @@ class InflectorTest extends TestCase
         $properties = (new ReflectionClass($inflector))->getProperty('properties');
         $properties->setAccessible(true);
 
-        self::assertSame($properties->getValue($inflector), [
+        $this->assertSame($properties->getValue($inflector), [
             'property1' => 'value',
             'property2' => 'value',
             'property3' => 'value'
@@ -64,16 +64,16 @@ class InflectorTest extends TestCase
         };
 
         $container
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('has')
-            ->with(self::equalTo(Bar::class))
+            ->with($this->equalTo(Bar::class))
             ->willReturn(true)
         ;
 
         $container
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('get')
-            ->with(self::equalTo(Bar::class))
+            ->with($this->equalTo(Bar::class))
             ->willReturn($bar)
         ;
 
@@ -88,7 +88,7 @@ class InflectorTest extends TestCase
 
         $inflector->inflect($foo);
 
-        self::assertSame($bar, $foo->bar);
+        $this->assertSame($bar, $foo->bar);
     }
 
     public function testInflectorInflectsWithMethodCall(): void
@@ -99,16 +99,16 @@ class InflectorTest extends TestCase
         };
 
         $container
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('has')
-            ->with(self::equalTo(Bar::class))
+            ->with($this->equalTo(Bar::class))
             ->willReturn(true)
         ;
 
         $container
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('get')
-            ->with(self::equalTo(Bar::class))
+            ->with($this->equalTo(Bar::class))
             ->willReturn($bar)
         ;
 
@@ -126,7 +126,7 @@ class InflectorTest extends TestCase
         };
 
         $inflector->inflect($foo);
-        self::assertSame($bar, $foo->bar);
+        $this->assertSame($bar, $foo->bar);
     }
 
     public function testInflectorInflectsWithCallback(): void
@@ -147,6 +147,6 @@ class InflectorTest extends TestCase
         });
 
         $inflector->inflect($foo);
-        self::assertSame($bar, $foo->bar);
+        $this->assertSame($bar, $foo->bar);
     }
 }

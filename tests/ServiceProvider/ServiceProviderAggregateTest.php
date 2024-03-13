@@ -52,8 +52,8 @@ class ServiceProviderAggregateTest extends TestCase
         $aggregate = new ServiceProviderAggregate();
         $aggregate->setContainer($container);
         $aggregate->add($this->getServiceProvider());
-        self::assertTrue($aggregate->provides('SomeService'));
-        self::assertTrue($aggregate->provides('AnotherService'));
+        $this->assertTrue($aggregate->provides('SomeService'));
+        $this->assertTrue($aggregate->provides('AnotherService'));
     }
 
     public function testAggregateThrowsWhenRegisteringForServiceThatIsNotAdded(): void
@@ -72,7 +72,7 @@ class ServiceProviderAggregateTest extends TestCase
         $aggregate->add($provider);
         $aggregate->register('SomeService');
         $aggregate->register('AnotherService');
-        self::assertSame(1, $provider->registered);
+        $this->assertSame(1, $provider->registered);
     }
 
     public function testAggregateSkipsExistingProviders(): void
@@ -85,11 +85,11 @@ class ServiceProviderAggregateTest extends TestCase
 
         // assert after adding provider multiple times, that it
         // was only aggregated and booted once
-        self::assertSame(
+        $this->assertSame(
             [$provider],
             iterator_to_array($aggregate->getIterator())
         );
 
-        self::assertSame(1, $provider->booted);
+        $this->assertSame(1, $provider->booted);
     }
 }

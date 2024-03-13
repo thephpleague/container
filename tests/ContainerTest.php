@@ -18,9 +18,9 @@ class ContainerTest extends TestCase
     {
         $container = new Container();
         $container->add(Foo::class);
-        self::assertTrue($container->has(Foo::class));
+        $this->assertTrue($container->has(Foo::class));
         $foo = $container->get(Foo::class);
-        self::assertInstanceOf(Foo::class, $foo);
+        $this->assertInstanceOf(Foo::class, $foo);
     }
 
     public function testContainerAddsAndGetsRecursively(): void
@@ -28,37 +28,37 @@ class ContainerTest extends TestCase
         $container = new Container();
         $container->add(Bar::class, Foo::class);
         $container->add(Foo::class);
-        self::assertTrue($container->has(Foo::class));
+        $this->assertTrue($container->has(Foo::class));
         $foo = $container->get(Bar::class);
-        self::assertInstanceOf(Foo::class, $foo);
+        $this->assertInstanceOf(Foo::class, $foo);
     }
 
     public function testContainerAddsAndGetsShared(): void
     {
         $container = new Container();
         $container->addShared(Foo::class);
-        self::assertTrue($container->has(Foo::class));
+        $this->assertTrue($container->has(Foo::class));
 
         $fooOne = $container->get(Foo::class);
         $fooTwo = $container->get(Foo::class);
 
-        self::assertInstanceOf(Foo::class, $fooOne);
-        self::assertInstanceOf(Foo::class, $fooTwo);
-        self::assertSame($fooOne, $fooTwo);
+        $this->assertInstanceOf(Foo::class, $fooOne);
+        $this->assertInstanceOf(Foo::class, $fooTwo);
+        $this->assertSame($fooOne, $fooTwo);
     }
 
     public function testContainerAddsAndGetsSharedByDefault(): void
     {
         $container = (new Container())->defaultToShared();
         $container->add(Foo::class);
-        self::assertTrue($container->has(Foo::class));
+        $this->assertTrue($container->has(Foo::class));
 
         $fooOne = $container->get(Foo::class);
         $fooTwo = $container->get(Foo::class);
 
-        self::assertInstanceOf(Foo::class, $fooOne);
-        self::assertInstanceOf(Foo::class, $fooTwo);
-        self::assertSame($fooOne, $fooTwo);
+        $this->assertInstanceOf(Foo::class, $fooOne);
+        $this->assertInstanceOf(Foo::class, $fooTwo);
+        $this->assertSame($fooOne, $fooTwo);
     }
 
     public function testContainerAddsAndGetsFromTag(): void
@@ -66,15 +66,15 @@ class ContainerTest extends TestCase
         $container = new Container();
         $container->add(Foo::class)->addTag('foobar');
         $container->add(Bar::class)->addTag('foobar');
-        self::assertTrue($container->has(Foo::class));
+        $this->assertTrue($container->has(Foo::class));
 
         $arrayOf = $container->get('foobar');
 
-        self::assertTrue($container->has('foobar'));
-        self::assertIsArray($arrayOf);
-        self::assertCount(2, $arrayOf);
-        self::assertInstanceOf(Foo::class, $arrayOf[0]);
-        self::assertInstanceOf(Bar::class, $arrayOf[1]);
+        $this->assertTrue($container->has('foobar'));
+        $this->assertIsArray($arrayOf);
+        $this->assertCount(2, $arrayOf);
+        $this->assertInstanceOf(Foo::class, $arrayOf[0]);
+        $this->assertInstanceOf(Bar::class, $arrayOf[1]);
     }
 
     public function testContainerAddsAndGetsNewFromTag(): void
@@ -82,18 +82,18 @@ class ContainerTest extends TestCase
         $container = new Container();
         $container->add(Foo::class)->addTag('foobar');
         $container->add(Bar::class)->addTag('foobar');
-        self::assertTrue($container->has(Foo::class));
+        $this->assertTrue($container->has(Foo::class));
 
         $arrayOf = $container->get('foobar');
 
-        self::assertTrue($container->has('foobar'));
-        self::assertIsArray($arrayOf);
-        self::assertCount(2, $arrayOf);
-        self::assertInstanceOf(Foo::class, $arrayOf[0]);
-        self::assertInstanceOf(Bar::class, $arrayOf[1]);
+        $this->assertTrue($container->has('foobar'));
+        $this->assertIsArray($arrayOf);
+        $this->assertCount(2, $arrayOf);
+        $this->assertInstanceOf(Foo::class, $arrayOf[0]);
+        $this->assertInstanceOf(Bar::class, $arrayOf[1]);
 
         $arrayOfTwo = $container->getNew('foobar');
-        self::assertNotSame($arrayOfTwo, $arrayOf);
+        $this->assertNotSame($arrayOfTwo, $arrayOf);
     }
 
     public function testContainerAddsAndGetsWithServiceProvider(): void
@@ -114,10 +114,10 @@ class ContainerTest extends TestCase
         $container = new Container();
 
         $container->addServiceProvider($provider);
-        self::assertTrue($container->has(Foo::class));
+        $this->assertTrue($container->has(Foo::class));
 
         $foo = $container->get(Foo::class);
-        self::assertInstanceOf(Foo::class, $foo);
+        $this->assertInstanceOf(Foo::class, $foo);
     }
 
     public function testThrowsWhenServiceProviderLies(): void
@@ -137,7 +137,7 @@ class ContainerTest extends TestCase
         $container = new Container();
 
         $container->addServiceProvider($liar);
-        self::assertTrue($container->has('lie'));
+        $this->assertTrue($container->has('lie'));
 
         $this->expectException(ContainerException::class);
         $container->get('lie');
@@ -149,14 +149,14 @@ class ContainerTest extends TestCase
         $container = new Container();
         $container->delegate($delegate);
         $foo = $container->get(Foo::class);
-        self::assertInstanceOf(Foo::class, $foo);
+        $this->assertInstanceOf(Foo::class, $foo);
     }
 
     public function testContainerThrowsWhenCannotGetService(): void
     {
         $this->expectException(NotFoundException::class);
         $container = new Container();
-        self::assertFalse($container->has(Foo::class));
+        $this->assertFalse($container->has(Foo::class));
         $container->get(Foo::class);
     }
 
@@ -165,8 +165,8 @@ class ContainerTest extends TestCase
         $container = new Container();
         $container->add(Foo::class);
         $definition = $container->extend(Foo::class);
-        self::assertSame(Foo::class, $definition->getAlias());
-        self::assertSame(Foo::class, $definition->getConcrete());
+        $this->assertSame(Foo::class, $definition->getAlias());
+        $this->assertSame(Foo::class, $definition->getConcrete());
     }
 
     public function testContainerCanExtendDefinitionFromServiceProvider(): void
@@ -187,15 +187,15 @@ class ContainerTest extends TestCase
         $container = new Container();
         $container->addServiceProvider($provider);
         $definition = $container->extend(Foo::class);
-        self::assertSame(Foo::class, $definition->getAlias());
-        self::assertSame(Foo::class, $definition->getConcrete());
+        $this->assertSame(Foo::class, $definition->getAlias());
+        $this->assertSame(Foo::class, $definition->getConcrete());
     }
 
     public function testContainerThrowsWhenCannotGetDefinitionToExtend(): void
     {
         $this->expectException(NotFoundException::class);
         $container = new Container();
-        self::assertFalse($container->has(Foo::class));
+        $this->assertFalse($container->has(Foo::class));
         $container->extend(Foo::class);
     }
 
@@ -206,8 +206,8 @@ class ContainerTest extends TestCase
         $container->add(Foo::class);
         $container->add(Bar::class);
         $foo = $container->get(Foo::class);
-        self::assertInstanceOf(Foo::class, $foo);
-        self::assertInstanceOf(Bar::class, $foo->bar);
+        $this->assertInstanceOf(Foo::class, $foo);
+        $this->assertInstanceOf(Bar::class, $foo->bar);
     }
 
     public function testContainerAwareCannotBeUsedWithoutImplementingInterface(): void
