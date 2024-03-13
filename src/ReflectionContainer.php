@@ -72,7 +72,7 @@ class ReflectionContainer implements ArgumentResolverInterface, ContainerInterfa
 
     public function call(callable $callable, array $args = [])
     {
-        if (is_string($callable) && strpos($callable, '::') !== false) {
+        if (is_string($callable) && str_contains($callable, '::')) {
             $callable = explode('::', $callable);
         }
 
