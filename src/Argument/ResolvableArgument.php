@@ -6,11 +6,8 @@ namespace League\Container\Argument;
 
 class ResolvableArgument implements ResolvableArgumentInterface
 {
-    protected $value;
-
-    public function __construct(string $value)
+    public function __construct(protected string $value)
     {
-        $this->value = $value;
     }
 
     public function getValue(): string

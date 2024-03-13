@@ -19,12 +19,9 @@ class LiteralArgument implements LiteralArgumentInterface
     public const TYPE_OBJECT = 'object';
     public const TYPE_STRING = 'string';
 
-    /**
-     * @var mixed
-     */
-    protected $value;
+    protected mixed $value;
 
-    public function __construct($value, string $type = null)
+    public function __construct(mixed $value, string $type = null)
     {
         if (
             null === $type
@@ -38,10 +35,7 @@ class LiteralArgument implements LiteralArgumentInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getValue()
+    public function getValue(): mixed
     {
         return $this->value;
     }

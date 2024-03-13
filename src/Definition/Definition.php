@@ -21,55 +21,18 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
     use ArgumentResolverTrait;
     use ContainerAwareTrait;
 
-    /**
-     * @var string
-     */
-    protected $alias;
+    protected mixed $resolved = null;
+    protected array $recursiveCheck = [];
 
-    /**
-     * @var mixed
-     */
-    protected $concrete;
-
-    /**
-     * @var boolean
-     */
-    protected $shared = false;
-
-    /**
-     * @var array
-     */
-    protected $tags = [];
-
-    /**
-     * @var array
-     */
-    protected $arguments = [];
-
-    /**
-     * @var array
-     */
-    protected $methods = [];
-
-    /**
-     * @var mixed
-     */
-    protected $resolved;
-
-    /**
-     * @var bool
-     */
-    protected $isAlreadySearched = false;
-
-    /**
-     * @param string     $id
-     * @param mixed|null $concrete
-     */
-    public function __construct(string $id, $concrete = null)
-    {
-        $concrete ??= $id;
-        $this->alias = $id;
-        $this->concrete = $concrete;
+    public function __construct(
+        protected string $id,
+        protected mixed $concrete = null,
+        protected bool $shared = false,
+        protected array $arguments = [],
+        protected array $methods = [],
+        protected array $tags = [],
+    ) {
+        $this->concrete ??= $this->id;
     }
 
     public function addTag(string $tag): DefinitionInterface
@@ -83,15 +46,25 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
         return isset($this->tags[$tag]);
     }
 
+    public function setId(string $id): DefinitionInterface
+    {
+        $this->id = $id;
+        return $this;
+    }
+
+    public function getId(): string
+    {
+        return $this->id;
+    }
+
     public function setAlias(string $id): DefinitionInterface
     {
-        $this->alias = $id;
-        return $this;
+        return $this->setId($id);
     }
 
     public function getAlias(): string
     {
-        return $this->alias;
+        return $this->getId();
     }
 
     public function setShared(bool $shared = true): DefinitionInterface
@@ -135,7 +108,7 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
     public function addMethodCall(string $method, array $args = []): DefinitionInterface
     {
         $this->methods[] = [
-            'method'    => $method,
+            'method' => $method,
             'arguments' => $args
         ];
 
@@ -151,7 +124,7 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
         return $this;
     }
 
-    public function resolve()
+    public function resolve(): mixed
     {
         if (null !== $this->resolved && $this->isShared()) {
             return $this->resolved;
@@ -160,7 +133,7 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
         return $this->resolveNew();
     }
 
-    public function resolveNew()
+    public function resolveNew(): mixed
     {
         $concrete = $this->concrete;
 
@@ -192,16 +165,15 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
         }
 
         // stop recursive resolving
-        if ($this->isAlreadySearched) {
-            throw new NotFoundException(
-                sprintf('Alias or class "%s" did not found.', $concrete)
-            );
+        if (is_string($concrete) && in_array($concrete, $this->recursiveCheck)) {
+            $this->resolved = $concrete;
+            return $concrete;
         }
 
         // if we still have a string, try to pull it from the container
         // this allows for `alias -> alias -> ... -> concrete
         if (is_string($concrete) && $container instanceof ContainerInterface && $container->has($concrete)) {
-            $this->isAlreadySearched = true;
+            $this->recursiveCheck[] = $concrete;
             $concrete = $container->get($concrete);
         }
 
@@ -209,11 +181,7 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
         return $concrete;
     }
 
-    /**
-     * @param callable $concrete
-     * @return mixed
-     */
-    protected function resolveCallable(callable $concrete)
+    protected function resolveCallable(callable $concrete): mixed
     {
         $resolved = $this->resolveArguments($this->arguments);
         return call_user_func_array($concrete, $resolved);
