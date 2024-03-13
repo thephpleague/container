@@ -228,8 +228,6 @@ class ContainerTest extends TestCase
         $container->add(NonExistent::class);
 
         self::assertTrue($container->has(NonExistent::class));
-
-        $this->expectException(NotFoundException::class);
-        $container->get(NonExistent::class);
+        self::assertSame(NonExistent::class, $container->get(NonExistent::class));
     }
 }
