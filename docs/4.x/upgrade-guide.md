@@ -162,7 +162,7 @@ $container->delegate($delegateContainer);
 // old
 $container->hasInDelegate($id);
 // new
-$container->has($id); // checks main container and then all delagates
+$container->has($id); // checks main container and then all delegates
 $delegateContainer->has($id); // check specifically in the delegate
 ~~~
 

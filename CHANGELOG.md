@@ -117,7 +117,7 @@ All Notable changes to `League\Container` will be documented in this file
 
 ### Added
 - Re-added the `share` proxy method that was mistakenly removed in previous major release.
-- Added ability to set Conatiner to "share" by default using `defaultToShared` method.
+- Added ability to set Container to "share" by default using `defaultToShared` method.
 - Added ability for `ReflectionContainer` to cache resolutions and pull from cache for following calls.
 
 ## 3.0.1

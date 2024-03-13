@@ -169,7 +169,7 @@ var_dump($controller->model->pdo instanceof PDO);   // true
 
 ## Factories
 
-Container can accept any `callable` that will be used as a factory to resolve your classes. This is the most performant way to resolve your objects as no inspection is needed of the definition, however, this does reduce the amount of flexibilty you can take advantage of.
+Container can accept any `callable` that will be used as a factory to resolve your classes. This is the most performant way to resolve your objects as no inspection is needed of the definition, however, this does reduce the amount of flexibility you can take advantage of.
 
 Using the same example as above, we can define it in Container as follows.
 
