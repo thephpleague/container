@@ -1,5 +1,6 @@
 build
 composer.lock
+composer.phar
 vendor
 .sass-cache
 .phpunit.result.cache
