@@ -149,4 +149,26 @@ class InflectorTest extends TestCase
         $inflector->inflect($foo);
         $this->assertSame($bar, $foo->bar);
     }
+
+    public function testInflectorOnlyInflectsOncePerMatch(): void
+    {
+        $foo = new class {
+            public int $count = 0;
+            public function tick(): void
+            {
+                $this->count++;
+            }
+        };
+
+        $bar = new class {
+        };
+
+        $inflector = new Inflector('Type');
+        $inflector->oncePerMatch();
+        $inflector->invokeMethod('tick', []);
+
+        $inflector->inflect($foo);
+        $inflector->inflect($foo);
+        $this->assertSame(1, $foo->count);
+    }
 }

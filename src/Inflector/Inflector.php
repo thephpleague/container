@@ -18,13 +18,22 @@ class Inflector implements ArgumentResolverInterface, InflectorInterface
      */
     protected $callback;
 
+    protected array $inflected = [];
+
     public function __construct(
         protected string $type,
-        protected $methods = [],
-        protected $properties = [],
-        ?callable $callback = null
+        ?callable $callback = null,
+        protected bool $oncePerMatch = false,
+        protected array $methods = [],
+        protected array $properties = [],
     ) {
         $this->callback = $callback;
+    }
+
+    public function oncePerMatch(): InflectorInterface
+    {
+        $this->oncePerMatch = true;
+        return $this;
     }
 
     public function getType(): string
@@ -64,6 +73,10 @@ class Inflector implements ArgumentResolverInterface, InflectorInterface
 
     public function inflect(object $object): void
     {
+        if (true === $this->oncePerMatch && in_array($object, $this->inflected, true)) {
+            return;
+        }
+
         $properties = $this->resolveArguments(array_values($this->properties));
         $properties = array_combine(array_keys($this->properties), $properties);
 
@@ -80,6 +93,10 @@ class Inflector implements ArgumentResolverInterface, InflectorInterface
 
         if ($this->callback !== null) {
             call_user_func($this->callback, $object);
+        }
+
+        if (true === $this->oncePerMatch) {
+            $this->inflected[] = $object;
         }
     }
 }
