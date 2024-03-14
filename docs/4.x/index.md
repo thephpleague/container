@@ -147,7 +147,7 @@ Or, use any other [PSR-4](http://www.php-fig.org/psr/psr-4/) compatible autoload
 
 Container allows you to register services, with or without their dependencies for later retrieval. It is a registry of sorts that when used correctly can allow you to implement the dependency injection design pattern.
 
-Using the example in our [introduction](#introduction), we can start to take a look at how Container works. Now that `Acme\Foo` accepts `Acme\Bar` as a contructor argument, we can use Container to configure that.
+Using the example in our [introduction](#introduction), we can start to take a look at how Container works. Now that `Acme\Foo` accepts `Acme\Bar` as a constructor argument, we can use Container to configure that.
 
 ~~~ php
 <?php 

@@ -14,6 +14,7 @@ checks:
         fix_php_opening_tag: true
         fix_linefeed: true
         fix_line_ending: true
+        # Known typo
         fix_identation_4spaces: true
         fix_doc_comments: true
 tools:
