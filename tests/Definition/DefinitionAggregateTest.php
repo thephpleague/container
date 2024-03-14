@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace League\Container\Test\Definition;
 
 use League\Container\Container;
-use League\Container\Definition\{DefinitionAggregate, DefinitionInterface};
+use League\Container\Definition\{Definition, DefinitionAggregate, DefinitionInterface};
 use League\Container\Exception\NotFoundException;
 use League\Container\Test\Asset\Foo;
 use PHPUnit\Framework\TestCase;
@@ -227,5 +227,33 @@ class DefinitionAggregateTest extends TestCase
         $aggregate->addShared('alias2', $definition2);
 
         $aggregate->resolveNew('alias');
+    }
+
+    public function testDefinitionPreceedingSlash(): void
+    {
+        $container   = $this->getMockBuilder(Container::class)->getMock();
+        $aggregate   = new DefinitionAggregate();
+        $aggregate->setContainer($container);
+
+        $some_class = "\\League\\Container\\Test\\Asset\\Foo";
+        $aggregate->add($some_class, null);
+
+        $definition = $aggregate->getDefinition(Foo::class);
+
+        self::assertInstanceOf(Definition::class, $definition);
+    }
+
+    public function testGetPreceedingSlash(): void
+    {
+        $container   = $this->getMockBuilder(Container::class)->getMock();
+        $aggregate   = new DefinitionAggregate();
+        $aggregate->setContainer($container);
+
+        $some_class = Foo::class;
+        $aggregate->add($some_class, null);
+
+        $definition = $aggregate->getDefinition("\\League\\Container\\Test\\Asset\\Foo");
+
+        self::assertInstanceOf(Definition::class, $definition);
     }
 }
