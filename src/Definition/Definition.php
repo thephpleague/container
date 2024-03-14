@@ -12,7 +12,6 @@ use League\Container\Argument\{
 };
 use League\Container\ContainerAwareTrait;
 use League\Container\Exception\ContainerException;
-use League\Container\Exception\NotFoundException;
 use Psr\Container\ContainerInterface;
 use ReflectionClass;
 
@@ -78,7 +77,7 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
         return $this->shared;
     }
 
-    public function getConcrete()
+    public function getConcrete(): mixed
     {
         return $this->concrete;
     }

@@ -14,11 +14,11 @@ interface DefinitionInterface extends ContainerAwareInterface
     public function addMethodCalls(array $methods = []): DefinitionInterface;
     public function addTag(string $tag): DefinitionInterface;
     public function getAlias(): string;
-    public function getConcrete();
+    public function getConcrete(): mixed;
     public function hasTag(string $tag): bool;
     public function isShared(): bool;
-    public function resolve();
-    public function resolveNew();
+    public function resolve(): mixed;
+    public function resolveNew(): mixed;
     public function setAlias(string $id): DefinitionInterface;
     public function setConcrete($concrete): DefinitionInterface;
     public function setShared(bool $shared): DefinitionInterface;

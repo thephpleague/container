@@ -142,7 +142,7 @@ class InflectorTest extends TestCase
         $bar = new class {
         };
 
-        $inflector = new Inflector('Type', function ($object) use ($bar) {
+        $inflector = new Inflector('Type', callback: function ($object) use ($bar) {
             $object->setBar($bar);
         });
 

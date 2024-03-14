@@ -18,23 +18,17 @@ class ReflectionContainer implements ArgumentResolverInterface, ContainerInterfa
     use ContainerAwareTrait;
 
     /**
-     * @var boolean
-     */
-    protected $cacheResolutions;
-
-    /**
      * @var array
      */
-    protected $cache = [];
+    protected array $cache = [];
 
-    public function __construct(bool $cacheResolutions = false)
+    public function __construct(protected bool $cacheResolutions = false)
     {
-        $this->cacheResolutions = $cacheResolutions;
     }
 
-    public function get($id, array $args = [])
+    public function get(string $id, array $args = [])
     {
-        if ($this->cacheResolutions === true && array_key_exists($id, $this->cache)) {
+        if (true === $this->cacheResolutions && array_key_exists($id, $this->cache)) {
             return $this->cache[$id];
         }
 
@@ -65,7 +59,7 @@ class ReflectionContainer implements ArgumentResolverInterface, ContainerInterfa
         return $resolution;
     }
 
-    public function has($id): bool
+    public function has(string $id): bool
     {
         return class_exists($id);
     }

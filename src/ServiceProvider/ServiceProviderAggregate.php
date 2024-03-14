@@ -15,12 +15,12 @@ class ServiceProviderAggregate implements ServiceProviderAggregateInterface
     /**
      * @var ServiceProviderInterface[]
      */
-    protected $providers = [];
+    protected array $providers = [];
 
     /**
      * @var array
      */
-    protected $registered = [];
+    protected array $registered = [];
 
     public function add(ServiceProviderInterface $provider): ServiceProviderAggregateInterface
     {
@@ -38,10 +38,10 @@ class ServiceProviderAggregate implements ServiceProviderAggregateInterface
         return $this;
     }
 
-    public function provides(string $service): bool
+    public function provides(string $id): bool
     {
-        foreach ($this->getIterator() as $provider) {
-            if ($provider->provides($service)) {
+        foreach ($this as $provider) {
+            if ($provider->provides($id)) {
                 return true;
             }
         }
@@ -62,7 +62,7 @@ class ServiceProviderAggregate implements ServiceProviderAggregateInterface
             );
         }
 
-        foreach ($this->getIterator() as $provider) {
+        foreach ($this as $provider) {
             if (in_array($provider->getIdentifier(), $this->registered, true)) {
                 continue;
             }

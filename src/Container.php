@@ -15,39 +15,16 @@ use Psr\Container\ContainerInterface;
 class Container implements DefinitionContainerInterface
 {
     /**
-     * @var boolean
-     */
-    protected $defaultToShared = false;
-
-    /**
-     * @var DefinitionAggregateInterface
-     */
-    protected $definitions;
-
-    /**
-     * @var ServiceProviderAggregateInterface
-     */
-    protected $providers;
-
-    /**
-     * @var InflectorAggregateInterface
-     */
-    protected $inflectors;
-
-    /**
      * @var ContainerInterface[]
      */
-    protected $delegates = [];
+    protected array $delegates = [];
 
     public function __construct(
-        DefinitionAggregateInterface $definitions = null,
-        ServiceProviderAggregateInterface $providers = null,
-        InflectorAggregateInterface $inflectors = null
+        protected DefinitionAggregateInterface $definitions = new DefinitionAggregate(),
+        protected ServiceProviderAggregateInterface $providers = new ServiceProviderAggregate(),
+        protected InflectorAggregateInterface $inflectors = new InflectorAggregate(),
+        protected bool $defaultToShared = false
     ) {
-        $this->definitions = $definitions ?? new DefinitionAggregate();
-        $this->providers   = $providers   ?? new ServiceProviderAggregate();
-        $this->inflectors  = $inflectors  ?? new InflectorAggregate();
-
         if ($this->definitions instanceof ContainerAwareInterface) {
             $this->definitions->setContainer($this);
         }
@@ -61,7 +38,7 @@ class Container implements DefinitionContainerInterface
         }
     }
 
-    public function add(string $id, $concrete = null): DefinitionInterface
+    public function add(string $id, mixed $concrete = null): DefinitionInterface
     {
         $concrete ??= $id;
 
@@ -72,7 +49,7 @@ class Container implements DefinitionContainerInterface
         return $this->definitions->add($id, $concrete);
     }
 
-    public function addShared(string $id, $concrete = null): DefinitionInterface
+    public function addShared(string $id, mixed $concrete = null): DefinitionInterface
     {
         $concrete ??= $id;
         return $this->definitions->addShared($id, $concrete);
@@ -155,7 +132,7 @@ class Container implements DefinitionContainerInterface
         return $this;
     }
 
-    protected function resolve(string $id, bool $new = false)
+    protected function resolve(string $id, bool $new = false): mixed
     {
         if ($this->definitions->has($id)) {
             $resolved = (true === $new) ? $this->definitions->resolveNew($id) : $this->definitions->resolve($id);
@@ -177,6 +154,7 @@ class Container implements DefinitionContainerInterface
         if ($this->providers->provides($id)) {
             $this->providers->register($id);
 
+            /** @noinspection PhpUnreachableStatementInspection */
             if (false === $this->definitions->has($id) && false === $this->definitions->hasTag($id)) {
                 throw new ContainerException(sprintf('Service provider lied about providing (%s) service', $id));
             }

@@ -12,19 +12,14 @@ class DefinitionAggregate implements DefinitionAggregateInterface
 {
     use ContainerAwareTrait;
 
-    /**
-     * @var DefinitionInterface[]
-     */
-    protected array $definitions = [];
-
-    public function __construct(array $definitions = [])
+    public function __construct(protected array $definitions = [])
     {
-        $this->definitions = array_filter($definitions, static function ($definition) {
+        $this->definitions = array_filter($this->definitions, static function ($definition) {
             return ($definition instanceof DefinitionInterface);
         });
     }
 
-    public function add(string $id, $definition): DefinitionInterface
+    public function add(string $id, mixed $definition): DefinitionInterface
     {
         if (false === ($definition instanceof DefinitionInterface)) {
             $definition = new Definition($id, $definition);
@@ -35,7 +30,7 @@ class DefinitionAggregate implements DefinitionAggregateInterface
         return $definition;
     }
 
-    public function addShared(string $id, $definition): DefinitionInterface
+    public function addShared(string $id, mixed $definition): DefinitionInterface
     {
         $definition = $this->add($id, $definition);
         return $definition->setShared(true);
@@ -43,7 +38,7 @@ class DefinitionAggregate implements DefinitionAggregateInterface
 
     public function has(string $id): bool
     {
-        foreach ($this->getIterator() as $definition) {
+        foreach ($this as $definition) {
             if ($id === $definition->getAlias()) {
                 return true;
             }
@@ -54,7 +49,7 @@ class DefinitionAggregate implements DefinitionAggregateInterface
 
     public function hasTag(string $tag): bool
     {
-        foreach ($this->getIterator() as $definition) {
+        foreach ($this as $definition) {
             if ($definition->hasTag($tag)) {
                 return true;
             }
@@ -65,7 +60,7 @@ class DefinitionAggregate implements DefinitionAggregateInterface
 
     public function getDefinition(string $id): DefinitionInterface
     {
-        foreach ($this->getIterator() as $definition) {
+        foreach ($this as $definition) {
             if ($id === $definition->getAlias()) {
                 return $definition->setContainer($this->getContainer());
             }
@@ -74,12 +69,12 @@ class DefinitionAggregate implements DefinitionAggregateInterface
         throw new NotFoundException(sprintf('Alias (%s) is not being handled as a definition.', $id));
     }
 
-    public function resolve(string $id)
+    public function resolve(string $id): mixed
     {
         return $this->getDefinition($id)->resolve();
     }
 
-    public function resolveNew(string $id)
+    public function resolveNew(string $id): mixed
     {
         return $this->getDefinition($id)->resolveNew();
     }
@@ -88,7 +83,7 @@ class DefinitionAggregate implements DefinitionAggregateInterface
     {
         $arrayOf = [];
 
-        foreach ($this->getIterator() as $definition) {
+        foreach ($this as $definition) {
             if ($definition->hasTag($tag)) {
                 $arrayOf[] = $definition->setContainer($this->getContainer())->resolve();
             }
@@ -101,7 +96,7 @@ class DefinitionAggregate implements DefinitionAggregateInterface
     {
         $arrayOf = [];
 
-        foreach ($this->getIterator() as $definition) {
+        foreach ($this as $definition) {
             if ($definition->hasTag($tag)) {
                 $arrayOf[] = $definition->setContainer($this->getContainer())->resolveNew();
             }

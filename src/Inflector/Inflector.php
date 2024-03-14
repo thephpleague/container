@@ -14,28 +14,16 @@ class Inflector implements ArgumentResolverInterface, InflectorInterface
     use ContainerAwareTrait;
 
     /**
-     * @var string
-     */
-    protected $type;
-
-    /**
      * @var callable|null
      */
     protected $callback;
 
-    /**
-     * @var array
-     */
-    protected $methods = [];
-
-    /**
-     * @var array
-     */
-    protected $properties = [];
-
-    public function __construct(string $type, callable $callback = null)
-    {
-        $this->type = $type;
+    public function __construct(
+        protected string $type,
+        protected $methods = [],
+        protected $properties = [],
+        ?callable $callback = null
+    ) {
         $this->callback = $callback;
     }
 
