@@ -12,7 +12,7 @@ class Foo
 
     public static $staticHello;
 
-    public function __construct(Bar $bar = null)
+    public function __construct(?Bar $bar = null)
     {
         $this->bar = $bar;
     }
