@@ -33,6 +33,8 @@ jobs:
                 include:
                     - php: '8.0'
                       coverage: false
+                    - php: '8.4'
+                      coverage: false
                     - php: '7.2'
                       coverage: false
                       composer-flags: '--prefer-lowest'
@@ -53,7 +55,7 @@ jobs:
 
             - name: "Use PHPUnit 9.3+ on PHP 8"
               run: composer require --no-update --dev phpunit/phpunit:^9.3
-              if: "matrix.php == '8.0'"
+              if: "matrix.php == '8.0' || matrix.php == '8.4'"
 
             - run: composer update --no-progress ${{ matrix.composer-flags }}
 
