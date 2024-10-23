@@ -2,6 +2,11 @@
 
 All Notable changes to `League\Container` will be documented in this file
 
+## 4.2.3
+
+### Fixed
+- Warnings for PHP 8.4 implicit nullable types (@andypost)
+
 ## 4.2.1
 
 ### Fixed

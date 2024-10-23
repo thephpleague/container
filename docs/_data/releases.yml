@@ -22,7 +22,7 @@
   name: League\Container 4.x
   type: Current
   requires: PHP >= 7.2
-  release: 4.2.1 - 2024-03
+  release: 4.2.3 - 2024-10
   support: Ongoing
   url: /4.x/
   menu:
