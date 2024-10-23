@@ -193,7 +193,7 @@ declare(strict_types=1);
 
 $container = new League\Container\Container();
 
-$container->share(Acme\Foo::class);
+$container->addShared(Acme\Foo::class);
 ~~~
 
 If you would like to make all your definitions to default to shared, you can define that on Container, meaning that the `add` method will default to setting your definitions as shared and multiple calls to `get` will return the same instance. Only definitions after this is set will default to shared.
