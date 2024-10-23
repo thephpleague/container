@@ -67,6 +67,8 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
      */
     public function __construct(string $id, $concrete = null)
     {
+        $id = Util::normalizeAlias($id);
+
         $concrete = $concrete ?? $id;
         $this->alias    = $id;
         $this->concrete = $concrete;
@@ -85,6 +87,8 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
 
     public function setAlias(string $id): DefinitionInterface
     {
+        $id = Util::normalizeAlias($id);
+
         $this->alias = $id;
         return $this;
     }
