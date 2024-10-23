@@ -214,7 +214,8 @@ class ContainerTest extends TestCase
     {
         $this->expectException(BadMethodCallException::class);
 
-        $class = new class {
+        $class = new class
+        {
             use ContainerAwareTrait;
         };
 
@@ -222,12 +223,13 @@ class ContainerTest extends TestCase
         $class->setContainer($container);
     }
 
-    public function testNonExistentClassCausesException(): void
+    public function testNonExistentClassIsReturnedAsIdenticalString(): void
     {
+        $nonExistent = NonExistent::class;
         $container = new Container();
-        $container->add(NonExistent::class);
+        $container->add($nonExistent);
 
-        self::assertTrue($container->has(NonExistent::class));
-        self::assertSame(NonExistent::class, $container->get(NonExistent::class));
+        self::assertTrue($container->has($nonExistent));
+        self::assertSame($nonExistent, $container->get($nonExistent));
     }
 }
