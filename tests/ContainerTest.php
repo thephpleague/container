@@ -225,10 +225,10 @@ class ContainerTest extends TestCase
     public function testNonExistentClassResolvesAsString(): void
     {
         $container = new Container();
-        $container->add(NonExistent::class);
+        $container->add('NonExistent');
 
-        $this->assertTrue($container->has(NonExistent::class));
-        $this->assertSame(NonExistent::class, $container->get(NonExistent::class));
+        $this->assertTrue($container->has('NonExistent'));
+        $this->assertSame('NonExistent', $container->get('NonExistent'));
     }
 
     public function testRuntimeOverwrite(): void

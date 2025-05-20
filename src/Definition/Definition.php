@@ -164,10 +164,12 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
             $container = null;
         }
 
-        // stop recursive resolving
-        if (is_string($concrete) && in_array($concrete, $this->recursiveCheck)) {
-            $this->resolved = $concrete;
-            return $concrete;
+        if (is_string($concrete)) {
+            if (class_exists($concrete)) {
+                $concrete = $this->resolveClass($concrete);
+            } elseif ($this->getAlias() === $concrete) {
+                return $concrete;
+            }
         }
 
         // if we still have a string, try to pull it from the container
