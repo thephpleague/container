@@ -26,20 +26,12 @@ class Container implements DefinitionContainerInterface
         protected bool $defaultToShared = false,
         protected bool $defaultToOverwrite = false,
     ) {
-        if ($this->definitions instanceof ContainerAwareInterface) {
-            $this->definitions->setContainer($this);
-        }
-
-        if ($this->providers instanceof ContainerAwareInterface) {
-            $this->providers->setContainer($this);
-        }
-
-        if ($this->inflectors instanceof ContainerAwareInterface) {
-            $this->inflectors->setContainer($this);
-        }
+        $this->definitions->setContainer($this);
+        $this->providers->setContainer($this);
+        $this->inflectors->setContainer($this);
     }
 
-    public function add(string $id, $concrete = null, bool $overwrite = false): DefinitionInterface
+    public function add(string $id, mixed $concrete = null, bool $overwrite = false): DefinitionInterface
     {
         $toOverwrite = $this->defaultToOverwrite || $overwrite;
         $concrete = $concrete ??= $id;
@@ -51,7 +43,7 @@ class Container implements DefinitionContainerInterface
         return $this->definitions->add($id, $concrete, $toOverwrite);
     }
 
-    public function addShared(string $id, $concrete = null, bool $overwrite = false): DefinitionInterface
+    public function addShared(string $id, mixed $concrete = null, bool $overwrite = false): DefinitionInterface
     {
         $toOverwrite = $this->defaultToOverwrite || $overwrite;
         $concrete = $concrete ??= $id;

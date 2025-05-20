@@ -56,7 +56,7 @@ class Inflector implements ArgumentResolverInterface, InflectorInterface
         return $this;
     }
 
-    public function setProperty(string $property, $value): InflectorInterface
+    public function setProperty(string $property, mixed $value): InflectorInterface
     {
         $this->properties[$property] = $this->resolveArguments([$value])[0];
         return $this;

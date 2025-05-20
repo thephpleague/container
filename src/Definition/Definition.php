@@ -83,14 +83,14 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
         return $this->concrete;
     }
 
-    public function setConcrete($concrete): DefinitionInterface
+    public function setConcrete(mixed $concrete): DefinitionInterface
     {
         $this->concrete = $concrete;
         $this->resolved = null;
         return $this;
     }
 
-    public function addArgument($arg): DefinitionInterface
+    public function addArgument(mixed $arg): DefinitionInterface
     {
         $this->arguments[] = $arg;
         return $this;

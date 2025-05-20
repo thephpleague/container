@@ -9,8 +9,8 @@ use League\Container\ContainerAwareInterface;
 
 interface DefinitionAggregateInterface extends ContainerAwareInterface, IteratorAggregate
 {
-    public function add(string $id, $definition, bool $overwrite = false): DefinitionInterface;
-    public function addShared(string $id, $definition, bool $overwrite = false): DefinitionInterface;
+    public function add(string $id, mixed $definition, bool $overwrite = false): DefinitionInterface;
+    public function addShared(string $id, mixed $definition, bool $overwrite = false): DefinitionInterface;
     public function getDefinition(string $id): DefinitionInterface;
     public function has(string $id): bool;
     public function hasTag(string $tag): bool;

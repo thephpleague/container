@@ -11,5 +11,5 @@ interface InflectorInterface
     public function invokeMethod(string $name, array $args): InflectorInterface;
     public function invokeMethods(array $methods): InflectorInterface;
     public function setProperties(array $properties): InflectorInterface;
-    public function setProperty(string $property, $value): InflectorInterface;
+    public function setProperty(string $property, mixed $value): InflectorInterface;
 }

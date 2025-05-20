@@ -19,7 +19,7 @@ class DefinitionAggregate implements DefinitionAggregateInterface
         });
     }
 
-    public function add(string $id, $definition, bool $overwrite = false): DefinitionInterface
+    public function add(string $id, mixed $definition, bool $overwrite = false): DefinitionInterface
     {
         if (true === $overwrite) {
             $this->remove($id);
@@ -34,7 +34,7 @@ class DefinitionAggregate implements DefinitionAggregateInterface
         return $definition;
     }
 
-    public function addShared(string $id, $definition, bool $overwrite = false): DefinitionInterface
+    public function addShared(string $id, mixed $definition, bool $overwrite = false): DefinitionInterface
     {
         $definition = $this->add($id, $definition, $overwrite);
         return $definition->setShared(true);

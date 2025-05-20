@@ -23,7 +23,7 @@ class InflectorAggregate implements InflectorAggregateInterface
         return $inflector;
     }
 
-    public function inflect($object)
+    public function inflect(mixed $object): mixed
     {
         foreach ($this as $inflector) {
             $type = $inflector->getType();

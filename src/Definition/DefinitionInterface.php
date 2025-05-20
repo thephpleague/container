@@ -8,7 +8,7 @@ use League\Container\ContainerAwareInterface;
 
 interface DefinitionInterface extends ContainerAwareInterface
 {
-    public function addArgument($arg): DefinitionInterface;
+    public function addArgument(mixed $arg): DefinitionInterface;
     public function addArguments(array $args): DefinitionInterface;
     public function addMethodCall(string $method, array $args = []): DefinitionInterface;
     public function addMethodCalls(array $methods = []): DefinitionInterface;
@@ -20,6 +20,6 @@ interface DefinitionInterface extends ContainerAwareInterface
     public function resolve(): mixed;
     public function resolveNew(): mixed;
     public function setAlias(string $id): DefinitionInterface;
-    public function setConcrete($concrete): DefinitionInterface;
+    public function setConcrete(mixed $concrete): DefinitionInterface;
     public function setShared(bool $shared): DefinitionInterface;
 }
