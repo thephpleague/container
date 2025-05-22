@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace League\Container\Test\Definition;
 
+use Exception;
 use League\Container\Container;
 use League\Container\Definition\{Definition, DefinitionAggregate, DefinitionInterface};
 use League\Container\Exception\NotFoundException;
@@ -50,6 +51,9 @@ class DefinitionAggregateTest extends TestCase
         $this->assertFalse($aggregate->has('nope'));
     }
 
+    /**
+     * @throws Exception
+     */
     public function testAggregateAddsAndIteratesMultipleDefinitions(): void
     {
         $container = $this->getMockBuilder(Container::class)->getMock();

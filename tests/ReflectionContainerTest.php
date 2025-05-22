@@ -7,8 +7,12 @@ namespace League\Container\Test;
 use League\Container\Container;
 use League\Container\Exception\NotFoundException;
 use League\Container\ReflectionContainer;
-use League\Container\Test\Asset\{Foo, FooCallable, Bar, ProFoo, ProBar};
+use League\Container\Test\Asset\{Foo, FooCallable, FooWithAttr, Bar, ProFoo, ProBar};
 use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
+use ReflectionException;
+use stdClass;
 
 class ReflectionContainerTest extends TestCase
 {
@@ -29,6 +33,8 @@ class ReflectionContainerTest extends TestCase
                 if (array_key_exists($alias, $items)) {
                     return $items[$alias];
                 }
+
+                return null;
             })
         ;
 
@@ -47,16 +53,26 @@ class ReflectionContainerTest extends TestCase
         $this->assertFalse($container->has('blah'));
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws ReflectionException
+     */
     public function testContainerInstantiatesClassWithoutConstructor(): void
     {
-        $classWithoutConstructor = \stdClass::class;
+        $classWithoutConstructor = stdClass::class;
         $container = new ReflectionContainer();
         $this->assertInstanceOf($classWithoutConstructor, $container->get($classWithoutConstructor));
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws ReflectionException
+     */
     public function testContainerInstantiatesAndCachesClassWithoutConstructor(): void
     {
-        $classWithoutConstructor = \stdClass::class;
+        $classWithoutConstructor = stdClass::class;
         $container = new ReflectionContainer(true);
 
         $classWithoutConstructorOne = $container->get($classWithoutConstructor);
@@ -67,10 +83,15 @@ class ReflectionContainerTest extends TestCase
         $this->assertSame($classWithoutConstructorOne, $classWithoutConstructorTwo);
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws ReflectionException
+     */
     public function testGetInstantiatesClassWithConstructor(): void
     {
         $classWithConstructor = Foo::class;
-        $dependencyClass      = Bar::class;
+        $dependencyClass = Bar::class;
 
         $container = new ReflectionContainer();
         $item = $container->get($classWithConstructor);
@@ -79,10 +100,15 @@ class ReflectionContainerTest extends TestCase
         $this->assertInstanceOf($dependencyClass, $item->bar);
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws ReflectionException
+     */
     public function testGetInstantiatesAndCachedClassWithConstructor(): void
     {
         $classWithConstructor = Foo::class;
-        $dependencyClass      = Bar::class;
+        $dependencyClass = Bar::class;
 
         $container = new ReflectionContainer(true);
 
@@ -99,13 +125,18 @@ class ReflectionContainerTest extends TestCase
         $this->assertSame($itemOne->bar, $itemTwo->bar);
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws ReflectionException
+     */
     public function testGetInstantiatesClassWithConstructorAndUsesContainer(): void
     {
         $classWithConstructor = Foo::class;
-        $dependencyClass      = Bar::class;
+        $dependencyClass = Bar::class;
 
         $dependency = new $dependencyClass();
-        $container  = new ReflectionContainer();
+        $container = new ReflectionContainer();
 
         $container->setContainer($this->getContainerMock([
             $dependencyClass => $dependency,
@@ -117,13 +148,18 @@ class ReflectionContainerTest extends TestCase
         $this->assertSame($dependency, $item->bar);
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws ReflectionException
+     */
     public function testGetInstantiatesClassWithConstructorAndUsesArguments(): void
     {
         $classWithConstructor = Foo::class;
-        $dependencyClass      = Bar::class;
+        $dependencyClass = Bar::class;
 
         $dependency = new $dependencyClass();
-        $container  = new ReflectionContainer();
+        $container = new ReflectionContainer();
 
         $item = $container->get($classWithConstructor, [
             'bar' => $dependency
@@ -133,6 +169,11 @@ class ReflectionContainerTest extends TestCase
         $this->assertSame($dependency, $item->bar);
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws ReflectionException
+     */
     public function testThrowsWhenGettingNonExistentClass(): void
     {
         $this->expectException(NotFoundException::class);
@@ -140,6 +181,11 @@ class ReflectionContainerTest extends TestCase
         $container->get('Whoooo');
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws ReflectionException
+     */
     public function testCallReflectsOnClosureArguments(): void
     {
         $container = new ReflectionContainer();
@@ -152,15 +198,25 @@ class ReflectionContainerTest extends TestCase
         $this->assertInstanceOf(Bar::class, $foo->bar);
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws ReflectionException
+     */
     public function testCallReflectsOnInstanceMethodArguments(): void
     {
         $container = new ReflectionContainer();
-        $foo       = new Foo();
+        $foo = new Foo();
         $container->call([$foo, 'setBar']);
         $this->assertInstanceOf(Foo::class, $foo);
         $this->assertInstanceOf(Bar::class, $foo->bar);
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws ReflectionException
+     */
     public function testCallReflectsOnStaticMethodArguments(): void
     {
         $container = new ReflectionContainer();
@@ -169,6 +225,11 @@ class ReflectionContainerTest extends TestCase
         $this->assertEquals('hello world', Asset\Foo::$staticHello);
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws ReflectionException
+     */
     public function testCallThrowsWhenArgumentCannotBeResolved(): void
     {
         $this->expectException(NotFoundException::class);
@@ -176,6 +237,11 @@ class ReflectionContainerTest extends TestCase
         $container->call([new Bar(), 'setSomething']);
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws ReflectionException
+     */
     public function testCallResolvesInvokableClass(): void
     {
         $container = new ReflectionContainer();
@@ -184,14 +250,23 @@ class ReflectionContainerTest extends TestCase
         $this->assertInstanceOf(Bar::class, $foo->bar);
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws ReflectionException
+     */
     public function testCallResolvesFunction(): void
     {
         $container = new ReflectionContainer();
-        $foo = $container->call(Asset\test::class, [new Bar()]);
+        $foo = $container->call('League\Container\Test\Asset\test', [new Bar()]);
         $this->assertInstanceOf(Foo::class, $foo);
         $this->assertInstanceOf(Bar::class, $foo->bar);
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public function testGetInstantiatesClassWithConstructorAndSkipsProtectedConstructor(): void
     {
         $classWithConstructor = ProFoo::class;
@@ -205,6 +280,10 @@ class ReflectionContainerTest extends TestCase
         $this->assertNull($item->bar);
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public function testGetInstantiatesClassWithConstructorAndUsesFactory(): void
     {
         $classWithConstructor = ProFoo::class;
@@ -214,6 +293,27 @@ class ReflectionContainerTest extends TestCase
         $container->delegate(new ReflectionContainer());
 
         $container->add($dependencyClass, [$dependencyClass, 'factory']);
+
+        $item = $container->get($classWithConstructor);
+
+        $this->assertInstanceOf($classWithConstructor, $item);
+        $this->assertInstanceOf($dependencyClass, $item->bar);
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function testGetInstantiatesClassWithConstructorAndAttributes(): void
+    {
+        $classWithConstructor = FooWithAttr::class;
+        $dependencyClass = Bar::class;
+
+        $container = new Container();
+        $reflectionContainer = new ReflectionContainer();
+        $reflectionContainer->setMode(ReflectionContainer::ATTRIBUTE_RESOLUTION);
+
+        $container->delegate($reflectionContainer);
 
         $item = $container->get($classWithConstructor);
 

@@ -12,8 +12,9 @@ use League\Container\Argument\{
 };
 use League\Container\ContainerAwareTrait;
 use League\Container\Exception\ContainerException;
-use Psr\Container\ContainerInterface;
+use Psr\Container\{ContainerExceptionInterface, ContainerInterface, NotFoundExceptionInterface};
 use ReflectionClass;
+use ReflectionException;
 
 class Definition implements ArgumentResolverInterface, DefinitionInterface
 {
@@ -124,6 +125,11 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
         return $this;
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws ReflectionException
+     */
     public function resolve(): mixed
     {
         if (null !== $this->resolved && $this->isShared()) {
@@ -133,6 +139,11 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
         return $this->resolveNew();
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws ReflectionException
+     */
     public function resolveNew(): mixed
     {
         $concrete = $this->concrete;
@@ -160,7 +171,7 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
 
         try {
             $container = $this->getContainer();
-        } catch (ContainerException $e) {
+        } catch (ContainerException) {
             $container = null;
         }
 
@@ -183,12 +194,22 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
         return $concrete;
     }
 
+    /**
+     * @throws ReflectionException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     protected function resolveCallable(callable $concrete): mixed
     {
         $resolved = $this->resolveArguments($this->arguments);
         return call_user_func_array($concrete, $resolved);
     }
 
+    /**
+     * @throws NotFoundExceptionInterface
+     * @throws ReflectionException
+     * @throws ContainerExceptionInterface
+     */
     protected function resolveClass(string $concrete): object
     {
         $resolved   = $this->resolveArguments($this->arguments);
@@ -196,6 +217,11 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
         return $reflection->newInstanceArgs($resolved);
     }
 
+    /**
+     * @throws ReflectionException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     protected function invokeMethods(object $instance): object
     {
         foreach ($this->methods as $method) {

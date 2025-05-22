@@ -14,15 +14,15 @@ class TypedArgumentTest extends TestCase
     public function testLiteralArgumentSetsAndGetsArgument(): void
     {
         $arguments = [
-            Literal\ArrayArgument::class    => [],
-            Literal\BooleanArgument::class  => true,
+            Literal\ArrayArgument::class => [],
+            Literal\BooleanArgument::class => true,
             Literal\CallableArgument::class => function () {
             },
-            Literal\FloatArgument::class    => 1.23,
-            Literal\IntegerArgument::class  => 1,
-            Literal\ObjectArgument::class   => new class {
+            Literal\FloatArgument::class => 1.23,
+            Literal\IntegerArgument::class => 1,
+            Literal\ObjectArgument::class => new class {
             },
-            Literal\StringArgument::class   => 'string',
+            Literal\StringArgument::class => 'string',
         ];
 
         foreach ($arguments as $type => $expected) {

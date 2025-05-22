@@ -5,15 +5,20 @@ declare(strict_types=1);
 namespace League\Container\Test;
 
 use BadMethodCallException;
-use League\Container\Definition\DefinitionInterface;
 use League\Container\Exception\{ContainerException, NotFoundException};
 use League\Container\ServiceProvider\AbstractServiceProvider;
 use League\Container\Test\Asset\{Foo, Bar};
 use League\Container\{Container, ContainerAwareTrait, ReflectionContainer};
 use PHPUnit\Framework\TestCase;
+use Psr\Container\{ContainerExceptionInterface, NotFoundExceptionInterface};
+use stdClass;
 
 class ContainerTest extends TestCase
 {
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public function testContainerAddsAndGets(): void
     {
         $container = new Container();
@@ -23,6 +28,10 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(Foo::class, $foo);
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public function testContainerAddsAndGetsRecursively(): void
     {
         $container = new Container();
@@ -33,6 +42,10 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(Foo::class, $foo);
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public function testContainerAddsAndGetsShared(): void
     {
         $container = new Container();
@@ -47,9 +60,14 @@ class ContainerTest extends TestCase
         $this->assertSame($fooOne, $fooTwo);
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public function testContainerAddsAndGetsSharedByDefault(): void
     {
-        $container = (new Container())->defaultToShared();
+        $container = new Container();
+        $container->defaultToShared();
         $container->add(Foo::class);
         $this->assertTrue($container->has(Foo::class));
 
@@ -61,6 +79,10 @@ class ContainerTest extends TestCase
         $this->assertSame($fooOne, $fooTwo);
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public function testContainerAddsAndGetsFromTag(): void
     {
         $container = new Container();
@@ -77,6 +99,10 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(Bar::class, $arrayOf[1]);
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public function testContainerAddsAndGetsNewFromTag(): void
     {
         $container = new Container();
@@ -96,6 +122,10 @@ class ContainerTest extends TestCase
         $this->assertNotSame($arrayOfTwo, $arrayOf);
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public function testContainerAddsAndGetsWithServiceProvider(): void
     {
         $provider = new class extends AbstractServiceProvider
@@ -120,6 +150,10 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(Foo::class, $foo);
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public function testThrowsWhenServiceProviderLies(): void
     {
         $liar = new class extends AbstractServiceProvider
@@ -143,6 +177,10 @@ class ContainerTest extends TestCase
         $container->get('lie');
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public function testContainerAddsAndGetsFromDelegate(): void
     {
         $delegate  = new ReflectionContainer();
@@ -152,6 +190,10 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(Foo::class, $foo);
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public function testContainerThrowsWhenCannotGetService(): void
     {
         $this->expectException(NotFoundException::class);
@@ -199,6 +241,10 @@ class ContainerTest extends TestCase
         $container->extend(Foo::class);
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public function testContainerAddsAndInvokesInflector(): void
     {
         $container = new Container();
@@ -222,6 +268,10 @@ class ContainerTest extends TestCase
         $class->setContainer($container);
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public function testNonExistentClassResolvesAsString(): void
     {
         $container = new Container();
@@ -231,10 +281,14 @@ class ContainerTest extends TestCase
         $this->assertSame('NonExistent', $container->get('NonExistent'));
     }
 
+    /**
+     * @throws NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
+     */
     public function testRuntimeOverwrite(): void
     {
-        $concreteOne = new \stdClass();
-        $concreteTwo = new \stdClass();
+        $concreteOne = new stdClass();
+        $concreteTwo = new stdClass();
 
         $container = new Container();
         $container->add('foo', $concreteOne);
@@ -245,10 +299,14 @@ class ContainerTest extends TestCase
         $this->assertNotSame($concreteOne, $container->get('foo'));
     }
 
+    /**
+     * @throws NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
+     */
     public function testDefaultOverwrite(): void
     {
-        $concreteOne = new \stdClass();
-        $concreteTwo = new \stdClass();
+        $concreteOne = new stdClass();
+        $concreteTwo = new stdClass();
 
         $container = new Container();
         $container->defaultToOverwrite();

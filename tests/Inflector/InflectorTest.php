@@ -8,14 +8,20 @@ use League\Container\Container;
 use League\Container\Inflector\Inflector;
 use League\Container\Test\Asset\Bar;
 use PHPUnit\Framework\TestCase;
+use Psr\Container\{ContainerExceptionInterface, NotFoundExceptionInterface};
 use ReflectionClass;
+use ReflectionException;
 
 class InflectorTest extends TestCase
 {
+    /**
+     * @throws ReflectionException
+     */
     public function testInflectorSetsExpectedMethodCalls(): void
     {
         $container = $this->getMockBuilder(Container::class)->getMock();
-        $inflector = (new Inflector('Type'))->setContainer($container);
+        $inflector = (new Inflector('Type'));
+        $inflector->setContainer($container);
 
         $inflector->invokeMethod('method1', ['arg1']);
 
@@ -25,7 +31,6 @@ class InflectorTest extends TestCase
         ]);
 
         $methods = (new ReflectionClass($inflector))->getProperty('methods');
-        $methods->setAccessible(true);
 
         $this->assertSame($methods->getValue($inflector), [
             'method1' => ['arg1'],
@@ -34,10 +39,16 @@ class InflectorTest extends TestCase
         ]);
     }
 
+    /**
+     * @throws NotFoundExceptionInterface
+     * @throws ReflectionException
+     * @throws ContainerExceptionInterface
+     */
     public function testInflectorSetsExpectedProperties(): void
     {
         $container = $this->getMockBuilder(Container::class)->getMock();
-        $inflector = (new Inflector('Type'))->setContainer($container);
+        $inflector = (new Inflector('Type'));
+        $inflector->setContainer($container);
 
         $inflector->setProperty('property1', 'value');
 
@@ -47,7 +58,6 @@ class InflectorTest extends TestCase
         ]);
 
         $properties = (new ReflectionClass($inflector))->getProperty('properties');
-        $properties->setAccessible(true);
 
         $this->assertSame($properties->getValue($inflector), [
             'property1' => 'value',
@@ -56,6 +66,11 @@ class InflectorTest extends TestCase
         ]);
     }
 
+    /**
+     * @throws NotFoundExceptionInterface
+     * @throws ReflectionException
+     * @throws ContainerExceptionInterface
+     */
     public function testInflectorInflectsWithProperties(): void
     {
         $container = $this->getMockBuilder(Container::class)->getMock();
@@ -77,13 +92,12 @@ class InflectorTest extends TestCase
             ->willReturn($bar)
         ;
 
-        $inflector = (new Inflector('Type'))
-            ->setContainer($container)
-            ->setProperty('bar', Bar::class)
-        ;
+        $inflector = (new Inflector('Type'));
+        $inflector->setContainer($container);
+        $inflector->setProperty('bar', Bar::class);
 
         $foo = new class {
-            public $bar;
+            public object $bar;
         };
 
         $inflector->inflect($foo);
@@ -91,6 +105,11 @@ class InflectorTest extends TestCase
         $this->assertSame($bar, $foo->bar);
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws ReflectionException
+     * @throws NotFoundExceptionInterface
+     */
     public function testInflectorInflectsWithMethodCall(): void
     {
         $container = $this->getMockBuilder(Container::class)->getMock();
@@ -112,14 +131,13 @@ class InflectorTest extends TestCase
             ->willReturn($bar)
         ;
 
-        $inflector = (new Inflector('Type'))
-            ->setContainer($container)
-            ->invokeMethod('setBar', [Bar::class])
-        ;
+        $inflector = (new Inflector('Type'));
+        $inflector->setContainer($container);
+        $inflector->invokeMethod('setBar', [Bar::class]);
 
         $foo = new class {
-            public $bar;
-            public function setBar($bar): void
+            public object $bar;
+            public function setBar(object $bar): void
             {
                 $this->bar = $bar;
             }
@@ -129,11 +147,16 @@ class InflectorTest extends TestCase
         $this->assertSame($bar, $foo->bar);
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws ReflectionException
+     * @throws NotFoundExceptionInterface
+     */
     public function testInflectorInflectsWithCallback(): void
     {
         $foo = new class {
-            public $bar;
-            public function setBar($bar): void
+            public object $bar;
+            public function setBar(object $bar): void
             {
                 $this->bar = $bar;
             }
@@ -150,6 +173,11 @@ class InflectorTest extends TestCase
         $this->assertSame($bar, $foo->bar);
     }
 
+    /**
+     * @throws NotFoundExceptionInterface
+     * @throws ReflectionException
+     * @throws ContainerExceptionInterface
+     */
     public function testInflectorOnlyInflectsOncePerMatch(): void
     {
         $foo = new class {
@@ -158,9 +186,6 @@ class InflectorTest extends TestCase
             {
                 $this->count++;
             }
-        };
-
-        $bar = new class {
         };
 
         $inflector = new Inflector('Type');

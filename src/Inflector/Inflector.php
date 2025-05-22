@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace League\Container\Inflector;
 
-use League\Container\Argument\ArgumentResolverInterface;
-use League\Container\Argument\ArgumentResolverTrait;
+use League\Container\Argument\{ArgumentResolverInterface, ArgumentResolverTrait};
 use League\Container\ContainerAwareTrait;
+use Psr\Container\{ContainerExceptionInterface, NotFoundExceptionInterface};
+use ReflectionException;
 
 class Inflector implements ArgumentResolverInterface, InflectorInterface
 {
@@ -56,12 +57,22 @@ class Inflector implements ArgumentResolverInterface, InflectorInterface
         return $this;
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws ReflectionException
+     * @throws NotFoundExceptionInterface
+     */
     public function setProperty(string $property, mixed $value): InflectorInterface
     {
         $this->properties[$property] = $this->resolveArguments([$value])[0];
         return $this;
     }
 
+    /**
+     * @throws ReflectionException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public function setProperties(array $properties): InflectorInterface
     {
         foreach ($properties as $property => $value) {
@@ -71,6 +82,11 @@ class Inflector implements ArgumentResolverInterface, InflectorInterface
         return $this;
     }
 
+    /**
+     * @throws NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
+     * @throws ReflectionException
+     */
     public function inflect(object $object): void
     {
         if (true === $this->oncePerMatch && in_array($object, $this->inflected, true)) {

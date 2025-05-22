@@ -7,6 +7,8 @@ namespace League\Container;
 use League\Container\Definition\{DefinitionAggregate, DefinitionInterface, DefinitionAggregateInterface};
 use League\Container\Exception\{NotFoundException, ContainerException};
 use League\Container\Inflector\{InflectorAggregate, InflectorInterface, InflectorAggregateInterface};
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use League\Container\ServiceProvider\{ServiceProviderAggregate,
     ServiceProviderAggregateInterface,
     ServiceProviderInterface};
@@ -34,7 +36,7 @@ class Container implements DefinitionContainerInterface
     public function add(string $id, mixed $concrete = null, bool $overwrite = false): DefinitionInterface
     {
         $toOverwrite = $this->defaultToOverwrite || $overwrite;
-        $concrete = $concrete ??= $id;
+        $concrete = $concrete ?? $id;
 
         if (true === $this->defaultToShared) {
             return $this->addShared($id, $concrete, $toOverwrite);
@@ -46,7 +48,7 @@ class Container implements DefinitionContainerInterface
     public function addShared(string $id, mixed $concrete = null, bool $overwrite = false): DefinitionInterface
     {
         $toOverwrite = $this->defaultToOverwrite || $overwrite;
-        $concrete = $concrete ??= $id;
+        $concrete = $concrete ?? $id;
         return $this->definitions->addShared($id, $concrete, $toOverwrite);
     }
 
@@ -89,6 +91,10 @@ class Container implements DefinitionContainerInterface
         return $this->resolve($id);
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public function getNew(string $id): mixed
     {
         return $this->resolve($id, true);
@@ -133,6 +139,10 @@ class Container implements DefinitionContainerInterface
         return $this;
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     protected function resolve(string $id, bool $new = false): mixed
     {
         if ($this->definitions->has($id)) {

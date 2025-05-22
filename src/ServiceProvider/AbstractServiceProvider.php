@@ -10,9 +10,6 @@ abstract class AbstractServiceProvider implements ServiceProviderInterface
 {
     use ContainerAwareTrait;
 
-    /**
-     * @var string
-     */
     protected string $identifier;
 
     public function getIdentifier(): string

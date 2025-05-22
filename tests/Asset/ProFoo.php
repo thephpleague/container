@@ -4,7 +4,7 @@ namespace League\Container\Test\Asset;
 
 class ProFoo
 {
-    public $bar;
+    public ?ProBar $bar;
 
     public function __construct(?ProBar $bar = null)
     {

@@ -4,15 +4,21 @@ declare(strict_types=1);
 
 namespace League\Container\Test\Definition;
 
-use League\Container\Argument\Literal;
-use League\Container\Argument\ResolvableArgument;
+use League\Container\Argument\{Literal, ResolvableArgument};
 use League\Container\Container;
 use League\Container\Definition\Definition;
 use League\Container\Test\Asset\{Foo, FooCallable, Bar};
 use PHPUnit\Framework\TestCase;
+use Psr\Container\{ContainerExceptionInterface, NotFoundExceptionInterface};
+use ReflectionException;
 
 class DefinitionTest extends TestCase
 {
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws ReflectionException
+     * @throws NotFoundExceptionInterface
+     */
     public function testDefinitionResolvesClosureWithDefinedArgs(): void
     {
         $definition = new Definition('callable', function (...$args) {
@@ -24,6 +30,11 @@ class DefinitionTest extends TestCase
         $this->assertSame('hello world', $actual);
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws ReflectionException
+     * @throws NotFoundExceptionInterface
+     */
     public function testDefinitionResolvesClosureReturningRawArgument(): void
     {
         $definition = new Definition('callable', function () {
@@ -34,6 +45,11 @@ class DefinitionTest extends TestCase
         $this->assertSame('hello world', $actual);
     }
 
+    /**
+     * @throws ReflectionException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public function testDefinitionResolvesCallableClass(): void
     {
         $definition = new Definition('callable', new FooCallable());
@@ -42,6 +58,11 @@ class DefinitionTest extends TestCase
         $this->assertInstanceOf(Foo::class, $actual);
     }
 
+    /**
+     * @throws ReflectionException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public function testDefinitionResolvesArrayCallable(): void
     {
         $definition = new Definition('callable', [new FooCallable(), '__invoke']);
@@ -50,6 +71,11 @@ class DefinitionTest extends TestCase
         $this->assertInstanceOf(Foo::class, $actual);
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws ReflectionException
+     * @throws NotFoundExceptionInterface
+     */
     public function testDefinitionResolvesClassWithMethodCalls(): void
     {
         $container = $this->getMockBuilder(Container::class)->getMock();
@@ -68,6 +94,11 @@ class DefinitionTest extends TestCase
         $this->assertInstanceOf(Bar::class, $actual->bar);
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws ReflectionException
+     * @throws NotFoundExceptionInterface
+     */
     public function testDefinitionResolvesClassWithDefinedArgs(): void
     {
         $container = $this->getMockBuilder(Container::class)->getMock();
@@ -86,10 +117,15 @@ class DefinitionTest extends TestCase
         $this->assertInstanceOf(Bar::class, $actual->bar);
     }
 
+    /**
+     * @throws NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
+     * @throws ReflectionException
+     */
     public function testDefinitionResolvesSharedItemOnlyOnce(): void
     {
         $definition = new Definition('class', Foo::class);
-        $definition->setShared(true);
+        $definition->setShared();
         $actual1 = $definition->resolve();
         $actual2 = $definition->resolve();
         $actual3 = $definition->resolveNew();
@@ -97,6 +133,11 @@ class DefinitionTest extends TestCase
         $this->assertNotSame($actual1, $actual3);
     }
 
+    /**
+     * @throws NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
+     * @throws ReflectionException
+     */
     public function testDefinitionResolvesNestedAlias(): void
     {
         $aliasDefinition = new Definition('alias', new ResolvableArgument('class'));
@@ -137,6 +178,11 @@ class DefinitionTest extends TestCase
         $this->assertSame($concrete, $definition->getConcrete());
     }
 
+    /**
+     * @throws ReflectionException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public function testNonExistentClassIsReturnedAsIdenticalString(): void
     {
         $nonExistent = 'NonExistent';

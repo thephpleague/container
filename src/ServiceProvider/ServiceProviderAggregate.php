@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace League\Container\ServiceProvider;
 
 use Generator;
+use League\Container\ContainerAwareTrait;
 use League\Container\Exception\ContainerException;
-use League\Container\{ContainerAwareInterface, ContainerAwareTrait};
 
 class ServiceProviderAggregate implements ServiceProviderAggregateInterface
 {
@@ -16,10 +16,6 @@ class ServiceProviderAggregate implements ServiceProviderAggregateInterface
      * @var ServiceProviderInterface[]
      */
     protected array $providers = [];
-
-    /**
-     * @var array
-     */
     protected array $registered = [];
 
     public function add(ServiceProviderInterface $provider): ServiceProviderAggregateInterface

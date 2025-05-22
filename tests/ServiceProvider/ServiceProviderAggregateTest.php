@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace League\Container\Test\ServiceProvider;
 
+use Exception;
 use League\Container\Container;
 use League\Container\Exception\ContainerException;
 use League\Container\ServiceProvider\{
@@ -19,8 +20,8 @@ class ServiceProviderAggregateTest extends TestCase
     protected function getServiceProvider(): ServiceProviderInterface
     {
         return new class extends AbstractServiceProvider implements BootableServiceProviderInterface {
-            public $booted     = 0;
-            public $registered = 0;
+            public int $booted = 0;
+            public int $registered = 0;
 
             public function provides(string $id): bool
             {
@@ -60,26 +61,33 @@ class ServiceProviderAggregateTest extends TestCase
     {
         $this->expectException(ContainerException::class);
         $container = $this->getMockBuilder(Container::class)->getMock();
-        $aggregate = (new ServiceProviderAggregate())->setContainer($container);
+        $aggregate = new ServiceProviderAggregate();
+        $aggregate->setContainer($container);
         $aggregate->register('SomeService');
     }
 
     public function testAggregateInvokesCorrectRegisterMethodOnlyOnce(): void
     {
         $container = $this->getMockBuilder(Container::class)->getMock();
-        $aggregate = (new ServiceProviderAggregate())->setContainer($container);
-        $provider  = $this->getServiceProvider();
+        $aggregate = new ServiceProviderAggregate();
+        $aggregate->setContainer($container);
+        $provider = $this->getServiceProvider();
         $aggregate->add($provider);
         $aggregate->register('SomeService');
         $aggregate->register('AnotherService');
+        // @phpstan-ignore-next-line
         $this->assertSame(1, $provider->registered);
     }
 
+    /**
+     * @throws Exception
+     */
     public function testAggregateSkipsExistingProviders(): void
     {
         $container = $this->getMockBuilder(Container::class)->getMock();
-        $aggregate = (new ServiceProviderAggregate())->setContainer($container);
-        $provider  = $this->getServiceProvider();
+        $aggregate = new ServiceProviderAggregate();
+        $aggregate->setContainer($container);
+        $provider = $this->getServiceProvider();
         $aggregate->add($provider);
         $aggregate->add($provider);
 
@@ -90,6 +98,7 @@ class ServiceProviderAggregateTest extends TestCase
             iterator_to_array($aggregate->getIterator())
         );
 
+        // @phpstan-ignore-next-line
         $this->assertSame(1, $provider->booted);
     }
 }

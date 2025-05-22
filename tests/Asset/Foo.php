@@ -6,11 +6,11 @@ namespace League\Container\Test\Asset;
 
 class Foo
 {
-    public $bar;
+    public ?Bar $bar;
 
-    public static $staticBar;
+    public static ?Bar $staticBar;
 
-    public static $staticHello;
+    public static ?string $staticHello;
 
     public function __construct(?Bar $bar = null)
     {
@@ -22,7 +22,7 @@ class Foo
         $this->bar = $bar;
     }
 
-    public static function staticSetBar(Bar $bar, $hello = 'hello world'): void
+    public static function staticSetBar(Bar $bar, string $hello = 'hello world'): void
     {
         self::$staticHello = $hello;
         self::$staticBar = $bar;

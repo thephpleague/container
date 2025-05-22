@@ -4,20 +4,23 @@ declare(strict_types=1);
 
 namespace League\Container\Argument;
 
-use League\Container\DefinitionContainerInterface;
 use League\Container\Exception\{ContainerException, NotFoundException};
-use League\Container\ReflectionContainer;
-use Psr\Container\ContainerInterface;
-use ReflectionFunctionAbstract;
-use ReflectionNamedType;
+use League\Container\{DefinitionContainerInterface, ReflectionContainer};
+use Psr\Container\{ContainerExceptionInterface, ContainerInterface, NotFoundExceptionInterface};
+use ReflectionException;
 
 trait ArgumentResolverTrait
 {
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws ReflectionException
+     * @throws NotFoundExceptionInterface
+     */
     public function resolveArguments(array $arguments): array
     {
         try {
             $container = $this->getContainer();
-        } catch (ContainerException $e) {
+        } catch (ContainerException) {
             $container = ($this instanceof ReflectionContainer) ? $this : null;
         }
 
@@ -49,7 +52,7 @@ trait ArgumentResolverTrait
                     }
 
                     continue;
-                } catch (NotFoundException $e) {
+                } catch (NotFoundException) {
                 }
             }
 
@@ -61,50 +64,6 @@ trait ArgumentResolverTrait
         }
 
         return $arguments;
-    }
-
-    public function reflectArguments(ReflectionFunctionAbstract $method, array $args = []): array
-    {
-        $params    = $method->getParameters();
-        $arguments = [];
-
-        foreach ($params as $param) {
-            $name = $param->getName();
-
-            // if we've been given a value for the argument, treat as literal
-            if (array_key_exists($name, $args)) {
-                $arguments[] = new LiteralArgument($args[$name]);
-                continue;
-            }
-
-            $type = $param->getType();
-
-            if ($type instanceof ReflectionNamedType) {
-                // in PHP 8, nullable arguments have "?" prefix
-                $typeHint = ltrim($type->getName(), '?');
-
-                if ($param->isDefaultValueAvailable()) {
-                    $arguments[] = new DefaultValueArgument($typeHint, $param->getDefaultValue());
-                    continue;
-                }
-
-                $arguments[] = new ResolvableArgument($typeHint);
-                continue;
-            }
-
-            if ($param->isDefaultValueAvailable()) {
-                $arguments[] = new LiteralArgument($param->getDefaultValue());
-                continue;
-            }
-
-            throw new NotFoundException(sprintf(
-                'Unable to resolve a value for parameter (%s) in the function/method (%s)',
-                $name,
-                $method->getName()
-            ));
-        }
-
-        return $this->resolveArguments($arguments);
     }
 
     abstract public function getContainer(): DefinitionContainerInterface;

@@ -6,10 +6,15 @@ namespace League\Container\Test\Asset;
 
 class Bar implements BarInterface
 {
-    protected $something;
+    protected mixed $something;
 
-    public function setSomething($something): void
+    public function setSomething(mixed $something): void
     {
         $this->something = $something;
+    }
+
+    public function getSomething(): mixed
+    {
+        return $this->something;
     }
 }

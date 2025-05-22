@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace League\Container\Test\Inflector;
 
-use League\Container\Container;
-use League\Container\ContainerAwareInterface;
-use League\Container\Inflector\InflectorAggregate;
+use DateTimeZone;
+use Exception;
+use League\Container\{Container, ContainerAwareInterface, Inflector\InflectorAggregate};
 use PHPUnit\Framework\TestCase;
+use Psr\Container\{ContainerExceptionInterface, NotFoundExceptionInterface};
 
 class InflectorAggregateTest extends TestCase
 {
@@ -18,6 +19,9 @@ class InflectorAggregateTest extends TestCase
         $this->assertSame('Some\Type', $inflector->getType());
     }
 
+    /**
+     * @throws Exception
+     */
     public function testAggregateAddsAndIteratesMultipleInflectors(): void
     {
         $aggregate  = new InflectorAggregate();
@@ -44,15 +48,19 @@ class InflectorAggregateTest extends TestCase
         $aggregate->inflect($containerAware);
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public function testNoInflectionIsAttemptedOnNonObjects(): void
     {
-        $container = new \League\Container\Container();
+        $container = new Container();
 
         $types = [
             'my-array' => [1, 2, 3],
             'my-number' => 123,
             'my-string' => 'foo bar',
-            'my-generated-array' => [\DateTimeZone::class, 'listIdentifiers'],
+            'my-generated-array' => [DateTimeZone::class, 'listIdentifiers'],
             'my-generated-number' => 'time',
             'my-generated-string' => function (): string {
                 return 'blahblahblah';
