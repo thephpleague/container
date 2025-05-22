@@ -55,10 +55,8 @@ trait ArgumentReflectorTrait
             // if we have a union type, loop until we can resolve
             if ($type instanceof ReflectionUnionType) {
                 foreach ($type->getTypes() as $unionType) {
-                    if ($argument = $this->resolveArgumentForNamedType($param, $unionType)) {
-                        $arguments[] = $argument;
-                        continue 2;
-                    }
+                    $arguments[] = $this->resolveArgumentForNamedType($param, $unionType);
+                    continue 2;
                 }
             }
 
