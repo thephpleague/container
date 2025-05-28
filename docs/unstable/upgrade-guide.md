@@ -122,7 +122,7 @@ $container->add('string', new League\Container\Argument\RawArgument('a string'))
 $container->add('string', new League\Container\Argument\Literal\StringArgument('a string'));
 ~~~
 
-See [full documentation](/unstable/argument-types/) to determine the best changes for you.
+See [full documentation](/4.x/argument-types/) to determine the best changes for you.
 
 ## 2.x to 4.x
 
