@@ -61,6 +61,10 @@ echo $foo->bar->hello(); // 'hello'
 ~~~php
 <?php
 
+declare(strict_types=1);
+
+namespace Acme;
+
 use League\Container\Attribute\Resolve;
 
 class Config {
@@ -96,6 +100,10 @@ For example, to inject an environment variable:
 ~~~php
 <?php
 
+declare(strict_types=1);
+
+namespace Acme;
+
 use Attribute;
 use League\Container\Attribute\AttributeInterface;
 use League\Container\ContainerAwareInterface;
@@ -116,6 +124,20 @@ class Env implements AttributeInterface, ContainerAwareInterface
 }
 
 class NeedsSecret
+{
+    public function __construct(
+        #[Env('MY_SECRET')] public string $secret
+    ) {
+    }
+}
+
+putenv('MY_SECRET=super-secret-value');
+
+$container = new League\Container\Container();
+$container->delegate(new League\Container\ReflectionContainer());
+
+$needsSecret = $container->get(NeedsSecret::class);
+// $needsSecret->secret === 'super-secret-value'
 ~~~
 
 ## Benefits
