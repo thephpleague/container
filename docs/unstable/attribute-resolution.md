@@ -33,7 +33,8 @@ namespace Acme;
 
 use League\Container\Attribute\Inject;
 
-class Bar {
+class Bar 
+{
     public function hello(): string 
     { 
         return 'hello'; 
@@ -43,14 +44,12 @@ class Bar {
 class Foo
 {
     public function __construct(
-        #[Inject('bar')] Bar $bar
+        #[Inject(Bar::class)] public Bar $bar
     ) {
-        $this->bar = $bar;
     }
 }
 
 $container = new League\Container\Container();
-$container->add('bar', new Bar());
 $container->delegate(new League\Container\ReflectionContainer());
 
 $foo = $container->get(Foo::class);
@@ -64,8 +63,6 @@ echo $foo->bar->hello(); // 'hello'
 
 use League\Container\Attribute\Resolve;
 
-class Bar {}
-
 class Config {
     public array $settings = [
         'db' => [
@@ -78,13 +75,12 @@ class Config {
 class Baz
 {
     public function __construct(
-        #[Resolve('config', 'settings.db.host')] public string $dbHost
+        #[Resolve(Config::class, 'settings.db.host')] public string $dbHost
     ) {
     }
 }
 
 $container = new League\Container\Container();
-$container->add('config', new Config());
 $container->delegate(new League\Container\ReflectionContainer());
 
 $baz = $container->get(Baz::class);
