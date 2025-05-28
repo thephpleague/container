@@ -22,7 +22,7 @@
   name: League\Container 5.x
   type: Current
   requires: PHP >= 8.1
-  release: 5.0.1 - 2025-03
+  release: 5.1.0 - 2025-05
   support: Ongoing
   url: /5.x/
   menu:
@@ -33,6 +33,8 @@
     Service Providers: '/5.x/service-providers/'
     Inflectors: '/5.x/inflectors/'
     Delegate Containers: '/5.x/delegate-containers/'
+    Reflection Modes: '/5.x/reflection-modes/'
+    Attribute Resolution: '/5.x/attribute-resolution/'
     Auto Wiring: '/5.x/auto-wiring/'
     Upgrade Guide: '/5.x/upgrade-guide/'
 -

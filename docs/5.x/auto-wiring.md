@@ -7,7 +7,7 @@ sections:
 ---
 ## Introduction
 
-> Note: Auto wiring is turned off by default but can be turned on by registering the `ReflectionContainer` as a container delegate. Read below and see the [documentation on delegate containers](/3.x/delegate-containers/).
+> Note: Auto wiring is turned off by default but can be turned on by registering the `ReflectionContainer` as a container delegate. Read below and see the [documentation on delegate containers](/5.x/delegate-containers/).
 
 Container has the power to automatically resolve your objects and all of their dependencies recursively by inspecting the type hints of your constructor arguments. Unfortunately, this method of resolution has a few small limitations but is great for smaller apps. First of all, you are limited to constructor injection and secondly, all injections must be objects.
 
@@ -24,22 +24,9 @@ namespace Acme;
 
 class Foo
 {
-    /**
-     * @var \Acme\Bar
-     */
-    public $bar;
+    public Bar $bar;
+    public Baz $baz;
 
-    /**
-     * @var \Acme\Baz
-     */
-    public $baz;
-
-    /**
-     * Construct.
-     *
-     * @param \Acme\Bar $bar
-     * @param \Acme\Baz $baz
-     */
     public function __construct(Bar $bar, Baz $baz)
     {
         $this->bar = $bar;
@@ -49,16 +36,8 @@ class Foo
 
 class Bar
 {
-    /**
-     * @var \Acme\Bam
-     */
-    public $bam;
+    public Bam $bam;
 
-    /**
-     * Construct.
-     *
-     * @param \Acme\Bam $bam
-     */
     public function __construct(Bam $bam)
     {
         $this->bam = $bam;
@@ -124,7 +103,7 @@ $container = new League\Container\Container();
 
 // register the reflection container as a delegate to enable auto wiring
 $container->delegate(
-    new League\Container\ReflectionContainer(true)
+    new League\Container\ReflectionContainer(cacheResolutions: true)
 );
 
 $fooOne = $container->get(Acme\Foo::class);

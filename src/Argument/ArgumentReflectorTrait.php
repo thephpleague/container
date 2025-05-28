@@ -54,10 +54,14 @@ trait ArgumentReflectorTrait
 
             // if we have a union type, loop until we can resolve
             if ($type instanceof ReflectionUnionType) {
-                foreach ($type->getTypes() as $unionType) {
-                    $arguments[] = $this->resolveArgumentForNamedType($param, $unionType);
-                    continue 2;
-                }
+                $this->throwParameterException(
+                    $name,
+                    'union',
+                    $param->getDeclaringClass()?->getName(),
+                    $method->getName(),
+                    $method instanceof ReflectionMethod ? $method->isClosure() : false,
+                    'Union types are not supported'
+                );
             }
 
             // then we check if we have a type hint (if auto wiring is enabled)
@@ -72,14 +76,14 @@ trait ArgumentReflectorTrait
                 continue;
             }
 
-            throw new NotFoundException(sprintf(
-                'Unable to resolve a value for parameter "$%s" (type: %s, position: unknown) in %s%s%s()',
+            $this->throwParameterException(
                 $name,
-                $param->getPosition(),
-                $method instanceof ReflectionMethod ? $method->getDeclaringClass()->getName() . '::' : '',
+                $type ? $type->getName() : 'unknown',
+                $param->getDeclaringClass()?->getName(),
                 $method->getName(),
-                $method->isClosure() ? ' [closure]' : ''
-            ));
+                $method instanceof ReflectionMethod ? $method->isClosure() : false,
+                'No default value available and no type hint to resolve'
+            );
         }
 
         return $this->resolveArguments($arguments);
@@ -112,13 +116,14 @@ trait ArgumentReflectorTrait
         $typeHint = $type->getName();
 
         if ($type->getName() === 'mixed') {
-            throw new NotFoundException(sprintf(
-                'Unable to resolve parameter ($%s) with mixed type (mixed types are not supported) in %s%s%s()',
+            $this->throwParameterException(
                 $param->getName(),
-                $param->getDeclaringClass() ? $param->getDeclaringClass()->getName() . '::' : '',
+                'mixed',
+                $param->getDeclaringClass()?->getName(),
                 $param->getDeclaringFunction()->getName(),
-                $param->getDeclaringFunction()->isClosure() ? ' [closure]' : ''
-            ));
+                $param->getDeclaringFunction()->isClosure(),
+                'Mixed types are not supported'
+            );
         }
 
         if ($param->isDefaultValueAvailable()) {
@@ -126,6 +131,25 @@ trait ArgumentReflectorTrait
         }
 
         return new ResolvableArgument($typeHint);
+    }
+
+    public function throwParameterException(
+        string $name,
+        string $type,
+        ?string $declaringClass = null,
+        ?string $declaringFunction = null,
+        bool $isClosure = false,
+        ?string $additionalMessage = null
+    ): void {
+        throw new NotFoundException(sprintf(
+            'Unable to resolve parameter ($%s) with type (%s) in %s%s%s()%s',
+            $name,
+            $type,
+            $declaringClass ? $declaringClass . '::' : '',
+            $declaringFunction ?? '',
+            $isClosure ? ' [closure]' : '',
+            $additionalMessage ? ' - ' . $additionalMessage : ''
+        ));
     }
 
     abstract public function getContainer(): DefinitionContainerInterface;
