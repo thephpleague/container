@@ -78,7 +78,7 @@ trait ArgumentReflectorTrait
 
             $this->throwParameterException(
                 $name,
-                $type ? $type->getName() : 'unknown',
+                $type instanceof ReflectionNamedType ? $type->getName() : 'unknown',
                 $param->getDeclaringClass()?->getName(),
                 $method->getName(),
                 $method instanceof ReflectionMethod ? $method->isClosure() : false,
