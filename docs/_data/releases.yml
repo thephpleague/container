@@ -12,6 +12,7 @@
     Definitions: '/unstable/definitions/'
     Argument Types: '/unstable/argument-types/'
     Service Providers: '/unstable/service-providers/'
+    Events: '/unstable/events/'
     Inflectors: '/unstable/inflectors/'
     Delegate Containers: '/unstable/delegate-containers/'
     Auto Wiring: '/unstable/auto-wiring/'
