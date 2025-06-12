@@ -12,7 +12,6 @@ tiles-count: 4
 # social settings
 github_url: https://github.com/thephpleague/container
 slack_url: https://thephpleague.slack.com
-twitter_url: https://twitter.com/philipobenito
 
 # build settings
 markdown: kramdown
