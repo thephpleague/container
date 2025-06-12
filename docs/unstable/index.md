@@ -13,7 +13,7 @@ sections:
 [![Latest Version](https://img.shields.io/github/v/release/thephpleague/container?label=latest&style=for-the-badge)](https://github.com/thephpleague/container/releases)
 
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=for-the-badge)](LICENSE.md)
-[![Build Status](https://img.shields.io/github/workflow/status/thephpleague/container/Tests/5.x?style=for-the-badge)](https://github.com/thephpleague/container/actions)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/thephpleague/container/tests.yml?branch=5.x&style=for-the-badge)](https://github.com/thephpleague/container/actions)
 [![Coverage Status](https://img.shields.io/scrutinizer/coverage/g/thephpleague/container.svg?style=for-the-badge)](https://scrutinizer-ci.com/g/thephpleague/container/code-structure)
 [![Quality Score](https://img.shields.io/scrutinizer/g/thephpleague/container.svg?style=for-the-badge)](https://scrutinizer-ci.com/g/thephpleague/container)
 [![Total Downloads](https://img.shields.io/packagist/dt/league/container.svg?style=for-the-badge)](https://packagist.org/packages/league/container)
