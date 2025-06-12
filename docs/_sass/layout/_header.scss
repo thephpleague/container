@@ -27,10 +27,10 @@
 		top: 0;
 		width: 100%;
 		z-index: _misc(z-index-base);
-
 		.logo {
 			border: 0;
 			display: inline-block;
+			font-family: _font(family-sans);
 			font-size: 0.8em;
 			height: inherit;
 			line-height: inherit;
@@ -61,11 +61,11 @@
 				}
 			}
 		}
-
 		nav {
 			@include vendor('display', 'flex');
 			@include vendor('justify-content', 'flex-end');
 			@include vendor('flex-grow', '1');
+			font-family: _font(family-sans);
 			height: inherit;
 			line-height: inherit;
 

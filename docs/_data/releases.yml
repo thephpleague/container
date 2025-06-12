@@ -15,6 +15,8 @@
     Events: '/unstable/events/'
     Inflectors: '/unstable/inflectors/'
     Delegate Containers: '/unstable/delegate-containers/'
+    Reflection Modes: '/unstable/reflection-modes/'
+    Attribute Resolution: '/unstable/attribute-resolution/'
     Auto Wiring: '/unstable/auto-wiring/'
     Upgrade Guide: '/unstable/upgrade-guide/'
 -
@@ -42,7 +44,7 @@
   default: false
   version: 4.x
   name: League\Container 4.x
-  type: Current
+  type: Old
   requires: PHP >= 7.2
   release: 4.2.4 - 2024-11
   support: Ongoing
@@ -57,19 +59,3 @@
     Delegate Containers: '/4.x/delegate-containers/'
     Auto Wiring: '/4.x/auto-wiring/'
     Upgrade Guide: '/4.x/upgrade-guide/'
--
-  version: 3.x
-  name: League\Container 3.x
-  type: Old
-  requires: PHP >= 7.0
-  release: 3.4.1 - 2021-07
-  support: 2022-02
-  url: /3.x/
-  menu:
-    Getting Started: '/3.x/'
-    Dependency Injection: '/3.x/dependency-injection/'
-    Definitions: '/3.x/definitions/'
-    Service Providers: '/3.x/service-providers/'
-    Inflectors: '/3.x/inflectors/'
-    Delegate Containers: '/3.x/delegate-containers/'
-    Auto Wiring: '/3.x/auto-wiring/'

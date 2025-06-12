@@ -17,44 +17,20 @@ As a basic example, consider we have a controller class that depends on a model,
 ~~~php
 <?php 
 
-declare(strict_types=1);
-
 namespace Acme;
 
 class Controller
 {
-    /**
-     * @var \Acme\Model
-     */
-    public $model;
-
-    /**
-     * Construct.
-     *
-     * @param \Acme\Model $model
-     */
-    public function __construct(Model $model)
-    {
-        $this->model = $model;
-    }
+    public function __construct(
+        public readonly Model $model
+    ) {}
 }
 
 class Model
 {
-    /**
-     * @var \PDO
-     */
-    public $pdo;
-
-    /**
-     * Construct.
-     *
-     * @param \PDO $pdo
-     */
-    public function __construct(\PDO $pdo)
-    {
-        $this->pdo = $pdo;
-    }
+    public function __construct(
+        public readonly \PDO $pdo
+    ) {}
 }
 ~~~
 
@@ -62,8 +38,6 @@ This dependency tree can be defined in Container, then whenever we retrieve `Acm
 
 ~~~ php
 <?php 
-
-declare(strict_types=1);
 
 $container = new League\Container\Container();
 
@@ -92,41 +66,20 @@ Dependency injection can also be achieved by invoking and passing dependencies t
 ~~~php
 <?php 
 
-declare(strict_types=1);
-
 namespace Acme;
 
 class Controller
 {
-    /**
-     * @var \Acme\Model
-     */
-    public $model;
-
-    /**
-     * Construct.
-     *
-     * @param \Acme\Model $model
-     */
-    public function __construct(Model $model)
-    {
-        $this->model = $model;
-    }
+    public function __construct(
+        public readonly Model $model
+    ) {}
 }
 
 class Model
 {
-    /**
-     * @var \PDO
-     */
-    public $pdo;
+    public \PDO $pdo;
 
-    /**
-     * Set PDO.
-     *
-     * @param \PDO $pdo
-     */
-    public function setPdo(\PDO $pdo)
+    public function setPdo(\PDO $pdo): void
     {
         $this->pdo = $pdo;
     }
@@ -137,8 +90,6 @@ Now we need to make a slight change to our definition in Container to ensure tha
 
 ~~~ php
 <?php 
-
-declare(strict_types=1);
 
 $container = new League\Container\Container();
 
@@ -175,8 +126,6 @@ Using the same example as above, we can define it in Container as follows.
 
 ~~~ php
 <?php 
-
-declare(strict_types=1);
 
 $container = new League\Container\Container();
 

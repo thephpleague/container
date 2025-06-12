@@ -5,26 +5,29 @@
 ///
 
 /* Type */
-
 	body, input, select, textarea {
 		color: _palette(fg);
 		font-family: _font(family);
-		font-size: 14pt;
+		font-size: 16pt;
 		font-weight: _font(weight);
 		letter-spacing: _font(letter-spacing);
-		line-height: 1.65;
+		line-height: 1.7;
 
 		@include breakpoint(xlarge) {
-			font-size: 14pt;
+			font-size: 16pt;
 		}
 
 		@include breakpoint(large) {
-			font-size: 12pt;
+			font-size: 15pt;
 		}
 
 		@include breakpoint(xxsmall) {
-			font-size: 11pt;
+			font-size: 14pt;
 		}
+	}
+
+	input, select, textarea {
+		font-family: _font(family-sans);
 	}
 
 	a {
@@ -44,6 +47,15 @@
 		&:active {
 			color: desaturate(darken(_palette(highlight), 15), 5) !important;
 		}
+
+		// Remove underline from anchor tags containing images
+		img {
+			border-bottom: 0;
+		}
+
+		&:has(img) {
+			border-bottom: 0;
+		}
 	}
 
 	strong, b {
@@ -60,8 +72,9 @@
 	}
 
 	h1, h2, h3, h4, h5, h6 {
-		color: _palette(fg-bold);
-		font-weight: _font(weight);
+		color: _palette(accent6); // Teal color for headers (#94e2d5)
+		font-family: _font(family-sans);
+		font-weight: _font(weight-bold);
 		line-height: 1.65;
 		margin: 0 0 (_size(element-margin) * 0.5) 0;
 
@@ -119,35 +132,80 @@
 		font-size: 0.8em;
 		position: relative;
 		top: -0.5em;
-	}
-
-	blockquote {
-		border-left: solid 4px _palette(border);
+	}	blockquote {
+		border-left: solid 4px _palette(highlight);
+		background: _palette(border-bg);
+		border-radius: 0 6px 6px 0;
 		font-style: italic;
 		margin: 0 0 _size(element-margin) 0;
 		padding: (_size(element-margin) / 4) 0 (_size(element-margin) / 4) _size(element-margin);
-	}
+		color: _palette(fg-bold);
 
+		&:before {
+			color: _palette(highlight);
+			content: "\201C";
+			font-family: serif;
+			font-size: 2em;
+			line-height: 1;
+			position: absolute;
+			margin-left: -0.75em;
+			margin-top: -0.25em;
+		}
+	}
 	code {
 		background: _palette(border-bg);
+		border: none;
+		border-radius: 0;
 		font-family: _font(family-fixed);
 		font-size: 0.9em;
 		margin: 0 0.25em;
-		padding: 0.25em 0.65em;
+		padding: 0.35em 0.75em;
+		color: _palette(accent3);
 	}
 
 	pre {
 		-webkit-overflow-scrolling: touch;
 		font-family: _font(family-fixed);
-		font-size: 0.9em;
+		font-size: 0.95em;
 		margin: 0 0 _size(element-margin) 0;
+		background: _palette(border-bg);
+		overflow: hidden;
 
 		code {
+			background: transparent;
+			border: none;
+			border-radius: 0;
+			color: _palette(fg);
 			display: block;
-			line-height: 1.75;
-			padding: 1em 1.5em;
+			font-size: 1em;
+			line-height: 1.6;
+			margin: 0;
+			padding: 1.25em 1.75em;
 			overflow-x: auto;
 		}
+	}
+
+	// Ensure proper spacing for elements following code blocks
+	pre + p,
+	pre + h1,
+	pre + h2,
+	pre + h3,
+	pre + h4,
+	pre + h5,
+	pre + h6,
+	.highlight + p,
+	.highlight + h1,
+	.highlight + h2,
+	.highlight + h3,
+	.highlight + h4,
+	.highlight + h5,
+	.highlight + h6 {
+		margin-top: _size(element-margin) !important;
+	}
+
+
+	div.highlighter-rouge {
+		margin-bottom: (_size(element-margin) * 1.2) !important;
 	}
 
 	hr {

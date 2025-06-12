@@ -18,7 +18,7 @@ Generally, Container will handle everything that is required to build a definiti
 ~~~ php
 <?php 
 
-declare(strict_types=1);
+
 
 $container  = new League\Container\Container();
 $definition = $container->add(Acme\Foo::class);
@@ -31,7 +31,7 @@ You can also extend a definition if needed.
 ~~~ php
 <?php 
 
-declare(strict_types=1);
+
 
 $container = new League\Container\Container();
 
@@ -53,7 +53,7 @@ Creating definitions manually and passing them to the container is also possible
 ~~~ php
 <?php 
 
-declare(strict_types=1);
+
 
 $container = new League\Container\Container();
 
@@ -76,7 +76,7 @@ Container uses an aggregate to store all definitions. This means that you can bu
 ~~~ php
 <?php 
 
-declare(strict_types=1);
+
 
 $definitions = [
     (new Definition(Acme\Foo::class))->addArgument(Acme\Bar::class),
@@ -105,7 +105,7 @@ Adding an argument to a definition will pass that argument to the constructor of
 ~~~ php
 <?php 
 
-declare(strict_types=1);
+
 
 $container = new League\Container\Container();
 
@@ -121,7 +121,7 @@ We also have a proxy method to pass multiple arguments in one call.
 ~~~ php
 <?php 
 
-declare(strict_types=1);
+
 
 $container = new League\Container\Container();
 
@@ -138,7 +138,7 @@ We can define one or multiple method calls and the arguments to be passed to the
 ~~~ php
 <?php 
 
-declare(strict_types=1);
+
 
 $container = new League\Container\Container();
 
@@ -154,7 +154,7 @@ We also have a convenience method here to add multiple method calls to the defin
 ~~~ php
 <?php 
 
-declare(strict_types=1);
+
 
 $container = new League\Container\Container();
 
@@ -174,7 +174,7 @@ We can tell a definition to only resolve once and return the same instance every
 ~~~ php
 <?php 
 
-declare(strict_types=1);
+
 
 $container = new League\Container\Container();
 
@@ -189,7 +189,7 @@ We also have a shortcut method to do this with one method call.
 ~~~ php
 <?php 
 
-declare(strict_types=1);
+
 
 $container = new League\Container\Container();
 
@@ -201,7 +201,7 @@ If you would like to make all your definitions to default to shared, you can def
 ~~~ php
 <?php 
 
-declare(strict_types=1);
+
 
 $container = (new League\Container\Container())->defaultToShared();
 
@@ -213,7 +213,7 @@ When the container is set to default all definitions as shared, we can specifica
 ~~~ php
 <?php 
 
-declare(strict_types=1);
+
 
 $container = (new League\Container\Container())->defaultToShared();
 
@@ -225,7 +225,7 @@ If we have a definition marked as shared, and we want to force the retrieval of 
 ~~~ php
 <?php 
 
-declare(strict_types=1);
+
 
 $container = new League\Container\Container();
 
@@ -242,7 +242,7 @@ $container->getNew(Acme\Foo::class);
 We can tag definitions and retrieving the alias given to the tag will resolve all definitions using that tag in an indexed array. You can add multiple tags to each definition.
 
 ~~~ php
-<?php declare(strict_types=1);
+<?php 
 
 $container = new League\Container\Container();
 

@@ -1,0 +1,196 @@
+/* Enhanced Dark Theme Components */
+
+/* Improved focus states for accessibility */
+*:focus {
+	outline: 2px solid #89b4fa;
+	outline-offset: 2px;
+}
+
+/* Enhanced selection styling */
+::selection {
+	background: #313244;
+	color: #cdd6f4;
+}
+
+::-moz-selection {
+	background: #313244;
+	color: #cdd6f4;
+}
+
+/* Improved scrollbar for dark theme */
+::-webkit-scrollbar {
+	width: 12px;
+	height: 12px;
+}
+
+::-webkit-scrollbar-track {
+	background: #11111b;
+	border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+	background: #45475a;
+	border-radius: 6px;
+	border: 2px solid #11111b;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: #585b70;
+}
+
+/* Enhanced link styling */
+a {
+	transition: all 0.3s ease;
+}
+
+a:hover {
+	text-shadow: 0 0 8px rgba(137, 180, 250, 0.3);
+}
+
+/* Code block enhancements */
+.highlight {
+	margin: 1.5em 0;
+	box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+}
+
+.highlight pre {
+	margin: 0;
+	font-weight: 400;
+	tab-size: 4;
+}
+
+/* Enhanced typography for better readability */
+p, li {
+	text-rendering: optimizeLegibility;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+/* Subtle animations for better UX */
+.button, button, input[type="submit"], input[type="reset"], input[type="button"] {
+	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.button:hover, button:hover, input[type="submit"]:hover, input[type="reset"]:hover, input[type="button"]:hover {
+	transform: translateY(-1px);
+	box-shadow: 0 10px 25px rgba(88, 166, 255, 0.2);
+}
+
+/* Enhanced table styling */
+table {
+	border-collapse: separate;
+	border-spacing: 0;
+	border-radius: 8px;
+	overflow: hidden;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+table th {
+	background: #11111b;
+	border-bottom: 2px solid #45475a;
+}
+
+table td {
+	border-bottom: 1px solid #45475a;
+}
+
+table tr:last-child td {
+	border-bottom: none;
+}
+
+/* Enhanced form elements */
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="tel"],
+input[type="search"],
+input[type="url"],
+select,
+textarea {
+	background: #11111b;
+	border: 1px solid #45475a;
+	border-radius: 6px;
+	color: #cdd6f4;
+	font-family: _font(family-sans);
+	padding: 0.75em 1em;
+	transition: all 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="email"]:focus,
+input[type="tel"]:focus,
+input[type="search"]:focus,
+input[type="url"]:focus,
+select:focus,
+textarea:focus {
+	border-color: #89b4fa;
+	box-shadow: 0 0 0 3px rgba(137, 180, 250, 0.1);
+	outline: none;
+}
+
+/* Improved blockquote styling */
+blockquote {
+	position: relative;
+	font-weight: 400;
+	line-height: 1.8;
+}
+
+blockquote p {
+	margin-bottom: 0;
+}
+
+/* Enhanced navigation elements */
+nav a {
+	transition: all 0.3s ease;
+	position: relative;
+}
+
+nav a:hover {
+	transform: translateY(-1px);
+}
+
+/* Improved spacing for better visual hierarchy */
+h1, h2, h3, h4, h5, h6 {
+	font-feature-settings: "kern", "liga", "calt", "pnum";
+	margin-top: 1.5em;
+	margin-bottom: 0.75em;
+}
+
+h1:first-child, h2:first-child, h3:first-child, h4:first-child, h5:first-child, h6:first-child {
+	margin-top: 0;
+}
+
+/* Better spacing for lists */
+ul, ol {
+	margin-bottom: 1.5em;
+}
+
+li {
+	margin-bottom: 0.5em;
+}
+
+li:last-child {
+	margin-bottom: 0;
+}
+
+/* Enhanced code styling with better contrast */
+code {
+	font-feature-settings: "calt" 0;
+	font-variant-ligatures: none;
+}
+
+/* Subtle gradient overlays for depth */
+.spotlights > section {
+	background: linear-gradient(135deg, #181825 0%, #1e1e2e 100%);
+}
+
+/* Enhanced tile styling */
+.tiles article {
+	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tiles article:hover {
+	transform: translateY(-4px);
+	box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}

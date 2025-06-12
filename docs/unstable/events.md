@@ -31,7 +31,7 @@ The container dispatches four types of events during its lifecycle:
 Fired when a service definition is added to the container.
 
 ~~~ php
-<?php
+<?php 
 
 use League\Container\Event\OnDefineEvent;
 
@@ -47,7 +47,7 @@ $container->listen(OnDefineEvent::class, function (OnDefineEvent $event) {
 Fired just before resolution begins. Useful for logging or access control.
 
 ~~~ php
-<?php
+<?php 
 
 use League\Container\Event\BeforeResolveEvent;
 
@@ -67,7 +67,7 @@ $container->listen(BeforeResolveEvent::class, function (BeforeResolveEvent $even
 Fired after a definition is found but before the object is instantiated.
 
 ~~~ php
-<?php
+<?php 
 
 use League\Container\Event\DefinitionResolvedEvent;
 
@@ -82,7 +82,7 @@ $container->listen(DefinitionResolvedEvent::class, function (DefinitionResolvedE
 Fired after a service has been resolved from the container. This is the most commonly used event for service modification. The resolved service can be an object, scalar, array, or other value.
 
 ~~~ php
-<?php
+<?php 
 
 use League\Container\Event\ServiceResolvedEvent;
 
@@ -99,7 +99,7 @@ $container->listen(ServiceResolvedEvent::class, function (ServiceResolvedEvent $
 The simplest way to listen for events is using the container's `listen()` method:
 
 ~~~ php
-<?php
+<?php 
 
 use League\Container\Event\ServiceResolvedEvent;
 
@@ -116,7 +116,7 @@ $container->listen(ServiceResolvedEvent::class, function (ServiceResolvedEvent $
 Here's a practical example that combines explicit definitions with auto-wiring:
 
 ~~~ php
-<?php
+<?php 
 
 use League\Container\Container;
 use League\Container\ReflectionContainer;
@@ -156,7 +156,7 @@ $orderProcessor = $container->get(OrderProcessor::class);
 You can also work directly with the event dispatcher:
 
 ~~~ php
-<?php
+<?php 
 
 $dispatcher = $container->getEventDispatcher();
 $dispatcher->addListener(ServiceResolvedEvent::class, $listener);
@@ -171,7 +171,7 @@ Events can be filtered to only execute under specific conditions.
 Listen only for specific object types:
 
 ~~~ php
-<?php
+<?php 
 
 $container->listen(ServiceResolvedEvent::class, function (ServiceResolvedEvent $event) {
     $event->getResolved()->setCreatedAt(new DateTime());
@@ -183,7 +183,7 @@ $container->listen(ServiceResolvedEvent::class, function (ServiceResolvedEvent $
 Listen for services with specific tags:
 
 ~~~ php
-<?php
+<?php 
 
 // When adding a service
 $container->addShared('user.service', UserService::class)
@@ -201,7 +201,7 @@ $container->listen(ServiceResolvedEvent::class, function (ServiceResolvedEvent $
 Listen for specific service IDs:
 
 ~~~ php
-<?php
+<?php 
 
 $container->listen(ServiceResolvedEvent::class, function (ServiceResolvedEvent $event) {
     $event->getResolved()->setRole('admin');
@@ -213,7 +213,7 @@ $container->listen(ServiceResolvedEvent::class, function (ServiceResolvedEvent $
 Use custom logic for complex filtering:
 
 ~~~ php
-<?php
+<?php 
 
 $container->listen(ServiceResolvedEvent::class, function (ServiceResolvedEvent $event) {
     $event->getResolved()->setSpecial(true);
@@ -228,7 +228,7 @@ $container->listen(ServiceResolvedEvent::class, function (ServiceResolvedEvent $
 Combine multiple filtering criteria:
 
 ~~~ php
-<?php
+<?php 
 
 $container->listen(ServiceResolvedEvent::class, function (ServiceResolvedEvent $event) {
     // This will only execute for UserInterface objects that are tagged 'admin'
@@ -245,7 +245,7 @@ $container->listen(ServiceResolvedEvent::class, function (ServiceResolvedEvent $
 The event dispatcher implements PSR-14 interfaces and can work with external event dispatchers:
 
 ~~~ php
-<?php
+<?php 
 
 use Symfony\Component\EventDispatcher\EventDispatcher as SymfonyDispatcher;
 use League\Container\Event\EventDispatcher;
@@ -261,7 +261,7 @@ $container->setEventDispatcher($eventDispatcher);
 Events implement `StoppableEventInterface` and can halt propagation:
 
 ~~~ php
-<?php
+<?php 
 
 $container->listen(BeforeResolveEvent::class, function (BeforeResolveEvent $event) {
     if (!$this->isAuthorized($event->getId())) {
@@ -278,7 +278,7 @@ $container->listen(BeforeResolveEvent::class, function (BeforeResolveEvent $even
 Replace resolved objects with decorators or proxies:
 
 ~~~ php
-<?php
+<?php 
 
 $container->listen(ServiceResolvedEvent::class, function (ServiceResolvedEvent $event) {
     $original = $event->getResolved();
@@ -292,7 +292,7 @@ $container->listen(ServiceResolvedEvent::class, function (ServiceResolvedEvent $
 Access other container services within event listeners:
 
 ~~~ php
-<?php
+<?php 
 
 $container->listen(ServiceResolvedEvent::class, function (ServiceResolvedEvent $event) use ($container) {
     $database = $container->get(DatabaseInterface::class);
@@ -305,7 +305,7 @@ $container->listen(ServiceResolvedEvent::class, function (ServiceResolvedEvent $
 Events become particularly powerful when working with delegate containers. Here's a real-world example using `ReflectionContainer` as a delegate for auto-wiring:
 
 ~~~ php
-<?php
+<?php 
 
 use League\Container\Container;
 use League\Container\ReflectionContainer;
@@ -367,7 +367,7 @@ $logger = $container->get(LoggerInterface::class);
 Events with delegates are excellent for plugin architectures:
 
 ~~~ php
-<?php
+<?php 
 
 // Core application container
 $appContainer = new Container();
@@ -404,7 +404,7 @@ $notificationPlugin = $appContainer->get(NotificationPlugin::class);
 Use events to create different behaviors for testing:
 
 ~~~ php
-<?php
+<?php 
 
 // Production container setup
 $container = new Container();
@@ -433,7 +433,7 @@ $emailService = $container->get(EmailService::class);
 Handle errors gracefully in event listeners:
 
 ~~~ php
-<?php
+<?php 
 
 $container->listen(ServiceResolvedEvent::class, function (ServiceResolvedEvent $event) {
     try {
@@ -456,7 +456,7 @@ For optimal performance:
 4. **Minimize listener complexity** - keep event handlers simple and fast
 
 ~~~ php
-<?php
+<?php 
 
 // Faster - uses instanceof check
 $container->listen(ServiceResolvedEvent::class, $listener)
@@ -472,7 +472,7 @@ $container->listen(ServiceResolvedEvent::class, $listener)
 When using delegate containers, consider these performance tips:
 
 ~~~ php
-<?php
+<?php 
 
 // Order delegates by likelihood - most used first
 $container->delegate($fastContainer);

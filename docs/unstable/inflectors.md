@@ -20,14 +20,14 @@ The event system provides a more powerful and flexible replacement for inflector
 
 **Before (Inflectors):**
 ~~~ php
-<?php
+<?php 
 $container->inflector(LoggerAwareInterface::class)
     ->invokeMethod('setLogger', [Logger::class]);
 ~~~
 
 **After (Events):**
 ~~~ php
-<?php
+<?php 
 use League\Container\Event\ServiceResolvedEvent;
 
 $container->listen(ServiceResolvedEvent::class, function (ServiceResolvedEvent $event) use ($container) {
@@ -41,14 +41,14 @@ $container->listen(ServiceResolvedEvent::class, function (ServiceResolvedEvent $
 
 **Before (Inflectors):**
 ~~~ php
-<?php
+<?php 
 $container->inflector(DatabaseAwareInterface::class)
     ->setProperty('connection', Database::class);
 ~~~
 
 **After (Events):**
 ~~~ php
-<?php
+<?php 
 $container->listen(ServiceResolvedEvent::class, function (ServiceResolvedEvent $event) use ($container) {
     $service = $event->getResolved();
     $service->connection = $container->get(Database::class);
@@ -59,7 +59,7 @@ $container->listen(ServiceResolvedEvent::class, function (ServiceResolvedEvent $
 
 **Before (Inflectors):**
 ~~~ php
-<?php
+<?php 
 $container->inflector(TimestampableInterface::class)
     ->invokeMethods([
         'setCreatedAt' => [new DateTime()],
@@ -69,7 +69,7 @@ $container->inflector(TimestampableInterface::class)
 
 **After (Events):**
 ~~~ php
-<?php
+<?php 
 $container->listen(ServiceResolvedEvent::class, function (ServiceResolvedEvent $event) {
     $service = $event->getResolved();
     $service->setCreatedAt(new DateTime());
@@ -97,9 +97,7 @@ This is useful for example when you want to invoke a method on all objects that 
 Imagine that you have a `LoggerAwareInterface` and would like to invoke the method called `setLogger` passing in a logger every time a class is retrieved that implements this interface.
 
 ~~~ php
-<?php
-
-declare(strict_types=1);
+<?php 
 
 $container = new League\Container\Container();
 

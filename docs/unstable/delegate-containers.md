@@ -16,8 +16,6 @@ A delegate must be a [PSR-11](https://github.com/php-fig/fig-standards/blob/mast
 ~~~ php
 <?php 
 
-declare(strict_types=1);
-
 namespace Acme\Container;
 
 use Psr\Container\ContainerInterface;
@@ -30,8 +28,6 @@ class DelegateContainer implements ContainerInterface
 
 ~~~ php
 <?php 
-
-declare(strict_types=1);
 
 $container = new League\Container\Container();
 $delegate  = new Acme\Container\DelegateContainer();

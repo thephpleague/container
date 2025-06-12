@@ -17,31 +17,22 @@ To build a service provider, you need to extend the base service provider, provi
 ~~~ php
 <?php 
 
-declare(strict_types=1);
-
 namespace Acme\ServiceProvider;
 
 use League\Container\ServiceProvider\AbstractServiceProvider;
 
 class SomeServiceProvider extends AbstractServiceProvider
 {
-    /**
-     * The provides method is a way to let the container
-     * know that a service is provided by this service
-     * provider. Every service that is registered via
-     * this service provider must have an alias added
-     * to this array or it will be ignored.
-     */
+    private const SERVICES = [
+        'key',
+        Some\Controller::class,
+        Some\Model::class,
+        Some\Request::class,
+    ];
+
     public function provides(string $id): bool
     {
-        $services = [
-            'key',
-            Some\Controller::class,
-            Some\Model::class,
-            Some\Request::class,
-        ];
-        
-        return in_array($id, $services);
+        return in_array($id, self::SERVICES, true);
     }
 
     /**
@@ -50,7 +41,7 @@ class SomeServiceProvider extends AbstractServiceProvider
      * A convenience getter for the container is provided, you
      * can invoke any of the methods you would when defining
      * services directly, but remember, any alias added to the
-     * container here, when passed to the `provides` nethod
+     * container here, when passed to the `provides` method
      * must return true, or it will be ignored by the container.
      */
     public function register(): void
@@ -74,8 +65,6 @@ To register this service provider with the container simply pass an instance of 
 ~~~ php
 <?php 
 
-declare(strict_types=1);
-
 $container = new League\Container\Container();
 
 $container->addServiceProvider(new Acme\ServiceProvider\SomeServiceProvider);
@@ -88,7 +77,7 @@ The register method is not invoked until one of the aliases it `provides` is req
 If there is functionality that needs to be run as the service provider is added to the container, for example, setting up inflectors, including config files etc, we can make the service provider bootable by implementing the `League\Container\ServiceProvider\BootableServiceProviderInterface`.
 
 ~~~ php
-<?php
+<?php 
 
 namespace Acme\ServiceProvider;
 
@@ -115,12 +104,12 @@ class SomeServiceProvider extends AbstractServiceProvider implements BootableSer
              ->invokeMethod('someMethod', ['some_arg'])
          ;
     }
-    
+
     public function provides(string $id): bool
     {
         // ...
     }
-    
+
     public function register(): void
     {
         // ...

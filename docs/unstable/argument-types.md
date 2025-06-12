@@ -19,8 +19,6 @@ Where this becomes useful to explicitly define, is with nested aliases, you can 
 ~~~ php
 <?php 
 
-declare(strict_types=1);
-
 $container = new League\Container\Container();
 $container->add('alias1', new League\Container\Argument\ResolvableArgument('alias2'));
 $container->add('alias2', Acme\Foo::class);
@@ -34,7 +32,7 @@ var_dump($foo instanceof Acme\Foo); // true
 
 Literal arguments do the opposite to resolvable ones, when the container encounters one of these, it just returns the associated value with no further resolution.
 
-### What problem does this solve? 
+### What problem does this solve?
 
 It is mainly performance focused, however, the container will attempt possibly undesirable resolution on some types of argument.
 
@@ -50,8 +48,6 @@ You can have the container treat a string as a literal string by defining that b
 
 ~~~ php
 <?php 
-
-declare(strict_types=1);
 
 use League\Container\Argument\Literal;
 
@@ -72,8 +68,6 @@ Similarly to a `string`, the container wants to determine if an `array`, You can
 ~~~ php
 <?php 
 
-declare(strict_types=1);
-
 use League\Container\Argument\Literal;
 
 $container = new League\Container\Container();
@@ -93,13 +87,11 @@ Consider that you have an object that implements the magic `__invoke` method, bu
 ~~~php
 <?php 
 
-declare(strict_types=1);
-
 namespace Acme;
 
 class MyClass
 {
-    public function __invoke()
+    public function __invoke(): string
     {
         return 'hello';
     }
@@ -109,13 +101,11 @@ class MyClass
 ~~~ php
 <?php 
 
-declare(strict_types=1);
-
 use League\Container\Argument\Literal;
 
 $container = new League\Container\Container();
 $container->add('object', new Acme\MyClass());
-$container->add('literal-object', new Literal\ObjectArgument(new Acme\MyClass()); // Literal\CallableArgument could also be used here
+$container->add('literal-object', new Literal\ObjectArgument(new Acme\MyClass())); // Literal\CallableArgument could also be used here
 
 $obj = $container->get('object');
 
@@ -133,17 +123,13 @@ Similarly, if you want to pass any `callable` as an argument, the default behavi
 ~~~ php
 <?php 
 
-declare(strict_types=1);
-
 use League\Container\Argument\Literal;
 
-$callback = function () {
-    return 'hello';
-};
+$callback = fn() => 'hello';
 
 $container = new League\Container\Container();
 $container->add('callable', $callback);
-$container->add('literal-callable', new Literal\CallableArgument($callback);
+$container->add('literal-callable', new Literal\CallableArgument($callback));
 
 $cb = $container->get('callable');
 
@@ -156,9 +142,58 @@ var_dump($literalCb === $callback); // true
 var_dump($literalCb === 'hello'); // false
 ~~~
 
-### Boolean, Integer and Float
+### Modern PHP Features
 
-These have zero effect, and only exist for clarity and readability in your code, with a little type checking.
+The container works seamlessly with modern PHP features like enums and first-class callables:
+
+~~~ php
+<?php 
+
+enum LogLevel: string
+{
+    case DEBUG = 'debug';
+    case INFO = 'info';
+    case ERROR = 'error';
+}
+
+class Logger
+{
+    public function log(LogLevel $level, string $message): void
+    {
+        echo "[{$level->value}] $message\n";
+    }
+}
+
+class Service
+{
+    public function __construct(
+        private readonly Logger $logger,
+        private readonly LogLevel $defaultLevel = LogLevel::INFO
+    ) {}
+
+    public function doSomething(): void
+    {
+        $this->logger->log($this->defaultLevel, 'Service is working');
+    }
+}
+
+$container = new League\Container\Container();
+
+// Register services with enum arguments
+$container->add(Logger::class);
+$container->add(Service::class)
+    ->addArgument(Logger::class)
+    ->addArgument(new League\Container\Argument\Literal\ObjectArgument(LogLevel::DEBUG));
+
+// Using first-class callable syntax for factory
+$container->add('string_processor', fn() => strtoupper(...));
+
+$service = $container->get(Service::class);
+$processor = $container->get('string_processor');
+
+$service->doSomething(); // [debug] Service is working
+echo $processor('hello world'); // HELLO WORLD
+~~~
 
 ### All Literal Arguments
 

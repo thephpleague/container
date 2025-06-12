@@ -16,8 +16,16 @@ twitter_url: https://twitter.com/philipobenito
 
 # build settings
 markdown: kramdown
+highlighter: rouge
 
 permalink: pretty
 
 sass:
   style: compressed
+
+kramdown:
+  syntax_highlighter: rouge
+  syntax_highlighter_opts:
+    css_class: 'highlight'
+    span:
+      line_numbers: false

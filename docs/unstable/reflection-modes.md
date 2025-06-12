@@ -17,7 +17,7 @@ The `ReflectionContainer` supports two modes, which can be enabled or disabled u
 By default, both modes are enabled. You can control them like this:
 
 ~~~php
-<?php
+<?php 
 
 use League\Container\ReflectionContainer;
 

@@ -18,30 +18,21 @@ Consider the code below.
 ~~~ php
 <?php 
 
-declare(strict_types=1);
-
 namespace Acme;
 
 class Foo
 {
-    public Bar $bar;
-    public Baz $baz;
-
-    public function __construct(Bar $bar, Baz $baz)
-    {
-        $this->bar = $bar;
-        $this->baz = $baz;
-    }
+    public function __construct(
+        public readonly Bar $bar,
+        public readonly Baz $baz
+    ) {}
 }
 
 class Bar
 {
-    public Bam $bam;
-
-    public function __construct(Bam $bam)
-    {
-        $this->bam = $bam;
-    }
+    public function __construct(
+        public readonly Bam $bam
+    ) {}
 }
 
 class Baz
@@ -60,8 +51,6 @@ class Bam
 ~~~ php
 <?php 
 
-declare(strict_types=1);
-
 $bam = new Acme\Bam();
 $baz = new Acme\Baz();
 $bar = new Acme\Bar($bam);
@@ -72,8 +61,6 @@ With nested dependencies, this can become quite cumbersome and hard to keep trac
 
 ~~~ php
 <?php 
-
-declare(strict_types=1);
 
 $container = new League\Container\Container();
 
@@ -97,8 +84,6 @@ If you would like the reflection container to cache resolutions and pull from th
 ~~~ php
 <?php 
 
-declare(strict_types=1);
-
 $container = new League\Container\Container();
 
 // register the reflection container as a delegate to enable auto wiring
@@ -111,3 +96,66 @@ $fooTwo = $container->get(Acme\Foo::class);
 
 var_dump($fooOne === $fooTwo); // true
 ~~~
+
+## Advanced Auto-Wiring with Modern PHP
+
+Auto-wiring works excellently with modern PHP features like union types and promoted constructor properties:
+
+~~~ php
+<?php 
+
+interface CacheInterface
+{
+    public function get(string $key): mixed;
+    public function set(string $key, mixed $value): void;
+}
+
+class RedisCache implements CacheInterface
+{
+    public function get(string $key): mixed { /* ... */ }
+    public function set(string $key, mixed $value): void { /* ... */ }
+}
+
+class DatabaseLogger
+{
+    public function log(string $message): void { /* ... */ }
+}
+
+class FileLogger
+{
+    public function log(string $message): void { /* ... */ }
+}
+
+// Service using union types and nullable dependencies
+class AdvancedService
+{
+    public function __construct(
+        private readonly CacheInterface $cache,
+        private readonly DatabaseLogger|FileLogger $logger,
+        private readonly ?string $apiKey = null
+    ) {}
+
+    public function process(array $data): array
+    {
+        // Use cache and logger...
+        return match($this->logger::class) {
+            DatabaseLogger::class => $this->processWithDatabase($data),
+            FileLogger::class => $this->processWithFile($data),
+        };
+    }
+
+    private function processWithDatabase(array $data): array { return $data; }
+    private function processWithFile(array $data): array { return $data; }
+}
+
+$container = new League\Container\Container();
+$container->delegate(new League\Container\ReflectionContainer());
+
+// Register implementations
+$container->add(CacheInterface::class, RedisCache::class);
+$container->add(DatabaseLogger::class);
+
+$service = $container->get(AdvancedService::class);
+~~~
+
+**Note:** The reflection container, by default, will resolve what you are requesting every time you request it.

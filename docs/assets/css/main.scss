@@ -5,8 +5,9 @@
 @import 'libs/mixins';
 @import 'libs/skel';
 @import 'font-awesome.min.css';
-@import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,300italic,600,600italic');
-@import url('https://fonts.googleapis.com/css?family=Fira+Mono:400,500');
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+Pro:ital,wght@0,400;0,600;1,400;1,600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&display=swap');
 
 /*
 	Forty by HTML5 UP
@@ -69,6 +70,7 @@
 	@import 'components/tiles';
 	@import 'components/contact-method';
 	@import 'components/spotlights';
+	@import 'components/enhancements';
 
 // Layout.
 
@@ -79,3 +81,5 @@
 	@import 'layout/footer';
 	@import 'layout/wrapper';
 	@import 'layout/menu';
+
+// Import syntax highlighting after Jekyll processing

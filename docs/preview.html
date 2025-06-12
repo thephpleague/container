@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Container Documentation - Dark Theme Preview</title>
+    <link rel="stylesheet" href="assets/css/pygments.css">
+    <style>
+        /* Quick inline styles to preview our dark theme variables */
+        body {
+            background: #0d1117;
+            color: #e6edf3;
+            font-family: 'Source Serif Pro', 'Georgia', 'Times New Roman', serif;
+            font-size: 16pt;
+            line-height: 1.7;
+            margin: 0;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1, h2, h3 {
+            color: #f0f6fc;
+            margin-top: 1.5em;
+            margin-bottom: 0.75em;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            border-bottom: 2px solid #f0f6fc;
+            padding-bottom: 0.5rem;
+        }
+
+        h2 {
+            font-size: 1.75em;
+            color: #58a6ff;
+        }
+
+        h3 {
+            font-size: 1.35em;
+        }
+
+        p {
+            margin-bottom: 1.5em;
+        }
+
+        a {
+            color: #58a6ff;
+            text-decoration: none;
+            border-bottom: 1px dotted;
+            transition: all 0.3s ease;
+        }
+
+        a:hover {
+            color: #79c0ff;
+            border-bottom-color: transparent;
+            text-shadow: 0 0 8px rgba(88, 166, 255, 0.3);
+        }
+
+        blockquote {
+            border-left: solid 4px #58a6ff;
+            background: #21262d;
+            border-radius: 0 6px 6px 0;
+            font-style: italic;
+            margin: 0 0 2em 0;
+            padding: 1em 0 1em 2em;
+            color: #f0f6fc;
+            position: relative;
+        }
+
+        blockquote:before {
+            color: #58a6ff;
+            content: "\201C";
+            font-family: serif;
+            font-size: 2em;
+            line-height: 1;
+            position: absolute;
+            margin-left: -0.75em;
+            margin-top: -0.25em;
+        }
+
+        .button {
+            background: transparent;
+            border: 2px solid #f0f6fc;
+            border-radius: 0;
+            color: #f0f6fc;
+            padding: 0.75em 1.5em;
+            text-decoration: none;
+            display: inline-block;
+            margin: 1em 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.25em;
+            font-size: 0.8em;
+        }
+
+        .button:hover {
+            border-color: #58a6ff;
+            color: #58a6ff;
+            transform: translateY(-1px);
+            box-shadow: 0 10px 25px rgba(88, 166, 255, 0.2);
+        }
+
+        .highlight-section {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>League Container Documentation</h1>
+        <p class="subtitle">A simple but powerful PSR-11 dependency injection container</p>
+
+        <h2>Enhanced Dark Theme</h2>
+        <p>Welcome to the refreshed documentation with a beautiful dark mode theme. This new design features:</p>
+
+        <ul>
+            <li><strong>Comfortable serif typography</strong> using Source Serif Pro for better readability</li>
+            <li><strong>Larger font sizes</strong> (16pt base) for improved comfort</li>
+            <li><strong>GitHub-inspired dark colors</strong> with excellent contrast ratios</li>
+            <li><strong>Enhanced code highlighting</strong> with JetBrains Mono and GitHub Dark theme</li>
+            <li><strong>Smooth transitions</strong> and subtle animations for better UX</li>
+        </ul>
+
+        <div class="highlight-section">
+            <h3>Code Example</h3>
+            <p>Here's how the enhanced syntax highlighting looks:</p>
+
+            <div class="highlight">
+                <pre><code class="language-php">&lt;?php
+
+use League\Container\Container;
+use League\Container\ReflectionContainer;
+
+// Create a new container instance
+$container = new Container();
+
+// Enable auto-wiring
+$container-&gt;delegate(
+    new ReflectionContainer()
+);
+
+// Add a service definition
+$container-&gt;add(SomeService::class)
+    -&gt;addArgument('some-argument')
+    -&gt;addMethodCall('setLogger', [LoggerInterface::class]);
+
+// Resolve the service
+$service = $container-&gt;get(SomeService::class);</code></pre>
+            </div>
+        </div>
+
+        <blockquote>
+            <p>The new dark theme provides a more comfortable reading experience, especially during extended documentation sessions. The carefully chosen color palette reduces eye strain while maintaining excellent readability.</p>
+        </blockquote>
+
+        <h2>Typography Improvements</h2>
+        <p>The typography has been significantly enhanced with:</p>
+
+        <h3>Font Choices</h3>
+        <p>We've switched to <strong>Source Serif Pro</strong> for body text, providing better readability and a more comfortable reading experience. Code blocks now use <strong>JetBrains Mono</strong> for enhanced code legibility with proper ligature support.</p>
+
+        <h3>Size & Spacing</h3>
+        <p>Base font size increased to <code>16pt</code> with improved line height (<code>1.7</code>) for better readability. Headings have been rebalanced with improved spacing and visual hierarchy.</p>
+
+        <a href="#" class="button">Get Started</a>
+
+        <h2>Color Palette</h2>
+        <p>The new GitHub-inspired dark color scheme includes:</p>
+        <ul>
+            <li><strong>Background:</strong> Deep blues (#0d1117, #161b22) for reduced eye strain</li>
+            <li><strong>Text:</strong> Light grays (#e6edf3, #f0f6fc) for excellent contrast</li>
+            <li><strong>Accents:</strong> Blue highlights (#58a6ff) for links and interactive elements</li>
+            <li><strong>Code:</strong> Colorful syntax highlighting matching GitHub's dark theme</li>
+        </ul>
+    </div>
+</body>
+</html>

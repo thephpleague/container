@@ -34,7 +34,8 @@
 			min-height: 23em;
 			overflow: hidden;
 			position: relative;
-			width: 25%;
+			width: calc(100% / 3); // Optimized for 3 tiles
+			font-family: _font(family-sans); // Apply sans-serif font to entire tile
 
 			.image {
 				display: none;
@@ -47,10 +48,18 @@
 
 			h3 {
 				font-size: 1.75em;
+				font-family: _font(family-sans); // Ensure header uses sans-serif
+				color: #ffffff; // White text color
+				padding-bottom: 0.5em; // Add some spacing above the border
+				margin-bottom: 1em; // Add spacing below the border
 
 				a {
+					color: inherit; // Make links inherit the white color
+					border-bottom: none !important; // Remove any inherited link underlines
+
 					&:hover {
 						color: inherit !important;
+						border-bottom: none !important; // Ensure no underline on hover
 					}
 				}
 			}
@@ -72,7 +81,7 @@
 				display: block;
 				height: 100%;
 				left: 0;
-				opacity: 0.85;
+				opacity: 0.25;
 				position: absolute;
 				width: 100%;
 				z-index: 2;
@@ -102,39 +111,22 @@
 				opacity: 0;
 			}
 
-			&:nth-child(6n - 5) {
+			// Simplified color scheme for 3 tiles
+			&:nth-child(1) {
 				&:before {
-					background-color: _palette(accent1);
+					background-color: _palette(accent1); // Pink for unstable
 				}
 			}
 
-			&:nth-child(6n - 4) {
+			&:nth-child(2) {
 				&:before {
-					background-color: _palette(accent2);
+					background-color: #e6e6e6; // Slightly darkened white instead of green
 				}
 			}
 
-			&:nth-child(6n - 3) {
+			&:nth-child(3) {
 				&:before {
-					background-color: _palette(accent3);
-				}
-			}
-
-			&:nth-child(6n - 2) {
-				&:before {
-					background-color: _palette(accent4);
-				}
-			}
-
-			&:nth-child(6n - 1) {
-				&:before {
-					background-color: _palette(accent5);
-				}
-			}
-
-			&:nth-child(6n) {
-				&:before {
-					background-color: _palette(accent6);
+					background-color: _palette(accent3); // Yellow for old
 				}
 			}
 		}
@@ -150,7 +142,11 @@
 
 		@include breakpoint(medium) {
 			article {
-				width: 50% !important;
+				width: 50% !important; // 2 tiles per row on medium screens
+
+				&:nth-child(3) {
+					width: 100% !important; // Third tile takes full width
+				}
 			}
 		}
 
@@ -160,6 +156,7 @@
 				height: 16em;
 				max-height: none;
 				min-height: 0;
+				width: 100% !important; // Stack vertically on small screens
 
 				h3 {
 					font-size: 1.5em;

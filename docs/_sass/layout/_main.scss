@@ -6,13 +6,12 @@
 
 /* Main */
 
-	#one {
-		&.light {
+	#one {		&.light {
 			background: _palette(bg-light);
 			color: _palette(fg-dark);
 
 			h1, h2, h3, h4, h5, h6 {
-				color: _palette(bg);
+				color: _palette(accent6); // Teal color for headers in light sections (#94e2d5)
 			}
 
 			blockquote {
