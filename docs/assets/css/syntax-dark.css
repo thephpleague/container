@@ -94,7 +94,7 @@ code.highlighter-rouge {
 .highlight pre {
   background: #21262d;
   overflow-x: auto;
-  padding: 1.25em 1.75em;
+  padding: 0;
 }
 
 .highlight code {
@@ -102,10 +102,10 @@ code.highlighter-rouge {
   border: none !important;
   border-radius: 0 !important;
   color: inherit !important;
-  font-size: 1em !important;
+  font-size: 0.95em !important;
   line-height: 1.6 !important;
   margin: 0 !important;
-  padding: 0 !important;
+  padding: 1.25em 1.75em !important;
 }
 
 /* Language labels for code blocks - extract from Rouge's outer container class */

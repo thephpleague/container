@@ -111,7 +111,7 @@ code.highlighter-rouge {
 .highlight pre {
   background: #11111b;
   overflow-x: auto;
-  padding: 1.25em 1.75em;
+  padding: 0;
   margin: 0;
   font-weight: 400;
   tab-size: 4;
@@ -122,10 +122,10 @@ code.highlighter-rouge {
   border: none !important;
   border-radius: 0 !important;
   color: inherit !important;
-  font-size: 1em !important;
+  font-size: 0.95em !important;
   line-height: 1.6 !important;
   margin: 0 !important;
-  padding: 0 !important;
+  padding: 1.25em 1.75em !important;
   font-feature-settings: "calt" 0;
   font-variant-ligatures: none;
 }
