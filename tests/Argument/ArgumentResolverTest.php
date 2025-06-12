@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace League\Container\Test\Argument;
 
-use League\Container\Argument\{ArgumentResolverInterface, ArgumentResolverTrait, Literal};
-use League\Container\{Container, ContainerAwareTrait};
+use League\Container\Argument\ArgumentResolverInterface;
+use League\Container\Argument\ArgumentResolverTrait;
+use League\Container\Argument\Literal;
+use League\Container\Container;
+use League\Container\ContainerAwareTrait;
 use PHPUnit\Framework\TestCase;
 
 class ArgumentResolverTest extends TestCase

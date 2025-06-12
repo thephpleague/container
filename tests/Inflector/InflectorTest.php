@@ -8,7 +8,8 @@ use League\Container\Container;
 use League\Container\Inflector\Inflector;
 use League\Container\Test\Asset\Bar;
 use PHPUnit\Framework\TestCase;
-use Psr\Container\{ContainerExceptionInterface, NotFoundExceptionInterface};
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use ReflectionClass;
 use ReflectionException;
 

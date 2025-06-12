@@ -6,9 +6,12 @@ namespace League\Container\Test\Attribute;
 
 use League\Container\Attribute\Resolve;
 use League\Container\Container;
-use League\Container\Test\Asset\{Bar, Foo};
-use PHPUnit\Framework\{MockObject\Exception, TestCase};
-use Psr\Container\{ContainerExceptionInterface, NotFoundExceptionInterface};
+use League\Container\Test\Asset\Bar;
+use League\Container\Test\Asset\Foo;
+use PHPUnit\Framework\MockObject\Exception;
+use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 class ResolveTest extends TestCase
 {

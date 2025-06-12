@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace League\Container\Attribute;
 
 use Attribute;
-use League\Container\{ContainerAwareInterface, ContainerAwareTrait, Exception\NotFoundException};
-use Psr\Container\{ContainerExceptionInterface, NotFoundExceptionInterface};
+use League\Container\ContainerAwareInterface;
+use League\Container\ContainerAwareTrait;
+use League\Container\Exception\NotFoundException;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 #[Attribute(Attribute::TARGET_PARAMETER | Attribute::IS_REPEATABLE)]
 class Resolve implements AttributeInterface, ContainerAwareInterface

@@ -2,6 +2,31 @@
 
 All Notable changes to `League\Container` will be documented in this file
 
+## Unreleased
+
+### Added
+- **PSR-14 Compatible Event System** - A powerful new event-driven architecture that replaces inflectors
+  - Four event types: `OnDefineEvent`, `BeforeResolveEvent`, `DefinitionResolvedEvent`, `ServiceResolvedEvent`
+  - Advanced filtering system with fluent API: `forType()`, `forTag()`, `forId()`, `where()`
+  - Event chaining with priority support via `EventChain` and `ChainBuilder`
+  - Full PSR-14 compatibility with external event dispatchers (Symfony, etc.)
+  - Service replacement capabilities in `ServiceResolvedEvent`
+  - Container integration via `EventAwareTrait` and simplified `listen()` API
+  - Comprehensive documentation with real-world delegate container examples
+  - Docs: [https://container.thephpleague.com/unstable/events/](https://container.thephpleague.com/unstable/events/)
+
+### Deprecated
+- **Inflectors system** - Deprecated in favor of the new event system
+  - `Container::inflector()` method now triggers deprecation warnings
+  - Migration guide available in documentation
+  - Full backward compatibility maintained
+  - Will be removed in v6.0.0
+
+### Changed
+- Container lifecycle now dispatches events at key points (define, resolve, instantiate)
+- Enhanced `Container::resolve()` method with comprehensive event dispatching
+- Added `getDefinitionTags()` helper method for tag-based event filtering
+
 ## 5.1.0
 
 ### Added

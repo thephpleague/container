@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace League\Container\Argument;
 
 use League\Container\Attribute\AttributeInterface;
+use League\Container\ContainerAwareInterface;
+use League\Container\DefinitionContainerInterface;
 use League\Container\Exception\NotFoundException;
 use League\Container\ReflectionContainer;
-use League\Container\{ContainerAwareInterface, DefinitionContainerInterface};
-use Psr\Container\{ContainerExceptionInterface, NotFoundExceptionInterface};
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use ReflectionAttribute;
 use ReflectionException;
 use ReflectionFunctionAbstract;

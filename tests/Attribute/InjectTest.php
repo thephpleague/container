@@ -7,8 +7,10 @@ namespace League\Container\Test\Attribute;
 use League\Container\Attribute\Inject;
 use League\Container\Container;
 use League\Container\Test\Asset\Foo;
-use PHPUnit\Framework\{MockObject\Exception, TestCase};
-use Psr\Container\{ContainerExceptionInterface, NotFoundExceptionInterface};
+use PHPUnit\Framework\MockObject\Exception;
+use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 class InjectTest extends TestCase
 {

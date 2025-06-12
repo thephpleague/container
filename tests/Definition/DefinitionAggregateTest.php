@@ -6,7 +6,9 @@ namespace League\Container\Test\Definition;
 
 use Exception;
 use League\Container\Container;
-use League\Container\Definition\{Definition, DefinitionAggregate, DefinitionInterface};
+use League\Container\Definition\Definition;
+use League\Container\Definition\DefinitionAggregate;
+use League\Container\Definition\DefinitionInterface;
 use League\Container\Exception\NotFoundException;
 use League\Container\Test\Asset\Foo;
 use PHPUnit\Framework\TestCase;

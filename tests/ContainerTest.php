@@ -5,12 +5,17 @@ declare(strict_types=1);
 namespace League\Container\Test;
 
 use BadMethodCallException;
-use League\Container\Exception\{ContainerException, NotFoundException};
+use League\Container\Container;
+use League\Container\ContainerAwareTrait;
+use League\Container\Exception\ContainerException;
+use League\Container\Exception\NotFoundException;
+use League\Container\ReflectionContainer;
 use League\Container\ServiceProvider\AbstractServiceProvider;
-use League\Container\Test\Asset\{Foo, Bar};
-use League\Container\{Container, ContainerAwareTrait, ReflectionContainer};
+use League\Container\Test\Asset\Bar;
+use League\Container\Test\Asset\Foo;
 use PHPUnit\Framework\TestCase;
-use Psr\Container\{ContainerExceptionInterface, NotFoundExceptionInterface};
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use stdClass;
 
 class ContainerTest extends TestCase

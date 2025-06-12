@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace League\Container\Test\Argument;
 
-use League\Container\Argument\{ArgumentReflectorInterface,
-    ArgumentReflectorTrait,
-    ArgumentResolverInterface,
-    ArgumentResolverTrait};
-use League\Container\{Container, ContainerAwareTrait, ReflectionContainer};
+use League\Container\Argument\ArgumentReflectorInterface;
+use League\Container\Argument\ArgumentReflectorTrait;
+use League\Container\Argument\ArgumentResolverInterface;
+use League\Container\Argument\ArgumentResolverTrait;
+use League\Container\Container;
+use League\Container\ContainerAwareTrait;
+use League\Container\ReflectionContainer;
 use League\Container\Test\Asset\Baz;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\NotFoundExceptionInterface;

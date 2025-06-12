@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace League\Container\Test\ServiceProvider;
 
-use League\Container\ServiceProvider\{
-    AbstractServiceProvider,
-    BootableServiceProviderInterface,
-    ServiceProviderInterface
-};
+use League\Container\ServiceProvider\AbstractServiceProvider;
+use League\Container\ServiceProvider\BootableServiceProviderInterface;
+use League\Container\ServiceProvider\ServiceProviderInterface;
 use PHPUnit\Framework\TestCase;
 
 class ServiceProviderTest extends TestCase

@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace League\Container\Test\Definition;
 
-use League\Container\Argument\{Literal, ResolvableArgument};
+use League\Container\Argument\Literal;
+use League\Container\Argument\ResolvableArgument;
 use League\Container\Container;
 use League\Container\Definition\Definition;
-use League\Container\Test\Asset\{Foo, FooCallable, Bar};
+use League\Container\Test\Asset\Bar;
+use League\Container\Test\Asset\Foo;
+use League\Container\Test\Asset\FooCallable;
 use PHPUnit\Framework\TestCase;
-use Psr\Container\{ContainerExceptionInterface, NotFoundExceptionInterface};
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
 
 class DefinitionTest extends TestCase

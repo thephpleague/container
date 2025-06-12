@@ -7,12 +7,10 @@ namespace League\Container\Test\ServiceProvider;
 use Exception;
 use League\Container\Container;
 use League\Container\Exception\ContainerException;
-use League\Container\ServiceProvider\{
-    AbstractServiceProvider,
-    BootableServiceProviderInterface,
-    ServiceProviderAggregate,
-    ServiceProviderInterface
-};
+use League\Container\ServiceProvider\AbstractServiceProvider;
+use League\Container\ServiceProvider\BootableServiceProviderInterface;
+use League\Container\ServiceProvider\ServiceProviderAggregate;
+use League\Container\ServiceProvider\ServiceProviderInterface;
 use PHPUnit\Framework\TestCase;
 
 class ServiceProviderAggregateTest extends TestCase

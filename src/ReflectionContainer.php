@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace League\Container;
 
-use League\Container\Argument\{ArgumentReflectorInterface,
-    ArgumentReflectorTrait,
-    ArgumentResolverInterface,
-    ArgumentResolverTrait};
+use League\Container\Argument\ArgumentReflectorInterface;
+use League\Container\Argument\ArgumentReflectorTrait;
+use League\Container\Argument\ArgumentResolverInterface;
+use League\Container\Argument\ArgumentResolverTrait;
 use League\Container\Exception\NotFoundException;
-use Psr\Container\{ContainerExceptionInterface, ContainerInterface, NotFoundExceptionInterface};
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionFunction;

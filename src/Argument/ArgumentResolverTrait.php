@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace League\Container\Argument;
 
-use League\Container\Exception\{ContainerException, NotFoundException};
-use League\Container\{DefinitionContainerInterface, ReflectionContainer};
-use Psr\Container\{ContainerExceptionInterface, ContainerInterface, NotFoundExceptionInterface};
+use League\Container\DefinitionContainerInterface;
+use League\Container\Exception\ContainerException;
+use League\Container\Exception\NotFoundException;
+use League\Container\ReflectionContainer;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
 
 trait ArgumentResolverTrait

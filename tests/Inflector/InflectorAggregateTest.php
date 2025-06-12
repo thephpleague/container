@@ -6,9 +6,12 @@ namespace League\Container\Test\Inflector;
 
 use DateTimeZone;
 use Exception;
-use League\Container\{Container, ContainerAwareInterface, Inflector\InflectorAggregate};
+use League\Container\Container;
+use League\Container\ContainerAwareInterface;
+use League\Container\Inflector\InflectorAggregate;
 use PHPUnit\Framework\TestCase;
-use Psr\Container\{ContainerExceptionInterface, NotFoundExceptionInterface};
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 class InflectorAggregateTest extends TestCase
 {

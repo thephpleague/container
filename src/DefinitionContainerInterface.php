@@ -5,16 +5,21 @@ declare(strict_types=1);
 namespace League\Container;
 
 use League\Container\Definition\DefinitionInterface;
+use League\Container\Event\EventAwareContainerInterface;
 use League\Container\Inflector\InflectorInterface;
 use League\Container\ServiceProvider\ServiceProviderInterface;
 use Psr\Container\ContainerInterface;
 
-interface DefinitionContainerInterface extends ContainerInterface
+interface DefinitionContainerInterface extends ContainerInterface, EventAwareContainerInterface
 {
     public function add(string $id, mixed $concrete = null, bool $overwrite = false): DefinitionInterface;
     public function addServiceProvider(ServiceProviderInterface $provider): self;
     public function addShared(string $id, mixed $concrete = null, bool $overwrite = false): DefinitionInterface;
     public function extend(string $id): DefinitionInterface;
     public function getNew(string $id): mixed;
+
+    /**
+     * @deprecated Use event system instead. This method will be removed in v6.0
+     */
     public function inflector(string $type, ?callable $callback = null): InflectorInterface;
 }
