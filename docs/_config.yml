@@ -20,6 +20,10 @@ highlighter: rouge
 
 permalink: pretty
 
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+
 sass:
   style: compressed
 
