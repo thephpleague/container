@@ -58,7 +58,7 @@ class SomeServiceProvider extends AbstractServiceProvider
         $this->getContainer()->add('key', 'value');
 
         $this->getContainer()
-            ->add(Some\Controller::class)
+             ->add(Some\Controller::class)
              ->addArgument(Some\Request::class)
              ->addArgument(Some\Model::class)
         ;
