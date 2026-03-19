@@ -2,7 +2,7 @@
 
 All Notable changes to `League\Container` will be documented in this file
 
-## Unreleased
+## 5.2.0
 
 ### Added
 - **Event system** for hooking into the container lifecycle
@@ -13,7 +13,7 @@ All Notable changes to `League\Container` will be documented in this file
   - Lazy event dispatch: events are only created when listeners are registered for that event type
   - `EventDispatcher::hasListenersFor()` to check whether listeners exist for a given event type
   - `DefinitionInterface::getTags()` for retrieving tags from definitions
-  - Docs: [https://container.thephpleague.com/unstable/events/](https://container.thephpleague.com/unstable/events/)
+  - Docs: [https://container.thephpleague.com/5.x/events/](https://container.thephpleague.com/5.x/events/)
 - `Container::getDelegate(string $class)` to retrieve a registered delegate container by type
 
 ### Fixed

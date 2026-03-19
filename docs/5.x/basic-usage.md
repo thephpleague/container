@@ -12,26 +12,15 @@ At it's core, League\\Container allows you to register services, with or without
 We have a class, `Foo`, that depends on another class, `Bar`.
 
 ~~~ php
-<?php
+<?php 
 
 namespace Acme;
 
 class Foo
 {
-    /**
-     * @type Acme\Bar
-     */
-    public $bar;
-
-    /**
-     * Construct.
-     *
-     * @param \Acme\Bar $bar
-     */
-    public function __construct(Bar $bar)
-    {
-        $this->bar = $bar;
-    }
+    public function __construct(
+        public readonly Bar $bar
+    ) {}
 }
 
 class Bar
@@ -47,7 +36,7 @@ There are several ways to now register this service with the container.
 The container can be configured to register `Foo` against an alias with it's dependencies as a prototype so that every time it is retrieved, it will be a new instance of `Foo` with `Bar` injected in to the constructor.
 
 ~~~ php
-<?php
+<?php 
 
 use Acme\{Foo, Bar};
 use League\Container\Container;
@@ -73,7 +62,7 @@ var_dump($foo1->bar === $foo2->bar); // false
 Aliases can be useful when implementing interfaces.
 
 ~~~ php
-<?php
+<?php 
 
 namespace Acme;
 
@@ -91,7 +80,7 @@ class Foo implements FooInterface
 Now you can register `Foo` against it's interface as an alias `FooInterface`, meaning that whenever you retrieve `FooInterface` from the container, it will be the concrete implementation `Foo` that is returned.
 
 ~~~ php
-<?php
+<?php 
 
 use Acme\{Foo, FooInterface};
 use League\Container\Container;
@@ -102,7 +91,7 @@ $container->add(FooInterface::class, Foo::class);
 ~~~
 
 ~~~ php
-<?php
+<?php 
 
 $container = new League\Container\Container;
 
@@ -118,10 +107,60 @@ var_dump($service1 instanceof Acme\Service\SomeService); // true
 var_dump($service1 === $service2); // false
 ~~~
 
+## Modern PHP Patterns
+
+Container works seamlessly with all modern PHP patterns and features:
+
+~~~ php
+<?php 
+
+// Using readonly classes (PHP 8.2+)
+readonly class Configuration
+{
+    public function __construct(
+        public string $apiUrl,
+        public string $apiKey,
+        public int $timeout = 30
+    ) {}
+}
+
+// Service with readonly properties and typed arrays
+class ApiClient
+{
+    /**
+     * @param array<string, mixed> $defaultHeaders
+     */
+    public function __construct(
+        private readonly Configuration $config,
+        private readonly array $defaultHeaders = []
+    ) {}
+
+    public function request(string $endpoint): array
+    {
+        // Implementation...
+        return ['status' => 'success', 'data' => []];
+    }
+}
+
+$container = new League\Container\Container();
+
+// Register with modern syntax
+$container->add(Configuration::class, fn() => new Configuration(
+    apiUrl: 'https://api.example.com',
+    apiKey: $_ENV['API_KEY'] ?? 'default-key'
+));
+
+$container->add(ApiClient::class)
+    ->addArgument(Configuration::class)
+    ->addArgument(['Content-Type' => 'application/json']);
+
+$client = $container->get(ApiClient::class);
+~~~
+
 There may be occasions where you wish the service to be the same instance each time you retrieve it. There are two ways to achieve this, declare it as shared, or register a ready built instance of an object.
 
 ~~~ php
-<?php
+<?php 
 
 $container = new League\Container\Container;
 
@@ -138,7 +177,7 @@ var_dump($service1 === $service2); // true
 ~~~
 
 ~~~ php
-<?php
+<?php 
 
 $container = new League\Container\Container;
 

@@ -9,11 +9,11 @@ sections:
     Basic Usage: basic-usage
     Questions?: questions
 ---
-[![Author](http://img.shields.io/badge/author-@philipobenito-blue.svg?style=for-the-badge)](https://twitter.com/philipobenito)
+[![Author](http://img.shields.io/badge/author-Phil%20Bennett-blue.svg?style=for-the-badge)](https://github.com/philipobenito)
 [![Latest Version](https://img.shields.io/github/v/release/thephpleague/container?label=latest&style=for-the-badge)](https://github.com/thephpleague/container/releases)
 
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=for-the-badge)](LICENSE.md)
-[![Build Status](https://img.shields.io/github/workflow/status/thephpleague/container/Tests/4.x?style=for-the-badge)](https://github.com/thephpleague/container/actions)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/thephpleague/container/test.yml?branch=5.x&style=for-the-badge)](https://github.com/thephpleague/container/actions)
 [![Coverage Status](https://img.shields.io/scrutinizer/coverage/g/thephpleague/container.svg?style=for-the-badge)](https://scrutinizer-ci.com/g/thephpleague/container/code-structure)
 [![Quality Score](https://img.shields.io/scrutinizer/g/thephpleague/container.svg?style=for-the-badge)](https://scrutinizer-ci.com/g/thephpleague/container)
 [![Total Downloads](https://img.shields.io/packagist/dt/league/container.svg?style=for-the-badge)](https://packagist.org/packages/league/container)
@@ -21,30 +21,24 @@ sections:
 ## Key Features
 
 1. Simple API
-2. Interoperabiity. Container is an implementation of [PSR-11](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-11-container.md).
+2. Interoperability. Container is an implementation of [PSR-11](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-11-container.md).
 3. Speed. Because Container is simple, it is also very fast.
 4. Service Providers allow you to package code or configuration for packages that you reuse regularly.
-5. Inflectors allow you to manipulate objects resolved through the container based on the type.
+5. Event system with `afterResolve()` allows you to hook into the container lifecycle and apply cross-cutting behaviour to resolved services.
 
 ## Introduction
 
 Container is dependency injection container. It allows you to implement the [dependency injection design pattern](https://en.wikipedia.org/wiki/Dependency_injection) meaning that you can decouple your class dependencies and have the container inject them where they are needed.
 
-~~~ php
-<?php declare(strict_types=1);
+~~~php
+<?php 
 
 namespace Acme;
 
 class Foo
 {
-    /**
-     * @var \Acme\Bar
-     */
-    public $bar;
+    public Bar $bar;
 
-    /**
-     * Construct.
-     */
     public function __construct()
     {
         $this->bar = new Bar;
@@ -58,27 +52,16 @@ The class above `Acme\Foo` has a dependency on `Acme\Bar`, as it is written, thi
 
 By refactoring the code above to have the class accept it's dependency as a constructor argument, we can loosen that dependency.
 
-~~~ php
-<?php declare(strict_types=1);
+~~~php
+<?php 
 
 namespace Acme;
 
 class Foo
 {
-    /**
-     * @var \Acme\Bar
-     */
-    public $bar;
-
-    /**
-     * Construct.
-     *
-     * @param \Acme\Bar $bar
-     */
-    public function __construct(Bar $bar)
-    {
-        $this->bar = $bar;
-    }
+    public function __construct(
+        public readonly Bar $bar
+    ) {}
 }
 
 class Bar {}
@@ -101,20 +84,20 @@ I recommend reading the links below for further information about what problems 
 
 ### System Requirements
 
-You need `PHP >= 7.2.0` to use `League\Container` but the latest stable version of PHP is recommended.
+You need `PHP >= 8.1.0` to use `League\Container` but the latest stable version of PHP is recommended.
 
 ### Composer
 
 Container is available on [Packagist](https://packagist.org/packages/league/container) and can be installed using [Composer](https://getcomposer.org/):
 
-~~~
+~~~shell
 composer require league/container
 ~~~
 
 Most modern frameworks will include Composer out of the box, but ensure the following file is included:
 
 ~~~ php
-<?php
+<?php 
 
 // include the Composer autoloader
 require 'vendor/autoload.php';
@@ -152,8 +135,6 @@ Using the example in our [introduction](#introduction), we can start to take a l
 ~~~ php
 <?php 
 
-declare(strict_types=1);
-
 $container = new League\Container\Container();
 
 $container->add(Acme\Foo::class)->addArgument(Acme\Bar::class);
@@ -176,8 +157,6 @@ We can make a slight adjustment to the code above so that we can use aliases to 
 ~~~ php
 <?php 
 
-declare(strict_types=1);
-
 $container = new League\Container\Container();
 
 $container->add('foo', Acme\Foo::class)->addArgument(Acme\Bar::class);
@@ -192,26 +171,15 @@ var_dump($foo->bar instanceof Acme\Bar); // true
 This is useful especially when depending on interfaces rather than concretions. We can refactor our original example to have it depend on an interface instead, and configure Container to inject the concrete implementation.
 
 ~~~ php
-<?php declare(strict_types=1);
+<?php 
 
 namespace Acme;
 
 class Foo
 {
-    /**
-     * @var \Acme\BarInterface
-     */
-    public $bar;
-
-    /**
-     * Construct.
-     *
-     * @param \Acme\BarInterface $bar
-     */
-    public function __construct(BarInterface $bar)
-    {
-        $this->bar = $bar;
-    }
+    public function __construct(
+        public readonly BarInterface $bar
+    ) {}
 }
 
 interface BarInterface {}
@@ -223,8 +191,6 @@ We now have `Acme\Foo` depending on an implementation of `Acme\BarInterface` (`A
 
 ~~~ php
 <?php 
-
-declare(strict_types=1);
 
 $container = new League\Container\Container();
 

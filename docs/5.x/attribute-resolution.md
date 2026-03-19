@@ -19,34 +19,31 @@ The container provides built-in attributes for common resolution scenarios:
 
 - `#[Inject('service.id')]` — Injects a value or service from the container by its ID.
 - `#[Resolve('resolver.id', 'path.to.value')]` — Resolves a value from a service or array in the container, traversing the given path.
-  - Method calls are supported in the path, allowing you to resolve complex values or configurations. 
+  - Method calls are supported in the path, allowing you to resolve complex values or configurations.
     - e.g. `#[Resolve('config', 'getDbConfig.host')]`
 
 ### Using `Inject`
 
 ~~~php
-<?php
-
-declare(strict_types=1);
+<?php 
 
 namespace Acme;
 
 use League\Container\Attribute\Inject;
 
-class Bar 
+class Bar
 {
-    public function hello(): string 
-    { 
-        return 'hello'; 
+    public function hello(): string
+    {
+        return 'hello';
     }
 }
 
 class Foo
 {
     public function __construct(
-        #[Inject(Bar::class)] public Bar $bar
-    ) {
-    }
+        #[Inject(Bar::class)] public readonly Bar $bar
+    ) {}
 }
 
 $container = new League\Container\Container();
@@ -59,16 +56,14 @@ echo $foo->bar->hello(); // 'hello'
 ### Using `Resolve`
 
 ~~~php
-<?php
-
-declare(strict_types=1);
+<?php 
 
 namespace Acme;
 
 use League\Container\Attribute\Resolve;
 
 class Config {
-    public array $settings = [
+    public readonly array $settings = [
         'db' => [
             'host' => 'localhost',
             'user' => 'root',
@@ -79,9 +74,8 @@ class Config {
 class Baz
 {
     public function __construct(
-        #[Resolve(Config::class, 'settings.db.host')] public string $dbHost
-    ) {
-    }
+        #[Resolve(Config::class, 'settings.db.host')] public readonly string $dbHost
+    ) {}
 }
 
 $container = new League\Container\Container();
@@ -98,9 +92,7 @@ You can create your own attributes to implement custom resolution logic. To acce
 For example, to inject an environment variable:
 
 ~~~php
-<?php
-
-declare(strict_types=1);
+<?php 
 
 namespace Acme;
 
@@ -114,7 +106,9 @@ class Env implements AttributeInterface, ContainerAwareInterface
 {
     use ContainerAwareTrait;
 
-    public function __construct(private string $name) {}
+    public function __construct(
+        private readonly string $name
+    ) {}
 
     public function resolve(): string
     {
@@ -126,9 +120,8 @@ class Env implements AttributeInterface, ContainerAwareInterface
 class NeedsSecret
 {
     public function __construct(
-        #[Env('MY_SECRET')] public string $secret
-    ) {
-    }
+        #[Env('MY_SECRET')] public readonly string $secret
+    ) {}
 }
 
 putenv('MY_SECRET=super-secret-value');

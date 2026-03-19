@@ -18,30 +18,21 @@ Consider the code below.
 ~~~ php
 <?php 
 
-declare(strict_types=1);
-
 namespace Acme;
 
 class Foo
 {
-    public Bar $bar;
-    public Baz $baz;
-
-    public function __construct(Bar $bar, Baz $baz)
-    {
-        $this->bar = $bar;
-        $this->baz = $baz;
-    }
+    public function __construct(
+        public readonly Bar $bar,
+        public readonly Baz $baz
+    ) {}
 }
 
 class Bar
 {
-    public Bam $bam;
-
-    public function __construct(Bam $bam)
-    {
-        $this->bam = $bam;
-    }
+    public function __construct(
+        public readonly Bam $bam
+    ) {}
 }
 
 class Baz
@@ -60,8 +51,6 @@ class Bam
 ~~~ php
 <?php 
 
-declare(strict_types=1);
-
 $bam = new Acme\Bam();
 $baz = new Acme\Baz();
 $bar = new Acme\Bar($bam);
@@ -72,8 +61,6 @@ With nested dependencies, this can become quite cumbersome and hard to keep trac
 
 ~~~ php
 <?php 
-
-declare(strict_types=1);
 
 $container = new League\Container\Container();
 
@@ -90,14 +77,12 @@ var_dump($foo->baz instanceof Acme\Baz);      // true
 var_dump($foo->bar->bam instanceof Acme\Bam); // true
 ~~~
 
-**Note:** The reflection container, by default, will resolve what you are requesting every time you request it.
+**Note:** The reflection container, by default, will resolve what you are requesting every time you request it. Auto-wiring only applies to classes that have **not** been registered as explicit definitions. If you register a class with `add()` or `addShared()`, you must provide its constructor arguments explicitly using `addArgument()` or a callable.
 
 If you would like the reflection container to cache resolutions and pull from that cache if available, you can enable it to do so as below.
 
 ~~~ php
 <?php 
-
-declare(strict_types=1);
 
 $container = new League\Container\Container();
 
@@ -111,3 +96,102 @@ $fooTwo = $container->get(Acme\Foo::class);
 
 var_dump($fooOne === $fooTwo); // true
 ~~~
+
+## Advanced Auto-Wiring with Modern PHP
+
+Auto-wiring works excellently with modern PHP features like union types and promoted constructor properties:
+
+~~~ php
+<?php 
+
+interface CacheInterface
+{
+    public function get(string $key): mixed;
+    public function set(string $key, mixed $value): void;
+}
+
+class RedisCache implements CacheInterface
+{
+    public function get(string $key): mixed { /* ... */ }
+    public function set(string $key, mixed $value): void { /* ... */ }
+}
+
+class DatabaseLogger
+{
+    public function log(string $message): void { /* ... */ }
+}
+
+class FileLogger
+{
+    public function log(string $message): void { /* ... */ }
+}
+
+// Service using union types and nullable dependencies
+class AdvancedService
+{
+    public function __construct(
+        private readonly CacheInterface $cache,
+        private readonly DatabaseLogger|FileLogger $logger,
+        private readonly ?string $apiKey = null
+    ) {}
+
+    public function process(array $data): array
+    {
+        // Use cache and logger...
+        return match($this->logger::class) {
+            DatabaseLogger::class => $this->processWithDatabase($data),
+            FileLogger::class => $this->processWithFile($data),
+        };
+    }
+
+    private function processWithDatabase(array $data): array { return $data; }
+    private function processWithFile(array $data): array { return $data; }
+}
+
+$container = new League\Container\Container();
+$container->delegate(new League\Container\ReflectionContainer());
+
+// Register implementations
+$container->add(CacheInterface::class, RedisCache::class);
+$container->add(DatabaseLogger::class);
+
+$service = $container->get(AdvancedService::class);
+~~~
+
+## Passing Runtime Arguments
+
+When a class has constructor parameters that cannot be auto-wired (such as scalar values), you can pass them directly to the `ReflectionContainer`. Arguments are matched by parameter name.
+
+~~~ php
+<?php
+
+namespace Acme;
+
+class ApiClient
+{
+    public function __construct(
+        public readonly HttpClient $http,
+        public readonly string $apiKey,
+        public readonly int $timeout
+    ) {}
+}
+
+$container = new League\Container\Container();
+
+$container->delegate(
+    new League\Container\ReflectionContainer()
+);
+
+// Retrieve the ReflectionContainer delegate and pass runtime arguments
+$reflection = $container->getDelegate(League\Container\ReflectionContainer::class);
+$client = $reflection->get(Acme\ApiClient::class, [
+    'apiKey'  => 'sk-123',
+    'timeout' => 30,
+]);
+
+// HttpClient is auto-wired, apiKey and timeout are provided
+~~~
+
+Arguments must use the parameter name as the array key. Auto-wirable dependencies (type-hinted objects) are resolved automatically; only non-auto-wirable parameters need to be provided.
+
+**Note:** The reflection container, by default, will resolve what you are requesting every time you request it.
