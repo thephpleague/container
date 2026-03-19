@@ -20,5 +20,4 @@ final class BeforeResolveEvent extends ContainerEvent
     {
         $this->new = $new;
     }
-
 }

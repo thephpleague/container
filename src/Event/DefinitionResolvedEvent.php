@@ -31,5 +31,4 @@ final class DefinitionResolvedEvent extends ContainerEvent
     {
         return $this->new;
     }
-
 }
