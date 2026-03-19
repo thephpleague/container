@@ -42,6 +42,11 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
         return $this;
     }
 
+    public function getTags(): array
+    {
+        return array_keys($this->tags);
+    }
+
     public function hasTag(string $tag): bool
     {
         return isset($this->tags[$tag]);

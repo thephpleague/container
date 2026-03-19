@@ -11,7 +11,7 @@ class EventFilter
     protected array $typeFilters = [];
     protected array $tagFilters = [];
     protected array $idFilters = [];
-    protected ?Closure $customFilter = null;
+    protected array $customFilters = [];
 
     /**
      * @var callable|null
@@ -42,7 +42,7 @@ class EventFilter
 
     public function where(Closure $filter): self
     {
-        $this->customFilter = $filter;
+        $this->customFilters[] = $filter;
         return $this;
     }
 
@@ -65,7 +65,10 @@ class EventFilter
             }
         }
 
-        if (!empty($this->typeFilters) && $event instanceof ServiceResolvedEvent) {
+        if (!empty($this->typeFilters)) {
+            if (!$event instanceof ServiceResolvedEvent) {
+                return false;
+            }
             $hasMatchingType = false;
             foreach ($this->typeFilters as $type) {
                 if ($event->isInstanceOf($type)) {
@@ -78,8 +81,10 @@ class EventFilter
             }
         }
 
-        if ($this->customFilter && !($this->customFilter)($event)) {
-            return false;
+        foreach ($this->customFilters as $customFilter) {
+            if (!$customFilter($event)) {
+                return false;
+            }
         }
 
         return true;

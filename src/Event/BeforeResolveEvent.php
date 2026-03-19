@@ -21,8 +21,4 @@ final class BeforeResolveEvent extends ContainerEvent
         $this->new = $new;
     }
 
-    public function hasResolution(): bool
-    {
-        return $this->resolved !== null;
-    }
 }

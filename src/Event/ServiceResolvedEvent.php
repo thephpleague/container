@@ -16,6 +16,7 @@ final class ServiceResolvedEvent extends ContainerEvent
         protected bool $new = false,
     ) {
         parent::__construct($id, $definition, $tags, $resolved);
+        $this->resolutionProvided = true;
     }
 
     public function isNew(): bool

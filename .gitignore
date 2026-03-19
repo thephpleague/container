@@ -1,12 +1,50 @@
-.idea
-build
+# IDE and Editor files
+.idea/
+.vscode/
+.sublime-project
+.sublime-workspace
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+
+# OS-specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+.AppleDouble
+.LSOverride
+
+# PHP and Composer
+vendor/
 composer.lock
 composer.phar
-vendor
-.sass-cache
 .phpunit.result.cache
 .phpunit.cache
+.phpunit.xml.result.cache
 .phpcs-cache
-docs/.jekyll-cache
-docs/_site
-.idea
+
+# Build and documentation
+build/
+docs/.jekyll-cache/
+docs/_site/
+.sass-cache/
+coverage/
+
+# Local development
+.env
+.env.local
+.env.*.local
+*mise.toml*
+
+# Miscellaneous
+*.log
+.cache
+.php_cs.cache
+.phpstan.cache/

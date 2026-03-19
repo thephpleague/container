@@ -4,32 +4,22 @@ declare(strict_types=1);
 
 namespace League\Container\Event;
 
-use Psr\EventDispatcher\EventDispatcherInterface;
-use RuntimeException;
-
 trait EventAwareTrait
 {
-    protected ?EventDispatcherInterface $eventDispatcher = null;
+    protected ?EventDispatcher $eventDispatcher = null;
 
-    public function getEventDispatcher(): ?EventDispatcherInterface
+    public function getEventDispatcher(): ?EventDispatcher
     {
         return $this->eventDispatcher;
     }
 
-    public function setEventDispatcher(?EventDispatcherInterface $eventDispatcher): void
+    public function setEventDispatcher(?EventDispatcher $eventDispatcher): void
     {
         $this->eventDispatcher = $eventDispatcher;
     }
 
     public function listen(string $eventType, callable $listener): EventFilter
     {
-        if (!$this->eventDispatcher instanceof EventDispatcher) {
-            throw new RuntimeException(sprintf(
-                'Event dispatcher must be an instance of %s to use listen() method',
-                EventDispatcher::class
-            ));
-        }
-
         $filter = $this->eventDispatcher->listen($eventType);
         $filter->then($listener);
         return $filter;
@@ -46,13 +36,6 @@ trait EventAwareTrait
 
     public function addListener(string $eventType, callable $listener): void
     {
-        if (!$this->eventDispatcher instanceof EventDispatcher) {
-            throw new RuntimeException(sprintf(
-                'Event dispatcher must be an instance of %s to use addListener() method',
-                EventDispatcher::class
-            ));
-        }
-
         $this->eventDispatcher->addListener($eventType, $listener);
     }
 }

@@ -3,6 +3,7 @@ layout: post
 title: Upgrade Guide
 sections:
     Introduction: introduction
+    5.x to unstable: 5x-to-unstable
     3.x to 4.x: 3x-to-4x
     2.x to 4.x: 2x-to-4x
 ---
@@ -11,6 +12,51 @@ sections:
 Here we will attempt to provide as clear a guide as possible for upgrading to the latest version of the package.
 
 If you notice anything missing from this page, please create an issue, or pull request.
+
+## 5.x to unstable
+
+### Event System
+
+A new event system replaces inflectors. The event system hooks into the container lifecycle at four points: definition registration, pre-resolution, post-definition-resolution, and post-service-resolution.
+
+### Inflectors are deprecated
+
+`Container::inflector()` now triggers `E_USER_DEPRECATED`. Use `Container::afterResolve()` as a drop-in replacement:
+
+~~~php
+// Before
+$container->inflector(LoggerAwareInterface::class, fn($obj) => $obj->setLogger($logger));
+
+// After
+$container->afterResolve(LoggerAwareInterface::class, fn($obj) => $obj->setLogger($logger));
+~~~
+
+For method invocation and property setting patterns, the callback form covers all use cases:
+
+~~~php
+// Before
+$container->inflector(LoggerAwareInterface::class)
+    ->invokeMethod('setLogger', [Logger::class]);
+
+// After
+$container->afterResolve(LoggerAwareInterface::class, function (object $service) use ($container) {
+    $service->setLogger($container->get(Logger::class));
+});
+~~~
+
+### DefinitionInterface changes
+
+`DefinitionInterface` now includes `getTags(): array`. If you have custom implementations of `DefinitionInterface`, add this method.
+
+### EventAwareContainerInterface removed
+
+`EventAwareContainerInterface` has been removed. `DefinitionContainerInterface` no longer extends it. The event system is available on the concrete `Container` class via `EventAwareTrait`. If you were type-hinting against `EventAwareContainerInterface`, use the concrete `Container` class instead.
+
+### Shared tag
+
+Shared definitions (registered via `addShared()`) now automatically receive a `'shared'` tag. This means `$definition->hasTag('shared')` returns `true` for shared definitions. If you were using a custom `'shared'` tag, this may conflict.
+
+See the [events documentation](/docs/unstable/events) for the full API.
 
 ## 3.x to 4.x
 

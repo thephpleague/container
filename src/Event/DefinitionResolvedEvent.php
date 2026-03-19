@@ -32,8 +32,4 @@ final class DefinitionResolvedEvent extends ContainerEvent
         return $this->new;
     }
 
-    public function hasResolution(): bool
-    {
-        return $this->resolved !== null;
-    }
 }

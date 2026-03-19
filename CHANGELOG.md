@@ -5,27 +5,25 @@ All Notable changes to `League\Container` will be documented in this file
 ## Unreleased
 
 ### Added
-- **PSR-14 Compatible Event System** - A powerful new event-driven architecture that replaces inflectors
+- **Event system** for hooking into the container lifecycle
   - Four event types: `OnDefineEvent`, `BeforeResolveEvent`, `DefinitionResolvedEvent`, `ServiceResolvedEvent`
-  - Advanced filtering system with fluent API: `forType()`, `forTag()`, `forId()`, `where()`
-  - Event chaining with priority support via `EventChain` and `ChainBuilder`
-  - Full PSR-14 compatibility with external event dispatchers (Symfony, etc.)
-  - Service replacement capabilities in `ServiceResolvedEvent`
-  - Container integration via `EventAwareTrait` and simplified `listen()` API
-  - Comprehensive documentation with real-world delegate container examples
+  - Fluent filtering API: `forType()`, `forTag()`, `forId()`, `where()`
+  - `Container::listen()` for registering filtered event listeners
+  - `Container::afterResolve()` convenience method as a drop-in replacement for `inflector()`
+  - Lazy event dispatch: events are only created when listeners are registered for that event type
+  - `EventDispatcher::hasListenersFor()` to check whether listeners exist for a given event type
+  - `DefinitionInterface::getTags()` for retrieving tags from definitions
   - Docs: [https://container.thephpleague.com/unstable/events/](https://container.thephpleague.com/unstable/events/)
 
 ### Deprecated
-- **Inflectors system** - Deprecated in favor of the new event system
-  - `Container::inflector()` method now triggers deprecation warnings
-  - Migration guide available in documentation
-  - Full backward compatibility maintained
-  - Will be removed in v6.0.0
+- `Container::inflector()` - use `Container::afterResolve()` or the event system instead. Will be removed in v6.0.
 
 ### Changed
-- Container lifecycle now dispatches events at key points (define, resolve, instantiate)
-- Enhanced `Container::resolve()` method with comprehensive event dispatching
-- Added `getDefinitionTags()` helper method for tag-based event filtering
+- `DefinitionContainerInterface` no longer extends `EventAwareContainerInterface` (removed)
+- Shared definitions now receive a `'shared'` tag automatically via `addTag('shared')`
+
+### Removed
+- `EventAwareContainerInterface` - the event system is provided by `EventAwareTrait` on the concrete `Container` class, not as an interface contract
 
 ## 5.1.0
 

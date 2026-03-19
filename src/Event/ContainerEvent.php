@@ -10,6 +10,7 @@ use Psr\EventDispatcher\StoppableEventInterface;
 abstract class ContainerEvent implements StoppableEventInterface
 {
     protected bool $propagationStopped = false;
+    protected bool $resolutionProvided = false;
 
     public function __construct(
         protected string $id,
@@ -44,9 +45,15 @@ abstract class ContainerEvent implements StoppableEventInterface
         return $this->resolved;
     }
 
+    public function hasResolution(): bool
+    {
+        return $this->resolutionProvided;
+    }
+
     public function setResolved(mixed $resolved): void
     {
         $this->resolved = $resolved;
+        $this->resolutionProvided = true;
     }
 
     public function stopPropagation(): void

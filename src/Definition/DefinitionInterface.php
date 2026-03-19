@@ -15,6 +15,7 @@ interface DefinitionInterface extends ContainerAwareInterface
     public function addTag(string $tag): DefinitionInterface;
     public function getAlias(): string;
     public function getConcrete(): mixed;
+    public function getTags(): array;
     public function hasTag(string $tag): bool;
     public function isShared(): bool;
     public function resolve(): mixed;

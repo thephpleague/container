@@ -97,6 +97,11 @@ class EventDispatcher implements EventDispatcherInterface, ListenerProviderInter
         $this->listeners[$eventType] = array_values($this->listeners[$eventType]);
     }
 
+    public function hasListenersFor(string $eventType): bool
+    {
+        return !empty($this->listeners[$eventType]) || !empty($this->filters[$eventType]);
+    }
+
     public function getListeners(): array
     {
         return $this->listeners;

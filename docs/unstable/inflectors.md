@@ -3,111 +3,115 @@ layout: post
 title: Inflectors
 sections:
     Deprecation Notice: deprecation-notice
-    Upgrade Guide: upgrade-guide
-    Introduction: introduction
+    Migration Guide: migration-guide
     Usage: usage
 ---
 
 ## Deprecation Notice
 
-> **DEPRECATED:** Inflectors are deprecated as of v6.0 and will be removed in v7.0. Please migrate to the new [Event System](/docs/unstable/events) which provides more flexibility and better performance.
+> **DEPRECATED:** Inflectors are deprecated as of v5.2 and will be removed in v6.0. Use `afterResolve()` or the [event system](/docs/unstable/events) instead.
 
-## Upgrade Guide
+## Migration Guide
 
-The event system provides a more powerful and flexible replacement for inflectors. Here's how to migrate common inflector patterns:
+### Using afterResolve() (recommended)
 
-### Method Invocation
+`afterResolve()` is a drop-in replacement for the most common inflector patterns. The callback receives the resolved object directly:
 
-**Before (Inflectors):**
+**Callback form:**
 ~~~ php
-<?php 
+<?php
+
+// Before
+$container->inflector(LoggerAwareInterface::class, fn($obj) => $obj->setLogger($logger));
+
+// After
+$container->afterResolve(LoggerAwareInterface::class, fn($obj) => $obj->setLogger($logger));
+~~~
+
+**Method invocation:**
+~~~ php
+<?php
+
+// Before
 $container->inflector(LoggerAwareInterface::class)
     ->invokeMethod('setLogger', [Logger::class]);
+
+// After
+$container->afterResolve(LoggerAwareInterface::class, function (object $service) use ($container) {
+    $service->setLogger($container->get(Logger::class));
+});
 ~~~
 
-**After (Events):**
+**Property setting:**
 ~~~ php
-<?php 
-use League\Container\Event\ServiceResolvedEvent;
+<?php
 
-$container->listen(ServiceResolvedEvent::class, function (ServiceResolvedEvent $event) use ($container) {
-    $service = $event->getResolved();
-    $logger = $container->get(Logger::class);
-    $service->setLogger($logger);
-})->forType(LoggerAwareInterface::class);
-~~~
-
-### Property Setting
-
-**Before (Inflectors):**
-~~~ php
-<?php 
+// Before
 $container->inflector(DatabaseAwareInterface::class)
     ->setProperty('connection', Database::class);
-~~~
 
-**After (Events):**
-~~~ php
-<?php 
-$container->listen(ServiceResolvedEvent::class, function (ServiceResolvedEvent $event) use ($container) {
-    $service = $event->getResolved();
+// After
+$container->afterResolve(DatabaseAwareInterface::class, function (object $service) use ($container) {
     $service->connection = $container->get(Database::class);
-})->forType(DatabaseAwareInterface::class);
+});
 ~~~
 
-### Callback Invocation
-
-**Before (Inflectors):**
+**Multiple method calls:**
 ~~~ php
-<?php 
+<?php
+
+// Before
 $container->inflector(TimestampableInterface::class)
     ->invokeMethods([
         'setCreatedAt' => [new DateTime()],
         'setUpdatedAt' => [new DateTime()]
     ]);
-~~~
 
-**After (Events):**
-~~~ php
-<?php 
-$container->listen(ServiceResolvedEvent::class, function (ServiceResolvedEvent $event) {
-    $service = $event->getResolved();
+// After
+$container->afterResolve(TimestampableInterface::class, function (object $service) {
     $service->setCreatedAt(new DateTime());
     $service->setUpdatedAt(new DateTime());
-})->forType(TimestampableInterface::class);
+});
 ~~~
 
-### Benefits of Events Over Inflectors
+### Using the full event API
 
-- **Better Performance**: Events can be filtered more efficiently
-- **More Flexible**: Multiple filtering criteria (type, tag, ID, custom logic)
-- **PSR-14 Compatible**: Works with standard event dispatchers
-- **Better Testing**: Easier to test event listeners in isolation
-- **Type Safety**: Better IDE support and static analysis
+For advanced use cases such as replacing resolved objects, use `listen()` directly:
+
+~~~ php
+<?php
+
+use League\Container\Event\ServiceResolvedEvent;
+
+$container->listen(ServiceResolvedEvent::class, function (ServiceResolvedEvent $event) {
+    $event->setResolved(new CachedRepository($event->getResolved()));
+})->forType(RepositoryInterface::class);
+~~~
+
+See the [events documentation](/docs/unstable/events) for the full API.
 
 ---
-## Introduction
-
-Inflectors allow you to define the manipulation of an object of a specific type as the final step before it is returned by the container.
-
-This is useful for example when you want to invoke a method on all objects that implement a specific interface.
 
 ## Usage
 
-Imagine that you have a `LoggerAwareInterface` and would like to invoke the method called `setLogger` passing in a logger every time a class is retrieved that implements this interface.
+> The following documents the deprecated inflector API for reference. New code should use `afterResolve()` instead.
+
+Inflectors allow you to define the manipulation of an object of a specific type as the final step before it is returned by the container.
+
+This is useful when you want to invoke a method on all objects that implement a specific interface.
 
 ~~~ php
-<?php 
+<?php
 
 $container = new League\Container\Container();
 
 $container->add(Acme\Logger::class);
-$container->add(Acme\LoggerAwareClass::class); // implements LoggerAwareInterface
-$container->add(Acme\Other\LoggerAwareClass::class); // implements LoggerAwareInterface
+$container->add(Acme\LoggerAwareClass::class);
+$container->add(Acme\Other\LoggerAwareClass::class);
 
 $container
     ->inflector(LoggerAwareInterface::class)
-    ->invokeMethod('setLogger', [Acme\Logger::class]) // Acme\Logger will be resolved via the container
+    ->invokeMethod('setLogger', [Acme\Logger::class])
 ;
 ~~~
 

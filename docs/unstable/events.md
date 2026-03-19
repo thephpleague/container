@@ -3,8 +3,9 @@ layout: post
 title: Events
 sections:
     Introduction: introduction
+    Quick Start: quick-start
     Event Types: event-types
-    Basic Usage: basic-usage
+    afterResolve: after-resolve
     Event Filtering: event-filtering
     Event Dispatcher: event-dispatcher
     Advanced Features: advanced-features
@@ -12,15 +13,38 @@ sections:
 
 ## Introduction
 
-The League Container event system provides a powerful, PSR-14 compatible way to hook into the container's lifecycle and modify services during resolution. Events are dispatched at key points during the container's operation, allowing you to extend functionality without modifying core container code.
+The League Container event system provides a way to hook into the container's lifecycle and modify services during resolution. Events are dispatched at key points during the container's operation, allowing you to extend functionality without modifying core container code.
 
-The event system is particularly useful when working with delegate containers, such as using `ReflectionContainer` for auto-wiring while maintaining explicit control over core services.
+The event system replaces [inflectors](/docs/unstable/inflectors), providing a more flexible and powerful alternative. See `afterResolve()` below for the simplest migration path.
 
 The event system is designed to be:
-- **PSR-14 Compatible** - Works with any PSR-14 compliant event dispatcher
 - **Flexible** - Multiple filtering options and event types
-- **Performant** - Efficient filtering and execution
+- **Performant** - Events are only dispatched when listeners are registered for that event type
 - **Extensible** - Easy to add custom event logic
+
+## Quick Start
+
+For the most common use case, applying cross-cutting behaviour to resolved services by type, use `afterResolve()`:
+
+~~~ php
+<?php
+
+use League\Container\Container;
+
+$container = new Container();
+
+$container->afterResolve(LoggerAwareInterface::class, function (object $service) use ($logger) {
+    $service->setLogger($logger);
+});
+
+$container->afterResolve(CacheAwareInterface::class, function (object $service) use ($cache) {
+    $service->setCache($cache);
+});
+~~~
+
+The callback receives the resolved object directly. This is a drop-in replacement for the deprecated `inflector()` method.
+
+For more control, use the full event API with `listen()`.
 
 ## Event Types
 
@@ -28,33 +52,29 @@ The container dispatches four types of events during its lifecycle:
 
 ### OnDefineEvent
 
-Fired when a service definition is added to the container.
+Fired when a service definition is added to the container via `add()` or `addShared()`.
 
 ~~~ php
-<?php 
+<?php
 
 use League\Container\Event\OnDefineEvent;
 
 $container->listen(OnDefineEvent::class, function (OnDefineEvent $event) {
     echo "Service '{$event->getId()}' was defined\n";
     $definition = $event->getDefinition();
-    // Access definition properties
 });
 ~~~
 
 ### BeforeResolveEvent
 
-Fired just before resolution begins. Useful for logging or access control.
+Fired just before resolution begins. Can short-circuit resolution by providing an early result via `setResolved()`.
 
 ~~~ php
-<?php 
+<?php
 
 use League\Container\Event\BeforeResolveEvent;
 
 $container->listen(BeforeResolveEvent::class, function (BeforeResolveEvent $event) {
-    echo "About to resolve '{$event->getId()}'\n";
-
-    // You can stop propagation to prevent resolution
     if ($event->getId() === 'forbidden.service') {
         $event->stopPropagation();
         throw new AccessDeniedException();
@@ -64,25 +84,25 @@ $container->listen(BeforeResolveEvent::class, function (BeforeResolveEvent $even
 
 ### DefinitionResolvedEvent
 
-Fired after a definition is found but before the object is instantiated.
+Fired after a definition is found but before the object is instantiated. Can provide an alternative resolution.
 
 ~~~ php
-<?php 
+<?php
 
 use League\Container\Event\DefinitionResolvedEvent;
 
 $container->listen(DefinitionResolvedEvent::class, function (DefinitionResolvedEvent $event) {
-    $definition = $event->getResolved();
+    $definition = $event->getDefinition();
     echo "Definition found for '{$event->getId()}'\n";
 });
 ~~~
 
 ### ServiceResolvedEvent
 
-Fired after a service has been resolved from the container. This is the most commonly used event for service modification. The resolved service can be an object, scalar, array, or other value.
+Fired after a service has been fully resolved. This is the most commonly used event for service modification.
 
 ~~~ php
-<?php 
+<?php
 
 use League\Container\Event\ServiceResolvedEvent;
 
@@ -92,74 +112,54 @@ $container->listen(ServiceResolvedEvent::class, function (ServiceResolvedEvent $
 })->forType(TimestampableInterface::class);
 ~~~
 
-## Basic Usage
+## afterResolve
 
-### Listening to Events
-
-The simplest way to listen for events is using the container's `listen()` method:
+`afterResolve()` is a convenience method that wraps the event system for the most common use case: applying modifications to resolved services by type. It is the recommended replacement for the deprecated `inflector()` method.
 
 ~~~ php
-<?php 
+<?php
+
+$container->afterResolve(LoggerAwareInterface::class, function (object $service) use ($logger) {
+    $service->setLogger($logger);
+});
+~~~
+
+### Migrating from inflector()
+
+~~~ php
+<?php
+
+// Before
+$container->inflector(LoggerAwareInterface::class, fn($obj) => $obj->setLogger($logger));
+
+// After
+$container->afterResolve(LoggerAwareInterface::class, fn($obj) => $obj->setLogger($logger));
+~~~
+
+### Chaining filters
+
+`afterResolve()` returns an `EventFilter`, so you can add further constraints:
+
+~~~ php
+<?php
+
+$container->afterResolve(LoggerAwareInterface::class, function (object $service) use ($logger) {
+    $service->setLogger($logger);
+})->forTag('needs-logging');
+~~~
+
+### Limitations
+
+The callback receives the resolved object directly and can mutate it. To **replace** the resolved object entirely (e.g., wrapping it in a decorator), use the full event API:
+
+~~~ php
+<?php
 
 use League\Container\Event\ServiceResolvedEvent;
 
 $container->listen(ServiceResolvedEvent::class, function (ServiceResolvedEvent $event) {
-    $object = $event->getResolved();
-    $id = $event->getId();
-
-    $object->setLogger(new Logger());
-})->forType(LoggerAwareInterface::class);
-~~~
-
-### Real-World Example: Auto-Wiring with Custom Configuration
-
-Here's a practical example that combines explicit definitions with auto-wiring:
-
-~~~ php
-<?php 
-
-use League\Container\Container;
-use League\Container\ReflectionContainer;
-use League\Container\Event\ServiceResolvedEvent;
-
-// Create containers
-$container = new Container();
-$container->delegate(new ReflectionContainer());
-
-// Define core infrastructure services explicitly
-$container->addShared('config', function() {
-    return new Config($_ENV);
-});
-
-$container->addShared(LoggerInterface::class, function() use ($container) {
-    return new FileLogger($container->get('config')->get('log_path'));
-});
-
-// Auto-inject logger into any class that needs it
-$container->listen(ServiceResolvedEvent::class, function (ServiceResolvedEvent $event) use ($container) {
-    $event->getResolved()->setLogger($container->get(LoggerInterface::class));
-})->forType(LoggerAwareInterface::class);
-
-// Auto-inject configuration into configurable services
-$container->listen(ServiceResolvedEvent::class, function (ServiceResolvedEvent $event) use ($container) {
-    $event->getResolved()->setConfig($container->get('config'));
-})->forType(ConfigurableInterface::class);
-
-// These classes will be auto-wired and automatically configured:
-$userService = $container->get(UserService::class);
-$emailService = $container->get(EmailService::class);
-$orderProcessor = $container->get(OrderProcessor::class);
-~~~
-
-### Direct Event Dispatcher Access
-
-You can also work directly with the event dispatcher:
-
-~~~ php
-<?php 
-
-$dispatcher = $container->getEventDispatcher();
-$dispatcher->addListener(ServiceResolvedEvent::class, $listener);
+    $event->setResolved(new CachedRepository($event->getResolved()));
+})->forType(RepositoryInterface::class);
 ~~~
 
 ## Event Filtering
@@ -168,10 +168,10 @@ Events can be filtered to only execute under specific conditions.
 
 ### Type-Based Filtering
 
-Listen only for specific object types:
+Listen only for specific resolved object types (only works with `ServiceResolvedEvent`):
 
 ~~~ php
-<?php 
+<?php
 
 $container->listen(ServiceResolvedEvent::class, function (ServiceResolvedEvent $event) {
     $event->getResolved()->setCreatedAt(new DateTime());
@@ -183,16 +183,13 @@ $container->listen(ServiceResolvedEvent::class, function (ServiceResolvedEvent $
 Listen for services with specific tags:
 
 ~~~ php
-<?php 
+<?php
 
-// When adding a service
 $container->addShared('user.service', UserService::class)
     ->addTag('logging');
 
-// Listen for tagged services
-$container->listen(ServiceResolvedEvent::class, function (ServiceResolvedEvent $event) {
-    $logger = $container->get(LoggerInterface::class);
-    $event->getResolved()->setLogger($logger);
+$container->listen(ServiceResolvedEvent::class, function (ServiceResolvedEvent $event) use ($container) {
+    $event->getResolved()->setLogger($container->get(LoggerInterface::class));
 })->forTag('logging');
 ~~~
 
@@ -201,7 +198,7 @@ $container->listen(ServiceResolvedEvent::class, function (ServiceResolvedEvent $
 Listen for specific service IDs:
 
 ~~~ php
-<?php 
+<?php
 
 $container->listen(ServiceResolvedEvent::class, function (ServiceResolvedEvent $event) {
     $event->getResolved()->setRole('admin');
@@ -210,29 +207,26 @@ $container->listen(ServiceResolvedEvent::class, function (ServiceResolvedEvent $
 
 ### Custom Filtering
 
-Use custom logic for complex filtering:
+Use closures for complex filtering. Multiple `where()` calls compose with AND semantics (all must pass):
 
 ~~~ php
-<?php 
+<?php
 
 $container->listen(ServiceResolvedEvent::class, function (ServiceResolvedEvent $event) {
     $event->getResolved()->setSpecial(true);
 })->forType(UserInterface::class)
-  ->where(function (ServiceResolvedEvent $event) {
-      return str_starts_with($event->getId(), 'admin.');
-  });
+  ->where(fn ($event) => str_starts_with($event->getId(), 'admin.'));
 ~~~
 
 ### Combined Filtering
 
-Combine multiple filtering criteria:
+All filter types can be combined. They all must match for the listener to fire:
 
 ~~~ php
-<?php 
+<?php
 
 $container->listen(ServiceResolvedEvent::class, function (ServiceResolvedEvent $event) {
-    // This will only execute for UserInterface objects that are tagged 'admin'
-    // and have IDs starting with 'admin.'
+    $event->getResolved()->setAdminConfig(true);
 })->forType(UserInterface::class)
   ->forTag('admin')
   ->where(fn ($event) => str_starts_with($event->getId(), 'admin.'));
@@ -240,20 +234,41 @@ $container->listen(ServiceResolvedEvent::class, function (ServiceResolvedEvent $
 
 ## Event Dispatcher
 
-### PSR-14 Compatibility
+### Execution Order
 
-The event dispatcher implements PSR-14 interfaces and can work with external event dispatchers:
+When an event is dispatched, listeners are executed in the following order:
+
+1. **Direct listeners** registered via `addListener()` execute first, in registration order
+2. **Filtered listeners** registered via `listen()->then()` execute second, in registration order
+
+If a direct listener calls `stopPropagation()`, no filtered listeners will execute for that event.
+
+### Listener Removal
+
+`removeListener()` only removes listeners registered via `addListener()`. Listeners registered via `listen()->then()` (filtered listeners) cannot be individually removed. Use `removeListeners()` to clear all listeners and filters for a given event type.
+
+### Performance
+
+Events are only dispatched when listeners are registered for that specific event type. If no listeners exist for `BeforeResolveEvent`, no `BeforeResolveEvent` objects are created during resolution. This means the event system has near-zero overhead when not in use.
+
+You can check whether listeners exist for a given event type:
 
 ~~~ php
-<?php 
+<?php
 
-use Symfony\Component\EventDispatcher\EventDispatcher as SymfonyDispatcher;
-use League\Container\Event\EventDispatcher;
+$dispatcher = $container->getEventDispatcher();
+$dispatcher->hasListenersFor(ServiceResolvedEvent::class); // true or false
+~~~
 
-$symfonyDispatcher = new SymfonyDispatcher();
-$eventDispatcher = new EventDispatcher($symfonyDispatcher);
+### Direct Event Dispatcher Access
 
-$container->setEventDispatcher($eventDispatcher);
+You can work directly with the event dispatcher for advanced use cases:
+
+~~~ php
+<?php
+
+$dispatcher = $container->getEventDispatcher();
+$dispatcher->addListener(ServiceResolvedEvent::class, $listener);
 ~~~
 
 ### Stoppable Events
@@ -261,12 +276,14 @@ $container->setEventDispatcher($eventDispatcher);
 Events implement `StoppableEventInterface` and can halt propagation:
 
 ~~~ php
-<?php 
+<?php
+
+use League\Container\Event\BeforeResolveEvent;
 
 $container->listen(BeforeResolveEvent::class, function (BeforeResolveEvent $event) {
-    if (!$this->isAuthorized($event->getId())) {
+    if (!isAuthorised($event->getId())) {
         $event->stopPropagation();
-        throw new UnauthorizedException();
+        throw new UnauthorisedException();
     }
 });
 ~~~
@@ -278,7 +295,7 @@ $container->listen(BeforeResolveEvent::class, function (BeforeResolveEvent $even
 Replace resolved objects with decorators or proxies:
 
 ~~~ php
-<?php 
+<?php
 
 $container->listen(ServiceResolvedEvent::class, function (ServiceResolvedEvent $event) {
     $original = $event->getResolved();
@@ -287,135 +304,47 @@ $container->listen(ServiceResolvedEvent::class, function (ServiceResolvedEvent $
 })->forType(UserRepositoryInterface::class);
 ~~~
 
-### Dependency Injection in Listeners
-
-Access other container services within event listeners:
-
-~~~ php
-<?php 
-
-$container->listen(ServiceResolvedEvent::class, function (ServiceResolvedEvent $event) use ($container) {
-    $database = $container->get(DatabaseInterface::class);
-    $event->getResolved()->setDatabase($database);
-})->forType(DatabaseAwareInterface::class);
-~~~
-
 ### Working with Delegate Containers
 
-Events become particularly powerful when working with delegate containers. Here's a real-world example using `ReflectionContainer` as a delegate for auto-wiring:
+Events are dispatched for services resolved through delegate containers as well. This is useful when using `ReflectionContainer` for auto-wiring:
 
 ~~~ php
-<?php 
+<?php
 
 use League\Container\Container;
 use League\Container\ReflectionContainer;
-use League\Container\Event\ServiceResolvedEvent;
 
-// Main container for explicit definitions
-$container = new Container();
-
-// ReflectionContainer as delegate for auto-wiring
-$reflectionContainer = new ReflectionContainer();
-$container->delegate($reflectionContainer);
-
-// Define core services explicitly in main container
-$container->addShared(DatabaseInterface::class, PDODatabase::class);
-$container->addShared(LoggerInterface::class, MonologLogger::class);
-$container->addShared(CacheInterface::class, RedisCache::class);
-
-// Use events to track which container resolved what
-$container->listen(ServiceResolvedEvent::class, function (ServiceResolvedEvent $event) {
-    $source = $event->getDefinition() ? 'main container' : 'reflection delegate';
-    error_log("Service '{$event->getId()}' resolved by: {$source}");
-});
-
-// Add metadata based on resolution source
-$container->listen(ServiceResolvedEvent::class, function (ServiceResolvedEvent $event) {
-    $service = $event->getResolved();
-    $source = $event->getDefinition() ? 'main container' : 'reflection delegate';
-
-    if (method_exists($service, 'setMetadata')) {
-        $service->setMetadata('resolved_by', $source);
-    }
-});
-
-// Apply production configuration to explicitly defined services
-$container->listen(ServiceResolvedEvent::class, function (ServiceResolvedEvent $event) {
-    $event->getResolved()->setEnvironment('production');
-})->where(function (ServiceResolvedEvent $event) {
-    return $event->getDefinition() !== null;
-});
-
-// Apply development configuration to auto-wired services
-$container->listen(ServiceResolvedEvent::class, function (ServiceResolvedEvent $event) {
-    $service = $event->getResolved();
-    $service->setEnvironment('development');
-    $service->enableDebugMode(true);
-})->forType(ConfigurableInterface::class)
-  ->where(function (ServiceResolvedEvent $event) {
-      return $event->getDefinition() === null;
-  });
-
-// The ReflectionContainer will auto-wire these without explicit definitions:
-$userService = $container->get(UserService::class);
-$orderProcessor = $container->get(OrderProcessor::class);
-$logger = $container->get(LoggerInterface::class);
-~~~
-
-#### Plugin System Example
-
-Events with delegates are excellent for plugin architectures:
-
-~~~ php
-<?php 
-
-// Core application container
-$appContainer = new Container();
-$pluginContainer = new ReflectionContainer();
-$appContainer->delegate($pluginContainer);
-
-// Register core services
-$appContainer->addShared(EventDispatcher::class);
-$appContainer->addShared(DatabaseInterface::class, AppDatabase::class);
-
-// Event listener for plugin services
-$appContainer->listen(ServiceResolvedEvent::class, function (ServiceResolvedEvent $event) use ($appContainer) {
-    $service = $event->getResolved();
-
-    $service->setEventDispatcher($appContainer->get(EventDispatcher::class));
-    $service->setDatabase($appContainer->get(DatabaseInterface::class));
-
-    // Register plugin with the application
-    $service->register();
-
-    echo "Plugin {$event->getId()} loaded and registered\n";
-})->forType(PluginInterface::class)
-  ->where(function (ServiceResolvedEvent $event) {
-      return $event->getDefinition() === null;
-  });
-
-// Plugins are auto-wired through ReflectionContainer
-$paymentPlugin = $appContainer->get(PaymentPlugin::class);
-$notificationPlugin = $appContainer->get(NotificationPlugin::class);
-~~~
-
-#### Testing Environment Setup
-
-Use events to create different behaviors for testing:
-
-~~~ php
-<?php 
-
-// Production container setup
 $container = new Container();
 $container->delegate(new ReflectionContainer());
 
-// In testing, override certain services while keeping auto-wiring
+$container->addShared(DatabaseInterface::class, PDODatabase::class);
+$container->addShared(LoggerInterface::class, MonologLogger::class);
+
+$container->afterResolve(LoggerAwareInterface::class, function (object $service) use ($container) {
+    $service->setLogger($container->get(LoggerInterface::class));
+});
+
+$container->afterResolve(DatabaseAwareInterface::class, function (object $service) use ($container) {
+    $service->setDatabase($container->get(DatabaseInterface::class));
+});
+
+$userService = $container->get(UserService::class);
+~~~
+
+### Testing Environment Setup
+
+Use events to create different behaviours for testing:
+
+~~~ php
+<?php
+
+$container = new Container();
+$container->delegate(new ReflectionContainer());
+
 if ($environment === 'testing') {
     $container->addShared(EmailService::class, MockEmailService::class);
     $container->addShared(PaymentGateway::class, FakePaymentGateway::class);
 
-    // Log all auto-wired services in tests
     $container->listen(ServiceResolvedEvent::class, function (ServiceResolvedEvent $event) {
         if (!$event->getDefinition()) {
             TestLogger::log("Auto-wired: {$event->getId()}");
@@ -423,75 +352,25 @@ if ($environment === 'testing') {
     });
 }
 
-// Classes without explicit definitions are auto-wired
 $userController = $container->get(UserController::class);
 $emailService = $container->get(EmailService::class);
 ~~~
 
-### Error Handling
+### Performance Tips
 
-Handle errors gracefully in event listeners:
-
-~~~ php
-<?php 
-
-$container->listen(ServiceResolvedEvent::class, function (ServiceResolvedEvent $event) {
-    try {
-        $object = $event->getResolved();
-        $object->initialize();
-    } catch (Exception $e) {
-        // Log error but don't break resolution
-        error_log("Failed to initialize {$event->getId()}: " . $e->getMessage());
-    }
-});
-~~~
-
-### Performance Considerations
-
-For optimal performance:
-
-1. **Use type filters** when possible - they're faster than custom filters
-2. **Keep listeners focused** - one responsibility per listener
-3. **Use tags for grouping** - organize related services
-4. **Minimize listener complexity** - keep event handlers simple and fast
+1. **Use `afterResolve()` or `forType()`** for type-based filtering, it uses `instanceof` checks which are faster than custom closures
+2. **Keep listeners focused** with one responsibility per listener
+3. **Use tags for grouping** related services
+4. **Use `forType()` only with `ServiceResolvedEvent`**, it has no effect on other event types
 
 ~~~ php
-<?php 
+<?php
 
-// Faster - uses instanceof check
+// Faster: uses instanceof check
 $container->listen(ServiceResolvedEvent::class, $listener)
     ->forType(UserInterface::class);
 
-// Slower - executes custom function for every event
+// Slower: executes custom function for every event
 $container->listen(ServiceResolvedEvent::class, $listener)
     ->where(fn ($e) => $e->getResolved() instanceof UserInterface);
-~~~
-
-#### Delegate Container Performance
-
-When using delegate containers, consider these performance tips:
-
-~~~ php
-<?php 
-
-// Order delegates by likelihood - most used first
-$container->delegate($fastContainer);
-$container->delegate($reflectionContainer);
-
-// Use events to optimize delegate performance
-$container->listen(ServiceResolvedEvent::class, function (ServiceResolvedEvent $event) {
-    // Cache expensive reflection-resolved services
-    if (!$event->getDefinition() && $event->isNew() === false) {
-        $cached = "Reflection service '{$event->getId()}' was cached";
-        // Log caching for performance monitoring
-    }
-});
-
-// Pre-warm frequently used auto-wired services
-$container->listen(OnDefineEvent::class, function (OnDefineEvent $event) use ($container) {
-    // Pre-resolve commonly used dependencies
-    if (in_array($event->getId(), ['Logger', 'Cache', 'Database'])) {
-        $container->get($event->getId());
-    }
-})->forId('Logger', 'Cache', 'Database');
 ~~~
