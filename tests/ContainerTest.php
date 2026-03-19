@@ -322,4 +322,23 @@ class ContainerTest extends TestCase
         $this->assertSame($concreteTwo, $container->get('foo'));
         $this->assertNotSame($concreteOne, $container->get('foo'));
     }
+
+    public function testGetDelegateReturnsMatchingDelegate(): void
+    {
+        $container = new Container();
+        $delegate  = new ReflectionContainer();
+        $container->delegate($delegate);
+
+        $this->assertSame($delegate, $container->getDelegate(ReflectionContainer::class));
+    }
+
+    public function testGetDelegateThrowsWhenNoDelegateOfTypeExists(): void
+    {
+        $container = new Container();
+
+        $this->expectException(NotFoundException::class);
+        $this->expectExceptionMessage('No delegate container of type');
+
+        $container->getDelegate(ReflectionContainer::class);
+    }
 }

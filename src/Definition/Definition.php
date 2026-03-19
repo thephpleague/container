@@ -153,6 +153,12 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
     {
         $concrete = $this->concrete;
 
+        try {
+            $container = $this->getContainer();
+        } catch (ContainerException) {
+            $container = null;
+        }
+
         if (is_callable($concrete)) {
             $concrete = $this->resolveCallable($concrete);
         }
@@ -166,7 +172,13 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
             $concrete = $concrete->getValue();
         }
 
-        if (is_string($concrete) && class_exists($concrete)) {
+        if (is_string($concrete) && $concrete !== $this->getId()) {
+            if ($container instanceof ContainerInterface && $container->has($concrete)) {
+                $concrete = $container->get($concrete);
+            } elseif (class_exists($concrete)) {
+                $concrete = $this->resolveClass($concrete);
+            }
+        } elseif (is_string($concrete) && class_exists($concrete)) {
             $concrete = $this->resolveClass($concrete);
         }
 
@@ -174,23 +186,17 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
             $concrete = $this->invokeMethods($concrete);
         }
 
-        try {
-            $container = $this->getContainer();
-        } catch (ContainerException) {
-            $container = null;
-        }
-
         if (is_string($concrete)) {
-            if (class_exists($concrete)) {
+            if ($concrete !== $this->getId() && $container instanceof ContainerInterface && $container->has($concrete)) {
+                $concrete = $container->get($concrete);
+            } elseif (class_exists($concrete)) {
                 $concrete = $this->resolveClass($concrete);
             } elseif ($this->getAlias() === $concrete) {
                 return $concrete;
             }
         }
 
-        // if we still have a string, try to pull it from the container
-        // this allows for `alias -> alias -> ... -> concrete
-        if (is_string($concrete) && $container instanceof ContainerInterface && $container->has($concrete)) {
+        if (is_string($concrete) && $concrete !== $this->getId() && $container instanceof ContainerInterface && $container->has($concrete)) {
             $this->recursiveCheck[] = $concrete;
             $concrete = $container->get($concrete);
         }
@@ -219,7 +225,18 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
     {
         $resolved   = $this->resolveArguments($this->arguments);
         $reflection = new ReflectionClass($concrete);
-        return $reflection->newInstanceArgs($resolved);
+
+        try {
+            return $reflection->newInstanceArgs($resolved);
+        } catch (\ArgumentCountError $e) {
+            throw new ContainerException(sprintf(
+                'Class "%s" was registered as a definition but its constructor has '
+                . 'unsatisfied dependencies. Either provide arguments using '
+                . '->addArgument(), use a callable to construct the class, or remove '
+                . 'the explicit registration to allow autowiring via a delegate container.',
+                $concrete,
+            ), 0, $e);
+        }
     }
 
     /**

@@ -189,6 +189,20 @@ class Container implements DefinitionContainerInterface
         return $this;
     }
 
+    public function getDelegate(string $class): ContainerInterface
+    {
+        foreach ($this->delegates as $delegate) {
+            if ($delegate instanceof $class) {
+                return $delegate;
+            }
+        }
+
+        throw new NotFoundException(sprintf(
+            'No delegate container of type "%s" is configured',
+            $class
+        ));
+    }
+
     /**
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface

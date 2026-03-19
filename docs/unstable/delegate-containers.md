@@ -39,4 +39,20 @@ $container->delegate($delegate);
 
 Now that the delegate has been registered, if a service cannot be resolved via the primary container, it will resort to the `has` and `get` methods of the delegates to resolve the requested service.
 
+### Retrieving a Delegate
 
+If you need to access a registered delegate later, use the `getDelegate` method with the delegate's class name.
+
+~~~ php
+<?php
+
+$container = new League\Container\Container();
+
+$container->delegate(
+    new League\Container\ReflectionContainer()
+);
+
+$reflection = $container->getDelegate(League\Container\ReflectionContainer::class);
+~~~
+
+This is useful when you need to call delegate-specific methods that are not part of the PSR-11 interface, such as passing runtime arguments to `ReflectionContainer::get()` (see [Auto Wiring](/unstable/auto-wiring/)).

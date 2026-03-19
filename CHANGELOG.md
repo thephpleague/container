@@ -14,6 +14,11 @@ All Notable changes to `League\Container` will be documented in this file
   - `EventDispatcher::hasListenersFor()` to check whether listeners exist for a given event type
   - `DefinitionInterface::getTags()` for retrieving tags from definitions
   - Docs: [https://container.thephpleague.com/unstable/events/](https://container.thephpleague.com/unstable/events/)
+- `Container::getDelegate(string $class)` to retrieve a registered delegate container by type
+
+### Fixed
+- Interface-to-concrete definitions now correctly resolve through the concrete's own registered definition instead of bypassing it via direct reflection (#275, #278)
+- `Definition::resolveClass()` now throws `ContainerException` with actionable guidance when a class has unsatisfied constructor dependencies, instead of a raw `ArgumentCountError`
 
 ### Deprecated
 - `Container::inflector()` - use `Container::afterResolve()` or the event system instead. Will be removed in v6.0.

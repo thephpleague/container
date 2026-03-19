@@ -9,8 +9,10 @@ use League\Container\Argument\ResolvableArgument;
 use League\Container\Container;
 use League\Container\Definition\Definition;
 use League\Container\Test\Asset\Bar;
+use League\Container\Test\Asset\BarInterface;
 use League\Container\Test\Asset\Foo;
 use League\Container\Test\Asset\FooCallable;
+use League\Container\Test\Asset\FooWithRequiredDependency;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -85,7 +87,10 @@ class DefinitionTest extends TestCase
         $container = $this->getMockBuilder(Container::class)->getMock();
         $bar = new Bar();
 
-        $container->expects($this->once())->method('has')->with($this->equalTo(Bar::class))->willReturn(true);
+        $container->method('has')->willReturnMap([
+            [Foo::class, false],
+            [Bar::class, true],
+        ]);
         $container->expects($this->once())->method('get')->with($this->equalTo(Bar::class))->willReturn($bar);
 
         $definition = new Definition('callable', Foo::class);
@@ -108,7 +113,10 @@ class DefinitionTest extends TestCase
         $container = $this->getMockBuilder(Container::class)->getMock();
         $bar = new Bar();
 
-        $container->expects($this->once())->method('has')->with($this->equalTo(Bar::class))->willReturn(true);
+        $container->method('has')->willReturnMap([
+            [Foo::class, false],
+            [Bar::class, true],
+        ]);
         $container->expects($this->once())->method('get')->with($this->equalTo(Bar::class))->willReturn($bar);
 
         $definition = new Definition('callable', Foo::class);
@@ -194,5 +202,79 @@ class DefinitionTest extends TestCase
 
         self::assertSame($nonExistent, $definition->getAlias());
         self::assertSame($nonExistent, $definition->resolve());
+    }
+
+    /**
+     * @throws ReflectionException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function testDefinitionDelegatesToContainerForDifferentConcrete(): void
+    {
+        $container = $this->getMockBuilder(Container::class)->getMock();
+        $bar = new Bar();
+
+        $container->expects($this->once())->method('has')->with($this->equalTo(Bar::class))->willReturn(true);
+        $container->expects($this->once())->method('get')->with($this->equalTo(Bar::class))->willReturn($bar);
+
+        $definition = new Definition(BarInterface::class, Bar::class);
+        $definition->setContainer($container);
+
+        $actual = $definition->resolveNew();
+
+        $this->assertInstanceOf(Bar::class, $actual);
+        $this->assertSame($bar, $actual);
+    }
+
+    /**
+     * @throws ReflectionException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function testDefinitionResolvesOwnClassWhenConcreteMatchesId(): void
+    {
+        $container = $this->getMockBuilder(Container::class)->getMock();
+
+        $container->expects($this->never())->method('has');
+        $container->expects($this->never())->method('get');
+
+        $definition = new Definition(Foo::class, Foo::class);
+        $definition->setContainer($container);
+
+        $actual = $definition->resolveNew();
+
+        $this->assertInstanceOf(Foo::class, $actual);
+    }
+
+    /**
+     * @throws ReflectionException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function testDefinitionDelegatesToContainerWhenConcreteComesFromResolvableArgument(): void
+    {
+        $container = $this->getMockBuilder(Container::class)->getMock();
+        $bar = new Bar();
+
+        $container->expects($this->once())->method('has')->with($this->equalTo(Bar::class))->willReturn(true);
+        $container->expects($this->once())->method('get')->with($this->equalTo(Bar::class))->willReturn($bar);
+
+        $definition = new Definition(BarInterface::class, new ResolvableArgument(Bar::class));
+        $definition->setContainer($container);
+
+        $actual = $definition->resolveNew();
+
+        $this->assertInstanceOf(Bar::class, $actual);
+        $this->assertSame($bar, $actual);
+    }
+
+    public function testResolveClassThrowsContainerExceptionForUnsatisfiedDependencies(): void
+    {
+        $definition = new Definition(FooWithRequiredDependency::class);
+
+        $this->expectException(ContainerExceptionInterface::class);
+        $this->expectExceptionMessage('unsatisfied dependencies');
+
+        $definition->resolveNew();
     }
 }
