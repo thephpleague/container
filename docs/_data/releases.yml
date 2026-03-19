@@ -2,7 +2,7 @@
   version: unstable
   name: League\Container (dev-5.x)
   type: Unstable
-  requires: PHP >= 8.1.0
+  requires: PHP >= 8.1
   release: None
   support: Own Risk
   url: /unstable/
@@ -25,7 +25,7 @@
   name: League\Container 5.x
   type: Current
   requires: PHP >= 8.1
-  release: 5.1.0 - 2025-05
+  release: 5.2.0 - 2026-03
   support: Ongoing
   url: /5.x/
   menu:
@@ -34,6 +34,7 @@
     Definitions: '/5.x/definitions/'
     Argument Types: '/5.x/argument-types/'
     Service Providers: '/5.x/service-providers/'
+    Events: '/5.x/events/'
     Inflectors: '/5.x/inflectors/'
     Delegate Containers: '/5.x/delegate-containers/'
     Reflection Modes: '/5.x/reflection-modes/'
