@@ -1,10 +1,5 @@
 parameters:
-    level: 6
+    level: 8
     treatPhpDocTypesAsCertain: false
     paths:
         - src
-    ignoreErrors:
-        -
-            identifier: missingType.iterableValue
-        -
-            identifier: missingType.generics

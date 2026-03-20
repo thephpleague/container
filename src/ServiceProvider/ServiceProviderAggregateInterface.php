@@ -7,6 +7,7 @@ namespace League\Container\ServiceProvider;
 use IteratorAggregate;
 use League\Container\ContainerAwareInterface;
 
+/** @extends IteratorAggregate<int, ServiceProviderInterface> */
 interface ServiceProviderAggregateInterface extends ContainerAwareInterface, IteratorAggregate
 {
     public function add(ServiceProviderInterface $provider): ServiceProviderAggregateInterface;

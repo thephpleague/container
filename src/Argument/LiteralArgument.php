@@ -8,16 +8,16 @@ use InvalidArgumentException;
 
 class LiteralArgument implements LiteralArgumentInterface
 {
-    public const TYPE_ARRAY = 'array';
-    public const TYPE_BOOLEAN = 'boolean';
-    public const TYPE_BOOL = self::TYPE_BOOLEAN;
-    public const TYPE_CALLABLE = 'callable';
-    public const TYPE_DOUBLE = 'double';
-    public const TYPE_FLOAT = self::TYPE_DOUBLE;
-    public const TYPE_INTEGER = 'integer';
-    public const TYPE_INT = self::TYPE_INTEGER;
-    public const TYPE_OBJECT = 'object';
-    public const TYPE_STRING = 'string';
+    public const string TYPE_ARRAY = 'array';
+    public const string TYPE_BOOLEAN = 'boolean';
+    public const string TYPE_BOOL = self::TYPE_BOOLEAN;
+    public const string TYPE_CALLABLE = 'callable';
+    public const string TYPE_DOUBLE = 'double';
+    public const string TYPE_FLOAT = self::TYPE_DOUBLE;
+    public const string TYPE_INTEGER = 'integer';
+    public const string TYPE_INT = self::TYPE_INTEGER;
+    public const string TYPE_OBJECT = 'object';
+    public const string TYPE_STRING = 'string';
 
     protected mixed $value;
 
@@ -31,10 +31,13 @@ class LiteralArgument implements LiteralArgumentInterface
         ) {
             $this->value = $value;
         } else {
-            throw new InvalidArgumentException('Incorrect type for value.');
+            throw new InvalidArgumentException(
+                sprintf('Expected literal argument type "%s", got "%s"', $type, get_debug_type($value))
+            );
         }
     }
 
+    #[\Override]
     public function getValue(): mixed
     {
         return $this->value;

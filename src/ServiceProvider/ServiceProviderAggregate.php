@@ -12,12 +12,13 @@ class ServiceProviderAggregate implements ServiceProviderAggregateInterface
 {
     use ContainerAwareTrait;
 
-    /**
-     * @var ServiceProviderInterface[]
-     */
+    /** @var list<ServiceProviderInterface> */
     protected array $providers = [];
+
+    /** @var list<string> */
     protected array $registered = [];
 
+    #[\Override]
     public function add(ServiceProviderInterface $provider): ServiceProviderAggregateInterface
     {
         if (in_array($provider, $this->providers, true)) {
@@ -34,6 +35,7 @@ class ServiceProviderAggregate implements ServiceProviderAggregateInterface
         return $this;
     }
 
+    #[\Override]
     public function provides(string $id): bool
     {
         foreach ($this as $provider) {
@@ -45,11 +47,14 @@ class ServiceProviderAggregate implements ServiceProviderAggregateInterface
         return false;
     }
 
+    /** @return Generator<int, ServiceProviderInterface> */
+    #[\Override]
     public function getIterator(): Generator
     {
         yield from $this->providers;
     }
 
+    #[\Override]
     public function registerAll(): void
     {
         foreach ($this as $provider) {
@@ -57,6 +62,7 @@ class ServiceProviderAggregate implements ServiceProviderAggregateInterface
         }
     }
 
+    #[\Override]
     public function register(string $service): void
     {
         if (false === $this->provides($service)) {

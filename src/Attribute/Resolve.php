@@ -24,6 +24,7 @@ class Resolve implements AttributeInterface, ContainerAwareInterface
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
+    #[\Override]
     public function resolve(): mixed
     {
         $resolved = $this->getContainer()->get($this->resolver);

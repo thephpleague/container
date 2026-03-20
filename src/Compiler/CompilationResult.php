@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace League\Container\Compiler;
 
-final class CompilationResult
+final readonly class CompilationResult
 {
     public function __construct(
-        public readonly string $phpSource,
-        public readonly string $fullyQualifiedClassName,
-        public readonly string $sourceHash,
-        public readonly int $serviceCount,
+        public string $phpSource,
+        public string $fullyQualifiedClassName,
+        public string $sourceHash,
+        public int $serviceCount,
     ) {
     }
 

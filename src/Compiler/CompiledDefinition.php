@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace League\Container\Compiler;
 
-final class CompiledDefinition
+final readonly class CompiledDefinition
 {
     /**
      * @param list<string> $resolvedArguments
@@ -12,15 +12,15 @@ final class CompiledDefinition
      * @param list<string> $tags
      */
     public function __construct(
-        public readonly string $id,
-        public readonly ConcreteType $concreteType,
-        public readonly bool $shared,
-        public readonly array $resolvedArguments,
-        public readonly array $methodCalls,
-        public readonly array $tags,
-        public readonly ?string $concreteClass,
-        public readonly ?string $factoryClass,
-        public readonly ?string $factoryMethod,
+        public string $id,
+        public ConcreteType $concreteType,
+        public bool $shared,
+        public array $resolvedArguments,
+        public array $methodCalls,
+        public array $tags,
+        public ?string $concreteClass,
+        public ?string $factoryClass,
+        public ?string $factoryMethod,
     ) {
     }
 }

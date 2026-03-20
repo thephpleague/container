@@ -12,13 +12,18 @@ class DefinitionAggregate implements DefinitionAggregateInterface
 {
     use ContainerAwareTrait;
 
-    public function __construct(protected array $definitions = [])
+    /** @var array<int, DefinitionInterface> */
+    protected array $definitions;
+
+    /** @param array<int, mixed> $definitions */
+    public function __construct(array $definitions = [])
     {
-        $this->definitions = array_filter($this->definitions, static function ($definition) {
-            return ($definition instanceof DefinitionInterface);
-        });
+        $this->definitions = array_values(array_filter($definitions, static function (mixed $definition): bool {
+            return $definition instanceof DefinitionInterface;
+        }));
     }
 
+    #[\Override]
     public function add(string $id, mixed $definition, bool $overwrite = false): DefinitionInterface
     {
         if (true === $overwrite) {
@@ -34,12 +39,14 @@ class DefinitionAggregate implements DefinitionAggregateInterface
         return $definition;
     }
 
+    #[\Override]
     public function addShared(string $id, mixed $definition, bool $overwrite = false): DefinitionInterface
     {
         $definition = $this->add($id, $definition, $overwrite);
         return $definition->setShared(true);
     }
 
+    #[\Override]
     public function has(string $id): bool
     {
         $id = Definition::normaliseAlias($id);
@@ -53,6 +60,7 @@ class DefinitionAggregate implements DefinitionAggregateInterface
         return false;
     }
 
+    #[\Override]
     public function hasTag(string $tag): bool
     {
         foreach ($this as $definition) {
@@ -64,49 +72,59 @@ class DefinitionAggregate implements DefinitionAggregateInterface
         return false;
     }
 
+    #[\Override]
     public function getDefinition(string $id): DefinitionInterface
     {
         $id = Definition::normaliseAlias($id);
 
         foreach ($this as $definition) {
             if ($id === $definition->getAlias()) {
-                return $definition->setContainer($this->getContainer());
+                $definition->setContainer($this->getContainer());
+                return $definition;
             }
         }
 
         throw new NotFoundException(sprintf('Alias (%s) is not being handled as a definition.', $id));
     }
 
+    #[\Override]
     public function resolve(string $id): mixed
     {
         return $this->getDefinition($id)->resolve();
     }
 
+    #[\Override]
     public function resolveNew(string $id): mixed
     {
         return $this->getDefinition($id)->resolveNew();
     }
 
+    /** @return array<int, mixed> */
+    #[\Override]
     public function resolveTagged(string $tag): array
     {
         $arrayOf = [];
 
         foreach ($this as $definition) {
             if ($definition->hasTag($tag)) {
-                $arrayOf[] = $definition->setContainer($this->getContainer())->resolve();
+                $definition->setContainer($this->getContainer());
+                $arrayOf[] = $definition->resolve();
             }
         }
 
         return $arrayOf;
     }
 
+    /** @return array<int, mixed> */
+    #[\Override]
     public function resolveTaggedNew(string $tag): array
     {
         $arrayOf = [];
 
         foreach ($this as $definition) {
             if ($definition->hasTag($tag)) {
-                $arrayOf[] = $definition->setContainer($this->getContainer())->resolveNew();
+                $definition->setContainer($this->getContainer());
+                $arrayOf[] = $definition->resolveNew();
             }
         }
 
@@ -124,6 +142,8 @@ class DefinitionAggregate implements DefinitionAggregateInterface
         }
     }
 
+    /** @return Generator<int, DefinitionInterface> */
+    #[\Override]
     public function getIterator(): Generator
     {
         yield from $this->definitions;

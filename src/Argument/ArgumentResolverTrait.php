@@ -16,10 +16,13 @@ use ReflectionException;
 trait ArgumentResolverTrait
 {
     /**
+     * @param array<int, mixed> $arguments
+     * @return array<int, mixed>
      * @throws ContainerExceptionInterface
      * @throws ReflectionException
      * @throws NotFoundExceptionInterface
      */
+    #[\Override]
     public function resolveArguments(array $arguments): array
     {
         try {

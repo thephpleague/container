@@ -8,6 +8,7 @@ use League\Container\Definition\DefinitionInterface;
 
 final class ServiceResolvedEvent extends ContainerEvent
 {
+    /** @param list<string> $tags */
     public function __construct(
         string $id,
         mixed $resolved,
@@ -31,6 +32,6 @@ final class ServiceResolvedEvent extends ContainerEvent
 
     public function getServiceType(): string
     {
-        return is_object($this->resolved) ? get_class($this->resolved) : gettype($this->resolved);
+        return is_object($this->resolved) ? $this->resolved::class : gettype($this->resolved);
     }
 }

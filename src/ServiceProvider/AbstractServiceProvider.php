@@ -12,15 +12,17 @@ abstract class AbstractServiceProvider implements ServiceProviderInterface
 
     protected string $identifier;
 
+    #[\Override]
     public function getIdentifier(): string
     {
         if (empty($this->identifier)) {
-            $this->identifier = get_class($this);
+            $this->identifier = $this::class;
         }
 
         return $this->identifier;
     }
 
+    #[\Override]
     public function setIdentifier(string $id): ServiceProviderInterface
     {
         $this->identifier = $id;

@@ -7,6 +7,7 @@ namespace League\Container\Definition;
 use IteratorAggregate;
 use League\Container\ContainerAwareInterface;
 
+/** @extends IteratorAggregate<int, DefinitionInterface> */
 interface DefinitionAggregateInterface extends ContainerAwareInterface, IteratorAggregate
 {
     public function add(string $id, mixed $definition, bool $overwrite = false): DefinitionInterface;
@@ -16,6 +17,10 @@ interface DefinitionAggregateInterface extends ContainerAwareInterface, Iterator
     public function hasTag(string $tag): bool;
     public function resolve(string $id): mixed;
     public function resolveNew(string $id): mixed;
+
+    /** @return array<int, mixed> */
     public function resolveTagged(string $tag): array;
+
+    /** @return array<int, mixed> */
     public function resolveTaggedNew(string $tag): array;
 }

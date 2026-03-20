@@ -10,6 +10,7 @@ class ResolvableArgument implements ResolvableArgumentInterface
     {
     }
 
+    #[\Override]
     public function getValue(): string
     {
         return $this->value;

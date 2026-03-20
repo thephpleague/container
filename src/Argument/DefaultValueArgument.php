@@ -11,6 +11,7 @@ class DefaultValueArgument extends ResolvableArgument implements DefaultValueInt
         parent::__construct($value);
     }
 
+    #[\Override]
     public function getDefaultValue(): mixed
     {
         return $this->defaultValue;

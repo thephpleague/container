@@ -22,10 +22,13 @@ use ReflectionUnionType;
 trait ArgumentReflectorTrait
 {
     /**
+     * @param array<string, mixed> $args
+     * @return array<int, mixed>
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      * @throws ReflectionException
      */
+    #[\Override]
     public function reflectArguments(ReflectionFunctionAbstract $method, array $args = []): array
     {
         $params = $method->getParameters();
@@ -91,6 +94,7 @@ trait ArgumentReflectorTrait
         return $this->resolveArguments($arguments);
     }
 
+    /** @param ReflectionAttribute<object> $attribute */
     protected function resolveArgumentFromAttribute(ReflectionAttribute $attribute): LiteralArgumentInterface|false
     {
         $attrClass = $attribute->getName();

@@ -8,5 +8,7 @@ use League\Container\ContainerAwareInterface;
 
 interface ArgumentResolverInterface extends ContainerAwareInterface
 {
+    /** @param array<int, mixed> $arguments
+     *  @return array<int, mixed> */
     public function resolveArguments(array $arguments): array;
 }

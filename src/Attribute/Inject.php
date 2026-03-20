@@ -23,6 +23,7 @@ class Inject implements AttributeInterface, ContainerAwareInterface
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
+    #[\Override]
     public function resolve(): mixed
     {
         return $this->getContainer()->get($this->id);

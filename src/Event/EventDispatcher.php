@@ -9,23 +9,20 @@ use Psr\EventDispatcher\ListenerProviderInterface;
 
 class EventDispatcher implements EventDispatcherInterface, ListenerProviderInterface
 {
-    /**
-     * @var array<class-string, callable[]>
-     */
+    /** @var array<string, array<int, callable>> */
     protected array $listeners = [];
 
-    /**
-     * @var array<string, EventFilter[]>
-     */
+    /** @var array<string, array<int, EventFilter>> */
     protected array $filters = [];
 
+    #[\Override]
     public function dispatch(object $event): object
     {
         if (!$event instanceof ContainerEvent) {
             return $event;
         }
 
-        $eventType = get_class($event);
+        $eventType = $event::class;
 
         foreach ($this->getListenersForEvent($event) as $listener) {
             if ($event->isPropagationStopped()) {
@@ -54,9 +51,10 @@ class EventDispatcher implements EventDispatcherInterface, ListenerProviderInter
     /**
      * @return iterable<callable>
      */
+    #[\Override]
     public function getListenersForEvent(object $event): iterable
     {
-        $eventClass = get_class($event);
+        $eventClass = $event::class;
         return $this->listeners[$eventClass] ?? [];
     }
 
@@ -102,11 +100,13 @@ class EventDispatcher implements EventDispatcherInterface, ListenerProviderInter
         return !empty($this->listeners[$eventType]) || !empty($this->filters[$eventType]);
     }
 
+    /** @return array<string, array<int, callable>> */
     public function getListeners(): array
     {
         return $this->listeners;
     }
 
+    /** @return array<string, array<int, EventFilter>> */
     public function getFilters(): array
     {
         return $this->filters;

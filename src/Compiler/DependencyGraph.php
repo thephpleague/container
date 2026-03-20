@@ -8,9 +8,9 @@ use League\Container\Exception\ContainerException;
 
 final class DependencyGraph
 {
-    private const UNVISITED = 0;
-    private const IN_PROGRESS = 1;
-    private const COMPLETED = 2;
+    private const int UNVISITED = 0;
+    private const int IN_PROGRESS = 1;
+    private const int COMPLETED = 2;
 
     /** @var array<string, list<string>> */
     private array $adjacency = [];
@@ -42,8 +42,11 @@ final class DependencyGraph
      */
     public function detectCycles(): array
     {
+        /** @var array<string, int> $colours */
         $colours = array_fill_keys(array_map('strval', array_keys($this->adjacency)), self::UNVISITED);
+        /** @var list<string> $stack */
         $stack = [];
+        /** @var list<list<string>> $cycles */
         $cycles = [];
 
         foreach (array_keys($this->adjacency) as $node) {
@@ -69,7 +72,9 @@ final class DependencyGraph
             );
         }
 
+        /** @var array<string, int> $colours */
         $colours = array_fill_keys(array_map('strval', array_keys($this->adjacency)), self::UNVISITED);
+        /** @var list<string> $order */
         $order = [];
 
         foreach (array_keys($this->adjacency) as $node) {
@@ -102,6 +107,11 @@ final class DependencyGraph
         return array_values(array_filter($visited, static fn(string $dep): bool => $dep !== $id));
     }
 
+    /**
+     * @param array<string, int> $colours
+     * @param list<string> $stack
+     * @param list<list<string>> $cycles
+     */
     private function depthFirstSearchForCycles(
         string $node,
         array &$colours,
@@ -132,6 +142,10 @@ final class DependencyGraph
         $colours[$node] = self::COMPLETED;
     }
 
+    /**
+     * @param array<string, int> $colours
+     * @param list<string> $order
+     */
     private function depthFirstSearchForTopologicalOrder(
         string $node,
         array &$colours,
@@ -152,6 +166,7 @@ final class DependencyGraph
         $order[] = $node;
     }
 
+    /** @param list<string> $visited */
     private function collectTransitiveDependencies(string $id, array &$visited, int $depth): void
     {
         $this->guardDepth($depth, $id);

@@ -14,7 +14,8 @@ trait ContainerAwareTrait
      */
     protected ?DefinitionContainerInterface $container = null;
 
-    public function setContainer(DefinitionContainerInterface $container): ContainerAwareInterface
+    #[\Override]
+    public function setContainer(DefinitionContainerInterface $container): static
     {
         $this->container = $container;
 
@@ -29,6 +30,7 @@ trait ContainerAwareTrait
         ));
     }
 
+    #[\Override]
     public function getContainer(): DefinitionContainerInterface
     {
         if ($this->container instanceof DefinitionContainerInterface) {

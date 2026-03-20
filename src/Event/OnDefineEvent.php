@@ -8,6 +8,7 @@ use League\Container\Definition\DefinitionInterface;
 
 final class OnDefineEvent extends ContainerEvent
 {
+    /** @param list<string> $tags */
     public function __construct(
         string $id,
         DefinitionInterface $definition,
@@ -16,8 +17,10 @@ final class OnDefineEvent extends ContainerEvent
         parent::__construct($id, $definition, $tags);
     }
 
+    #[\Override]
     public function getDefinition(): DefinitionInterface
     {
+        assert($this->definition instanceof DefinitionInterface);
         return $this->definition;
     }
 

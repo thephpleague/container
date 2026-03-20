@@ -23,9 +23,10 @@ class ReflectionContainer implements ArgumentReflectorInterface, ArgumentResolve
     use ArgumentResolverTrait;
     use ContainerAwareTrait;
 
-    public const AUTO_WIRING = 0x01;
-    public const ATTRIBUTE_RESOLUTION = 0x02;
+    public const int AUTO_WIRING = 0x01;
+    public const int ATTRIBUTE_RESOLUTION = 0x02;
 
+    /** @var array<string, mixed> */
     protected array $cache = [];
 
     public function __construct(
@@ -45,11 +46,13 @@ class ReflectionContainer implements ArgumentReflectorInterface, ArgumentResolve
     }
 
     /**
+     * @param array<string, mixed> $args
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      * @throws ReflectionException
      */
-    public function get(string $id, array $args = [])
+    #[\Override]
+    public function get(string $id, array $args = []): mixed
     {
         if (true === $this->cacheResolutions && array_key_exists($id, $this->cache)) {
             return $this->cache[$id];
@@ -61,6 +64,7 @@ class ReflectionContainer implements ArgumentReflectorInterface, ArgumentResolve
             );
         }
 
+        /** @var class-string $id */
         $reflector = new ReflectionClass($id);
         $construct = $reflector->getConstructor();
 
@@ -82,12 +86,14 @@ class ReflectionContainer implements ArgumentReflectorInterface, ArgumentResolve
         return $resolution;
     }
 
+    #[\Override]
     public function has(string $id): bool
     {
         return class_exists($id);
     }
 
     /**
+     * @param array<string, mixed> $args
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      * @throws ReflectionException

@@ -8,6 +8,7 @@ use League\Container\Argument\LiteralArgument;
 
 class ArrayArgument extends LiteralArgument
 {
+    /** @param array<mixed> $value */
     public function __construct(array $value)
     {
         parent::__construct($value, LiteralArgument::TYPE_ARRAY);

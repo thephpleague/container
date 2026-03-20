@@ -22,8 +22,12 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
     use ContainerAwareTrait;
 
     protected mixed $resolved = null;
-    protected array $recursiveCheck = [];
 
+    /**
+     * @param array<int, mixed> $arguments
+     * @param list<array{method: string, arguments: array<int, mixed>}> $methods
+     * @param array<string, bool> $tags
+     */
     public function __construct(
         protected string $id,
         protected mixed $concrete = null,
@@ -36,17 +40,21 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
         $this->concrete ??= $this->id;
     }
 
+    #[\Override]
     public function addTag(string $tag): DefinitionInterface
     {
         $this->tags[$tag] = true;
         return $this;
     }
 
+    /** @return list<string> */
+    #[\Override]
     public function getTags(): array
     {
         return array_keys($this->tags);
     }
 
+    #[\Override]
     public function hasTag(string $tag): bool
     {
         return isset($this->tags[$tag]);
@@ -63,32 +71,38 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
         return static::normaliseAlias($this->id);
     }
 
+    #[\Override]
     public function setAlias(string $id): DefinitionInterface
     {
         return $this->setId($id);
     }
 
+    #[\Override]
     public function getAlias(): string
     {
         return $this->getId();
     }
 
+    #[\Override]
     public function setShared(bool $shared = true): DefinitionInterface
     {
         $this->shared = $shared;
         return $this;
     }
 
+    #[\Override]
     public function isShared(): bool
     {
         return $this->shared;
     }
 
+    #[\Override]
     public function getConcrete(): mixed
     {
         return $this->concrete;
     }
 
+    #[\Override]
     public function setConcrete(mixed $concrete): DefinitionInterface
     {
         $this->concrete = $concrete;
@@ -96,12 +110,15 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
         return $this;
     }
 
+    #[\Override]
     public function addArgument(mixed $arg): DefinitionInterface
     {
         $this->arguments[] = $arg;
         return $this;
     }
 
+    /** @param array<int, mixed> $args */
+    #[\Override]
     public function addArguments(array $args): DefinitionInterface
     {
         foreach ($args as $arg) {
@@ -111,6 +128,8 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
         return $this;
     }
 
+    /** @param array<int, mixed> $args */
+    #[\Override]
     public function addMethodCall(string $method, array $args = []): DefinitionInterface
     {
         $this->methods[] = [
@@ -121,6 +140,8 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
         return $this;
     }
 
+    /** @param array<string, array<int, mixed>> $methods */
+    #[\Override]
     public function addMethodCalls(array $methods = []): DefinitionInterface
     {
         foreach ($methods as $method => $args) {
@@ -135,6 +156,7 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
      * @throws NotFoundExceptionInterface
      * @throws ReflectionException
      */
+    #[\Override]
     public function resolve(): mixed
     {
         if (null !== $this->resolved && $this->isShared()) {
@@ -149,6 +171,7 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
      * @throws NotFoundExceptionInterface
      * @throws ReflectionException
      */
+    #[\Override]
     public function resolveNew(): mixed
     {
         $concrete = $this->concrete;
@@ -197,7 +220,6 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
         }
 
         if (is_string($concrete) && $concrete !== $this->getId() && $container instanceof ContainerInterface && $container->has($concrete)) {
-            $this->recursiveCheck[] = $concrete;
             $concrete = $container->get($concrete);
         }
 
@@ -213,10 +235,11 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
     protected function resolveCallable(callable $concrete): mixed
     {
         $resolved = $this->resolveArguments($this->arguments);
-        return call_user_func_array($concrete, $resolved);
+        return $concrete(...$resolved);
     }
 
     /**
+     * @param class-string $concrete
      * @throws NotFoundExceptionInterface
      * @throws ReflectionException
      * @throws ContainerExceptionInterface
@@ -248,8 +271,7 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
     {
         foreach ($this->methods as $method) {
             $args = $this->resolveArguments($method['arguments']);
-            $callable = [$instance, $method['method']];
-            call_user_func_array($callable, $args);
+            $instance->{$method['method']}(...$args);
         }
 
         return $instance;
