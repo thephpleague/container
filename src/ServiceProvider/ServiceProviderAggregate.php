@@ -7,6 +7,7 @@ namespace League\Container\ServiceProvider;
 use Generator;
 use League\Container\ContainerAwareTrait;
 use League\Container\Exception\ContainerException;
+use Override;
 
 class ServiceProviderAggregate implements ServiceProviderAggregateInterface
 {
@@ -18,7 +19,7 @@ class ServiceProviderAggregate implements ServiceProviderAggregateInterface
     /** @var list<string> */
     protected array $registered = [];
 
-    #[\Override]
+    #[Override]
     public function add(ServiceProviderInterface $provider): ServiceProviderAggregateInterface
     {
         if (in_array($provider, $this->providers, true)) {
@@ -35,7 +36,7 @@ class ServiceProviderAggregate implements ServiceProviderAggregateInterface
         return $this;
     }
 
-    #[\Override]
+    #[Override]
     public function provides(string $id): bool
     {
         foreach ($this as $provider) {
@@ -48,13 +49,13 @@ class ServiceProviderAggregate implements ServiceProviderAggregateInterface
     }
 
     /** @return Generator<int, ServiceProviderInterface> */
-    #[\Override]
+    #[Override]
     public function getIterator(): Generator
     {
         yield from $this->providers;
     }
 
-    #[\Override]
+    #[Override]
     public function registerAll(): void
     {
         foreach ($this as $provider) {
@@ -62,12 +63,12 @@ class ServiceProviderAggregate implements ServiceProviderAggregateInterface
         }
     }
 
-    #[\Override]
+    #[Override]
     public function register(string $service): void
     {
         if (false === $this->provides($service)) {
             throw new ContainerException(
-                sprintf('(%s) is not provided by a service provider', $service)
+                sprintf('(%s) is not provided by a service provider', $service),
             );
         }
 

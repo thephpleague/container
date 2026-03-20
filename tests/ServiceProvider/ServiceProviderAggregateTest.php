@@ -40,7 +40,7 @@ function createAggregateTestServiceProvider(): ServiceProviderInterface
 }
 
 test('aggregate adds class name service provider', function () {
-    $container = $this->getMockBuilder(Container::class)->getMock();
+    $container = Mockery::mock(Container::class);
     $aggregate = new ServiceProviderAggregate();
     $aggregate->setContainer($container);
     $aggregate->add(createAggregateTestServiceProvider());
@@ -50,15 +50,16 @@ test('aggregate adds class name service provider', function () {
 });
 
 test('aggregate throws when registering for service that is not added', function () {
-    $container = $this->getMockBuilder(Container::class)->getMock();
+    $container = Mockery::mock(Container::class);
     $aggregate = new ServiceProviderAggregate();
     $aggregate->setContainer($container);
 
-    expect(fn () => $aggregate->register('SomeService'))->toThrow(ContainerException::class);
+    expect(fn() => $aggregate->register('SomeService'))->toThrow(ContainerException::class);
 });
 
 test('aggregate invokes correct register method only once', function () {
-    $container = $this->getMockBuilder(Container::class)->getMock();
+    $container = Mockery::mock(Container::class);
+    $container->allows('add');
     $aggregate = new ServiceProviderAggregate();
     $aggregate->setContainer($container);
     $provider = createAggregateTestServiceProvider();
@@ -71,7 +72,8 @@ test('aggregate invokes correct register method only once', function () {
 });
 
 test('register all registers every provider', function () {
-    $container = $this->getMockBuilder(Container::class)->getMock();
+    $container = Mockery::mock(Container::class);
+    $container->allows('add');
     $aggregate = new ServiceProviderAggregate();
     $aggregate->setContainer($container);
 
@@ -103,7 +105,8 @@ test('register all registers every provider', function () {
 });
 
 test('register all prevents double registration', function () {
-    $container = $this->getMockBuilder(Container::class)->getMock();
+    $container = Mockery::mock(Container::class);
+    $container->allows('add');
     $aggregate = new ServiceProviderAggregate();
     $aggregate->setContainer($container);
 
@@ -118,7 +121,8 @@ test('register all prevents double registration', function () {
 });
 
 test('register all and register share double registration tracking', function () {
-    $container = $this->getMockBuilder(Container::class)->getMock();
+    $container = Mockery::mock(Container::class);
+    $container->allows('add');
     $aggregate = new ServiceProviderAggregate();
     $aggregate->setContainer($container);
 
@@ -133,7 +137,7 @@ test('register all and register share double registration tracking', function ()
 });
 
 test('aggregate skips existing providers', function () {
-    $container = $this->getMockBuilder(Container::class)->getMock();
+    $container = Mockery::mock(Container::class);
     $aggregate = new ServiceProviderAggregate();
     $aggregate->setContainer($container);
     $provider = createAggregateTestServiceProvider();

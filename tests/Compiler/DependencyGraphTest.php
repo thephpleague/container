@@ -221,7 +221,7 @@ test('depth guard throws when cycle detection exceeds configured limit', functio
     $graph->addEdge('C', 'D');
     $graph->addEdge('D', 'E');
 
-    expect(fn () => $graph->detectCycles())
+    expect(fn() => $graph->detectCycles())
         ->toThrow(ContainerException::class, 'Dependency graph depth guard of 3 exceeded');
 });
 
@@ -232,7 +232,7 @@ test('depth guard throws when topological order exceeds configured limit', funct
     $graph->addEdge('B', 'C');
     $graph->addEdge('C', 'D');
 
-    expect(fn () => $graph->getTopologicalOrder())
+    expect(fn() => $graph->getTopologicalOrder())
         ->toThrow(ContainerException::class, 'Dependency graph depth guard of 3 exceeded');
 });
 
@@ -244,7 +244,7 @@ test('depth guard throws when transitive dependency traversal exceeds configured
     $graph->addEdge('C', 'D');
     $graph->addEdge('D', 'E');
 
-    expect(fn () => $graph->getTransitiveDependencies('A'))
+    expect(fn() => $graph->getTransitiveDependencies('A'))
         ->toThrow(ContainerException::class, 'Dependency graph depth guard of 3 exceeded');
 });
 
@@ -253,7 +253,7 @@ test('topological order throws when graph contains cycles', function () {
     $graph->addEdge('A', 'B');
     $graph->addEdge('B', 'A');
 
-    expect(fn () => $graph->getTopologicalOrder())
+    expect(fn() => $graph->getTopologicalOrder())
         ->toThrow(ContainerException::class, 'Cannot produce a topological ordering');
 });
 

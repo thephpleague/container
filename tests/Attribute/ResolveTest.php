@@ -11,8 +11,8 @@ test('can instantiate with class resolver and single segment path', function () 
     $foo = new Foo();
     $foo->setBar(new Bar());
 
-    $container = $this->createMock(Container::class);
-    $container->method('get')->with(Foo::class)->willReturn($foo);
+    $container = Mockery::mock(Container::class);
+    $container->allows('get')->with(Foo::class)->andReturn($foo);
 
     $resolve = new Resolve(Foo::class, 'bar');
     $resolve->setContainer($container);
@@ -29,8 +29,8 @@ test('can instantiate with class resolver and multi segment path', function () {
     $bar->setSomething(['foo' => 'bar']);
     $foo->setBar($bar);
 
-    $container = $this->createMock(Container::class);
-    $container->method('get')->with(Foo::class)->willReturn($foo);
+    $container = Mockery::mock(Container::class);
+    $container->allows('get')->with(Foo::class)->andReturn($foo);
 
     $resolve = new Resolve(Foo::class, 'bar.getSomething.foo');
     $resolve->setContainer($container);

@@ -17,9 +17,7 @@ function createTestServiceProvider(): ServiceProviderInterface
             ], true);
         }
 
-        public function boot(): void
-        {
-        }
+        public function boot(): void {}
 
         public function register(): void
         {

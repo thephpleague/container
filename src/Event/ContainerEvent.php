@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace League\Container\Event;
 
 use League\Container\Definition\DefinitionInterface;
+use Override;
 use Psr\EventDispatcher\StoppableEventInterface;
 
 abstract class ContainerEvent implements StoppableEventInterface
@@ -18,8 +19,7 @@ abstract class ContainerEvent implements StoppableEventInterface
         protected ?DefinitionInterface $definition = null,
         protected array $tags = [],
         protected mixed $resolved = null,
-    ) {
-    }
+    ) {}
 
     public function getId(): string
     {
@@ -63,7 +63,7 @@ abstract class ContainerEvent implements StoppableEventInterface
         $this->propagationStopped = true;
     }
 
-    #[\Override]
+    #[Override]
     public function isPropagationStopped(): bool
     {
         return $this->propagationStopped;

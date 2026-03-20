@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace League\Container\Argument;
 
 use InvalidArgumentException;
+use Override;
 
 class LiteralArgument implements LiteralArgumentInterface
 {
@@ -32,12 +33,12 @@ class LiteralArgument implements LiteralArgumentInterface
             $this->value = $value;
         } else {
             throw new InvalidArgumentException(
-                sprintf('Expected literal argument type "%s", got "%s"', $type, get_debug_type($value))
+                sprintf('Expected literal argument type "%s", got "%s"', $type, get_debug_type($value)),
             );
         }
     }
 
-    #[\Override]
+    #[Override]
     public function getValue(): mixed
     {
         return $this->value;

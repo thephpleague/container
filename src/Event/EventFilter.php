@@ -17,7 +17,7 @@ class EventFilter
     /** @var array<int, string> */
     protected array $idFilters = [];
 
-    /** @var array<int, \Closure> */
+    /** @var array<int, Closure> */
     protected array $customFilters = [];
 
     /**
@@ -25,9 +25,7 @@ class EventFilter
      */
     protected mixed $listener = null;
 
-    public function __construct(protected EventDispatcher $dispatcher, protected string $eventType)
-    {
-    }
+    public function __construct(protected EventDispatcher $dispatcher, protected string $eventType) {}
 
     public function forType(string ...$types): self
     {

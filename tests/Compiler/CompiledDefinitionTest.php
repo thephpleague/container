@@ -62,5 +62,5 @@ test('properties are readonly', function () {
         factoryMethod: null,
     );
 
-    expect(fn () => $definition->id = 'mutated')->toThrow(Error::class);
+    expect(fn() => $definition->id = 'mutated')->toThrow(Error::class);
 });

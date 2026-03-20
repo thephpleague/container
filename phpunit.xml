@@ -1,32 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd"
-         displayDetailsOnTestsThatTriggerDeprecations="true"
-         displayDetailsOnTestsThatTriggerErrors="true"
-         displayDetailsOnTestsThatTriggerNotices="true"
-         displayDetailsOnTestsThatTriggerWarnings="true"
-         displayDetailsOnPhpunitDeprecations="true"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/12.0/phpunit.xsd"
          bootstrap="vendor/autoload.php"
          colors="true"
          cacheDirectory=".phpunit.cache">
-    <coverage>
-        <report>
-            <clover outputFile="build/logs/clover.xml"/>
-            <html outputDirectory="build/coverage"/>
-            <text outputFile="build/coverage.txt"/>
-        </report>
-    </coverage>
     <testsuites>
         <testsuite name="League Test Suite">
             <directory>tests</directory>
         </testsuite>
     </testsuites>
-    <logging>
-        <junit outputFile="build/report.junit.xml"/>
-    </logging>
     <source>
         <include>
-            <directory suffix=".php">src/</directory>
+            <directory>src/</directory>
         </include>
     </source>
 </phpunit>

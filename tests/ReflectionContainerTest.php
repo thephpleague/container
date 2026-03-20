@@ -12,29 +12,6 @@ use League\Container\Test\Asset\FooWithAttr;
 use League\Container\Test\Asset\ProBar;
 use League\Container\Test\Asset\ProFoo;
 
-function getContainerMock(PHPUnit\Framework\TestCase $testCase, array $items = []): Container
-{
-    $container = $testCase->getMockBuilder(Container::class)->getMock();
-
-    $container
-        ->method('has')
-        ->willReturnCallback(function ($alias) use ($items) {
-            return array_key_exists($alias, $items);
-        });
-
-    $container
-        ->method('get')
-        ->willReturnCallback(function ($alias) use ($items) {
-            if (array_key_exists($alias, $items)) {
-                return $items[$alias];
-            }
-
-            return null;
-        });
-
-    return $container;
-}
-
 test('has returns true if class exists', function () {
     $container = new ReflectionContainer();
 
@@ -88,11 +65,14 @@ test('get instantiates and caches class with constructor', function () {
 
 test('get instantiates class with constructor and uses container', function () {
     $dependency = new Bar();
-    $container = new ReflectionContainer();
+    $items = [Bar::class => $dependency];
 
-    $container->setContainer(getContainerMock($this, [
-        Bar::class => $dependency,
-    ]));
+    $mock = Mockery::mock(Container::class);
+    $mock->allows('has')->andReturnUsing(fn($alias) => array_key_exists($alias, $items));
+    $mock->allows('get')->andReturnUsing(fn($alias) => $items[$alias] ?? null);
+
+    $container = new ReflectionContainer();
+    $container->setContainer($mock);
 
     $item = $container->get(Foo::class);
 
@@ -115,7 +95,7 @@ test('get instantiates class with constructor and uses arguments', function () {
 test('throws when getting non existent class', function () {
     $container = new ReflectionContainer();
 
-    expect(fn () => $container->get('Whoooo'))->toThrow(NotFoundException::class);
+    expect(fn() => $container->get('Whoooo'))->toThrow(NotFoundException::class);
 });
 
 test('call reflects on closure arguments', function () {
@@ -149,7 +129,7 @@ test('call reflects on static method arguments', function () {
 test('call throws when argument cannot be resolved', function () {
     $container = new ReflectionContainer();
 
-    expect(fn () => $container->call([new Bar(), 'setSomething']))->toThrow(NotFoundException::class);
+    expect(fn() => $container->call([new Bar(), 'setSomething']))->toThrow(NotFoundException::class);
 });
 
 test('call resolves invokable class', function () {

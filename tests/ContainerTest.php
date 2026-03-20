@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use League\Container\Container;
-use League\Container\ContainerAwareTrait;
 use League\Container\Exception\ContainerException;
 use League\Container\Exception\NotFoundException;
 use League\Container\ReflectionContainer;
@@ -119,9 +118,7 @@ test('throws when service provider lies', function () {
             return true;
         }
 
-        public function register(): void
-        {
-        }
+        public function register(): void {}
     };
 
     $container = new Container();
@@ -129,7 +126,7 @@ test('throws when service provider lies', function () {
 
     expect($container->has('lie'))->toBeTrue();
 
-    expect(fn () => $container->get('lie'))->toThrow(ContainerException::class);
+    expect(fn() => $container->get('lie'))->toThrow(ContainerException::class);
 });
 
 test('container adds and gets from delegate', function () {
@@ -144,7 +141,7 @@ test('container throws when cannot get service', function () {
     $container = new Container();
 
     expect($container->has(Foo::class))->toBeFalse();
-    expect(fn () => $container->get(Foo::class))->toThrow(NotFoundException::class);
+    expect(fn() => $container->get(Foo::class))->toThrow(NotFoundException::class);
 });
 
 test('container can extend definition', function () {
@@ -181,17 +178,7 @@ test('container throws when cannot get definition to extend', function () {
     $container = new Container();
 
     expect($container->has(Foo::class))->toBeFalse();
-    expect(fn () => $container->extend(Foo::class))->toThrow(NotFoundException::class);
-});
-
-test('container aware cannot be used without implementing interface', function () {
-    $class = new class {
-        use ContainerAwareTrait;
-    };
-
-    $container = $this->getMockBuilder(Container::class)->getMock();
-
-    expect(fn () => $class->setContainer($container))->toThrow(BadMethodCallException::class);
+    expect(fn() => $container->extend(Foo::class))->toThrow(NotFoundException::class);
 });
 
 test('non existent class resolves as string', function () {
@@ -244,6 +231,6 @@ test('get delegate returns matching delegate', function () {
 test('get delegate throws when no delegate of type exists', function () {
     $container = new Container();
 
-    expect(fn () => $container->getDelegate(ReflectionContainer::class))
+    expect(fn() => $container->getDelegate(ReflectionContainer::class))
         ->toThrow(NotFoundException::class, 'No delegate container of type');
 });

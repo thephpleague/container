@@ -11,7 +11,7 @@ use League\Container\Test\Asset\BarInterface;
 use League\Container\Test\Asset\Foo;
 use League\Container\Test\Asset\FooCallable;
 use League\Container\Test\Asset\FooWithRequiredDependency;
-use Psr\Container\ContainerExceptionInterface;
+use League\Container\Exception\ContainerException;
 
 test('definition resolves closure with defined args', function () {
     $definition = new Definition('callable', function (...$args) {
@@ -46,14 +46,14 @@ test('definition resolves array callable', function () {
 });
 
 test('definition resolves class with method calls', function () {
-    $container = $this->getMockBuilder(Container::class)->getMock();
+    $container = Mockery::mock(Container::class);
     $bar = new Bar();
 
-    $container->method('has')->willReturnMap([
-        [Foo::class, false],
-        [Bar::class, true],
-    ]);
-    $container->expects($this->once())->method('get')->with($this->equalTo(Bar::class))->willReturn($bar);
+    $container->allows('has')->andReturnUsing(fn(string $id) => match ($id) {
+        Foo::class => false,
+        Bar::class => true,
+    });
+    $container->shouldReceive('get')->once()->with(Bar::class)->andReturn($bar);
 
     $definition = new Definition('callable', Foo::class);
     $definition->setContainer($container);
@@ -66,14 +66,14 @@ test('definition resolves class with method calls', function () {
 });
 
 test('definition resolves class with defined args', function () {
-    $container = $this->getMockBuilder(Container::class)->getMock();
+    $container = Mockery::mock(Container::class);
     $bar = new Bar();
 
-    $container->method('has')->willReturnMap([
-        [Foo::class, false],
-        [Bar::class, true],
-    ]);
-    $container->expects($this->once())->method('get')->with($this->equalTo(Bar::class))->willReturn($bar);
+    $container->allows('has')->andReturnUsing(fn(string $id) => match ($id) {
+        Foo::class => false,
+        Bar::class => true,
+    });
+    $container->shouldReceive('get')->once()->with(Bar::class)->andReturn($bar);
 
     $definition = new Definition('callable', Foo::class);
     $definition->setContainer($container);
@@ -100,12 +100,12 @@ test('definition resolves shared item only once', function () {
 test('definition resolves nested alias', function () {
     $aliasDefinition = new Definition('alias', new ResolvableArgument('class'));
     $definition = new Definition('class', Foo::class);
-    $container = $this->getMockBuilder(Container::class)->getMock();
+    $container = Mockery::mock(Container::class);
 
     $expected = $definition->resolve();
 
-    $container->expects($this->once())->method('has')->with($this->equalTo('class'))->willReturn(true);
-    $container->expects($this->once())->method('get')->with($this->equalTo('class'))->willReturn($expected);
+    $container->shouldReceive('has')->once()->with('class')->andReturn(true);
+    $container->shouldReceive('get')->once()->with('class')->andReturn($expected);
 
     $aliasDefinition->setContainer($container);
 
@@ -145,11 +145,11 @@ test('non existent class is returned as identical string', function () {
 });
 
 test('definition delegates to container for different concrete', function () {
-    $container = $this->getMockBuilder(Container::class)->getMock();
+    $container = Mockery::mock(Container::class);
     $bar = new Bar();
 
-    $container->expects($this->once())->method('has')->with($this->equalTo(Bar::class))->willReturn(true);
-    $container->expects($this->once())->method('get')->with($this->equalTo(Bar::class))->willReturn($bar);
+    $container->shouldReceive('has')->once()->with(Bar::class)->andReturn(true);
+    $container->shouldReceive('get')->once()->with(Bar::class)->andReturn($bar);
 
     $definition = new Definition(BarInterface::class, Bar::class);
     $definition->setContainer($container);
@@ -161,10 +161,10 @@ test('definition delegates to container for different concrete', function () {
 });
 
 test('definition resolves own class when concrete matches id', function () {
-    $container = $this->getMockBuilder(Container::class)->getMock();
+    $container = Mockery::mock(Container::class);
 
-    $container->expects($this->never())->method('has');
-    $container->expects($this->never())->method('get');
+    $container->shouldNotReceive('has');
+    $container->shouldNotReceive('get');
 
     $definition = new Definition(Foo::class, Foo::class);
     $definition->setContainer($container);
@@ -173,11 +173,11 @@ test('definition resolves own class when concrete matches id', function () {
 });
 
 test('definition delegates to container when concrete comes from resolvable argument', function () {
-    $container = $this->getMockBuilder(Container::class)->getMock();
+    $container = Mockery::mock(Container::class);
     $bar = new Bar();
 
-    $container->expects($this->once())->method('has')->with($this->equalTo(Bar::class))->willReturn(true);
-    $container->expects($this->once())->method('get')->with($this->equalTo(Bar::class))->willReturn($bar);
+    $container->shouldReceive('has')->once()->with(Bar::class)->andReturn(true);
+    $container->shouldReceive('get')->once()->with(Bar::class)->andReturn($bar);
 
     $definition = new Definition(BarInterface::class, new ResolvableArgument(Bar::class));
     $definition->setContainer($container);
@@ -191,6 +191,6 @@ test('definition delegates to container when concrete comes from resolvable argu
 test('resolve class throws container exception for unsatisfied dependencies', function () {
     $definition = new Definition(FooWithRequiredDependency::class);
 
-    expect(fn () => $definition->resolveNew())
-        ->toThrow(ContainerExceptionInterface::class, 'unsatisfied dependencies');
+    expect(fn() => $definition->resolveNew())
+        ->toThrow(ContainerException::class, 'unsatisfied dependencies');
 });

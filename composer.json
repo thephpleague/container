@@ -25,10 +25,11 @@
         "psr/event-dispatcher": "^1.0"
     },
     "require-dev": {
-        "phpstan/phpstan": "^2.1.11",
+        "friendsofphp/php-cs-fixer": "^3.0",
+        "mockery/mockery": "^1.6",
         "pestphp/pest": "^4.0",
-        "roave/security-advisories": "dev-latest",
-        "friendsofphp/php-cs-fixer": "^3.0"
+        "phpstan/phpstan": "^2.1.11",
+        "roave/security-advisories": "dev-latest"
     },
     "provide": {
         "psr/container-implementation": "^2.0"
@@ -39,6 +40,9 @@
         }
     },
     "autoload-dev": {
+        "psr-4": {
+            "League\\Container\\Test\\": "tests"
+        },
         "files": [
             "tests/Asset/function.php"
         ]

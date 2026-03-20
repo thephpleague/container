@@ -17,8 +17,7 @@ final class DependencyGraph
 
     public function __construct(
         private readonly int $depthGuard = 50,
-    ) {
-    }
+    ) {}
 
     public function addNode(string $id): void
     {
@@ -68,7 +67,7 @@ final class DependencyGraph
 
         if ($cycles !== []) {
             throw new ContainerException(
-                'Cannot produce a topological ordering for a dependency graph that contains cycles.'
+                'Cannot produce a topological ordering for a dependency graph that contains cycles.',
             );
         }
 
@@ -190,7 +189,7 @@ final class DependencyGraph
                     'Dependency graph depth guard of %d exceeded at node "%s". The dependency graph may contain an extremely deep or unbounded dependency chain.',
                     $this->depthGuard,
                     $node,
-                )
+                ),
             );
         }
     }

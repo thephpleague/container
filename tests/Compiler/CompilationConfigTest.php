@@ -24,5 +24,5 @@ test('custom values override defaults', function () {
 test('properties are readonly', function () {
     $config = new CompilationConfig();
 
-    expect(fn () => $config->className = 'mutated')->toThrow(Error::class);
+    expect(fn() => $config->className = 'mutated')->toThrow(Error::class);
 });

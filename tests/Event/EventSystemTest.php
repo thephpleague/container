@@ -372,8 +372,8 @@ test('where composes multiple closures with and', function () {
     $this->container->listen(ServiceResolvedEvent::class, function () use (&$listenerFiredCount) {
         $listenerFiredCount++;
     })
-        ->where(fn ($e) => $e->getId() === Foo::class)
-        ->where(fn ($e) => $e instanceof ServiceResolvedEvent && $e->isInstanceOf(Foo::class));
+        ->where(fn($e) => $e->getId() === Foo::class)
+        ->where(fn($e) => $e instanceof ServiceResolvedEvent && $e->isInstanceOf(Foo::class));
 
     $this->container->add(Foo::class);
     $this->container->add(Bar::class);
@@ -423,7 +423,7 @@ test('has listeners for returns false when empty', function () {
 
 test('has listeners for returns true for direct listener', function () {
     $dispatcher = new EventDispatcher();
-    $dispatcher->addListener(ServiceResolvedEvent::class, fn () => null);
+    $dispatcher->addListener(ServiceResolvedEvent::class, fn() => null);
 
     expect($dispatcher->hasListenersFor(ServiceResolvedEvent::class))->toBeTrue();
     expect($dispatcher->hasListenersFor(BeforeResolveEvent::class))->toBeFalse();
@@ -431,14 +431,14 @@ test('has listeners for returns true for direct listener', function () {
 
 test('has listeners for returns true for filter', function () {
     $dispatcher = new EventDispatcher();
-    $dispatcher->listen(ServiceResolvedEvent::class)->then(fn () => null);
+    $dispatcher->listen(ServiceResolvedEvent::class)->then(fn() => null);
 
     expect($dispatcher->hasListenersFor(ServiceResolvedEvent::class))->toBeTrue();
 });
 
 test('has listeners for returns false after remove listeners', function () {
     $dispatcher = new EventDispatcher();
-    $dispatcher->addListener(ServiceResolvedEvent::class, fn () => null);
+    $dispatcher->addListener(ServiceResolvedEvent::class, fn() => null);
 
     expect($dispatcher->hasListenersFor(ServiceResolvedEvent::class))->toBeTrue();
 
@@ -511,7 +511,7 @@ test('after resolve filters by type', function () {
 });
 
 test('after resolve returns event filter for chaining', function () {
-    $filter = $this->container->afterResolve(Foo::class, fn () => null);
+    $filter = $this->container->afterResolve(Foo::class, fn() => null);
 
     expect($filter)->toBeInstanceOf(EventFilter::class);
     $filter->forTag('shared');

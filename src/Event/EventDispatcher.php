@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace League\Container\Event;
 
+use Override;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\EventDispatcher\ListenerProviderInterface;
 
@@ -15,7 +16,7 @@ class EventDispatcher implements EventDispatcherInterface, ListenerProviderInter
     /** @var array<string, array<int, EventFilter>> */
     protected array $filters = [];
 
-    #[\Override]
+    #[Override]
     public function dispatch(object $event): object
     {
         if (!$event instanceof ContainerEvent) {
@@ -51,7 +52,7 @@ class EventDispatcher implements EventDispatcherInterface, ListenerProviderInter
     /**
      * @return iterable<callable>
      */
-    #[\Override]
+    #[Override]
     public function getListenersForEvent(object $event): iterable
     {
         $eventClass = $event::class;

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace League\Container\Event;
 
 use League\Container\Definition\DefinitionInterface;
+use Override;
 
 final class OnDefineEvent extends ContainerEvent
 {
@@ -17,7 +18,7 @@ final class OnDefineEvent extends ContainerEvent
         parent::__construct($id, $definition, $tags);
     }
 
-    #[\Override]
+    #[Override]
     public function getDefinition(): DefinitionInterface
     {
         assert($this->definition instanceof DefinitionInterface);

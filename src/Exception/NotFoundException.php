@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace League\Container\Exception;
 
-use Psr\Container\NotFoundExceptionInterface;
 use InvalidArgumentException;
+use Psr\Container\NotFoundExceptionInterface;
 
-class NotFoundException extends InvalidArgumentException implements NotFoundExceptionInterface
-{
-}
+class NotFoundException extends InvalidArgumentException implements NotFoundExceptionInterface {}

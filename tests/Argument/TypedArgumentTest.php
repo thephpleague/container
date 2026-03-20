@@ -9,12 +9,10 @@ test('literal argument sets and gets argument', function () {
     $arguments = [
         Literal\ArrayArgument::class => [],
         Literal\BooleanArgument::class => true,
-        Literal\CallableArgument::class => function () {
-        },
+        Literal\CallableArgument::class => function () {},
         Literal\FloatArgument::class => 1.23,
         Literal\IntegerArgument::class => 1,
-        Literal\ObjectArgument::class => new class {
-        },
+        Literal\ObjectArgument::class => new class {},
         Literal\StringArgument::class => 'string',
     ];
 
@@ -25,6 +23,6 @@ test('literal argument sets and gets argument', function () {
 });
 
 test('literal argument throws with wrong argument type', function () {
-    expect(fn () => new LiteralArgument(LiteralArgument::TYPE_BOOL, 'blah'))
+    expect(fn() => new LiteralArgument(LiteralArgument::TYPE_BOOL, 'blah'))
         ->toThrow(InvalidArgumentException::class);
 });

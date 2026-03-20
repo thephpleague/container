@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace League\Container\ServiceProvider;
 
 use League\Container\ContainerAwareTrait;
+use Override;
 
 abstract class AbstractServiceProvider implements ServiceProviderInterface
 {
@@ -12,7 +13,7 @@ abstract class AbstractServiceProvider implements ServiceProviderInterface
 
     protected string $identifier;
 
-    #[\Override]
+    #[Override]
     public function getIdentifier(): string
     {
         if (empty($this->identifier)) {
@@ -22,7 +23,7 @@ abstract class AbstractServiceProvider implements ServiceProviderInterface
         return $this->identifier;
     }
 
-    #[\Override]
+    #[Override]
     public function setIdentifier(string $id): ServiceProviderInterface
     {
         $this->identifier = $id;

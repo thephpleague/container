@@ -9,6 +9,5 @@ final readonly class CompilationConfig
     public function __construct(
         public string $namespace = '',
         public string $className = 'CompiledContainer',
-    ) {
-    }
+    ) {}
 }

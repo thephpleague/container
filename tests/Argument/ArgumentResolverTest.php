@@ -14,16 +14,10 @@ test('resolver resolves from container', function () {
         use ContainerAwareTrait;
     };
 
-    $container = $this->getMockBuilder(Container::class)->getMock();
+    $container = Mockery::mock(Container::class);
 
-    $matcher = $this->exactly(2);
-
-    $container
-        ->expects($matcher)
-        ->method('has')
-        ->willReturnOnConsecutiveCalls(true, false);
-
-    $container->expects($this->once())->method('get')->with($this->equalTo('alias1'))->willReturn($resolver);
+    $container->shouldReceive('has')->twice()->andReturn(true, false);
+    $container->shouldReceive('get')->once()->with('alias1')->andReturn($resolver);
 
     $resolver->setContainer($container);
 
@@ -39,18 +33,10 @@ test('resolver resolves literal arguments', function () {
         use ContainerAwareTrait;
     };
 
-    $container = $this->getMockBuilder(Container::class)->getMock();
+    $container = Mockery::mock(Container::class);
 
-    $container
-        ->expects($this->once())
-        ->method('has')
-        ->willReturnOnConsecutiveCalls(true, false);
-
-    $container
-        ->expects($this->once())
-        ->method('get')
-        ->with($this->equalTo('alias1'))
-        ->willReturn(new Literal\StringArgument('value1'));
+    $container->shouldReceive('has')->once()->andReturn(true);
+    $container->shouldReceive('get')->once()->with('alias1')->andReturn(new Literal\StringArgument('value1'));
 
     $resolver->setContainer($container);
 

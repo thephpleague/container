@@ -11,8 +11,7 @@ final readonly class CompilationResult
         public string $fullyQualifiedClassName,
         public string $sourceHash,
         public int $serviceCount,
-    ) {
-    }
+    ) {}
 
     public function writeTo(string $path): void
     {

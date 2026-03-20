@@ -19,6 +19,7 @@ use League\Container\Exception\NotFoundException;
 use League\Container\ServiceProvider\ServiceProviderAggregate;
 use League\Container\ServiceProvider\ServiceProviderAggregateInterface;
 use League\Container\ServiceProvider\ServiceProviderInterface;
+use Override;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -42,7 +43,7 @@ class Container implements DefinitionContainerInterface
         $this->eventDispatcher = new EventDispatcher();
     }
 
-    #[\Override]
+    #[Override]
     public function add(string $id, mixed $concrete = null, bool $overwrite = false): DefinitionInterface
     {
         $toOverwrite = $this->defaultToOverwrite || $overwrite;
@@ -64,7 +65,7 @@ class Container implements DefinitionContainerInterface
         return $definition;
     }
 
-    #[\Override]
+    #[Override]
     public function addShared(string $id, mixed $concrete = null, bool $overwrite = false): DefinitionInterface
     {
         $toOverwrite = $this->defaultToOverwrite || $overwrite;
@@ -94,7 +95,7 @@ class Container implements DefinitionContainerInterface
         return $this;
     }
 
-    #[\Override]
+    #[Override]
     public function extend(string $id): DefinitionInterface
     {
         if ($this->providers->provides($id)) {
@@ -107,18 +108,18 @@ class Container implements DefinitionContainerInterface
 
         throw new NotFoundException(sprintf(
             'Unable to extend alias (%s) as it is not being managed as a definition',
-            $id
+            $id,
         ));
     }
 
-    #[\Override]
+    #[Override]
     public function addServiceProvider(ServiceProviderInterface $provider): DefinitionContainerInterface
     {
         $this->providers->add($provider);
         return $this;
     }
 
-    #[\Override]
+    #[Override]
     public function get(string $id): mixed
     {
         return $this->resolve($id);
@@ -128,13 +129,13 @@ class Container implements DefinitionContainerInterface
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[\Override]
+    #[Override]
     public function getNew(string $id): mixed
     {
         return $this->resolve($id, true);
     }
 
-    #[\Override]
+    #[Override]
     public function has(string $id): bool
     {
         if ($this->definitions->has($id)) {
@@ -186,7 +187,7 @@ class Container implements DefinitionContainerInterface
 
         throw new NotFoundException(sprintf(
             'No delegate container of type "%s" is configured',
-            $class
+            $class,
         ));
     }
 
@@ -258,7 +259,7 @@ class Container implements DefinitionContainerInterface
             ) {
                 throw new ContainerException(sprintf(
                     'Service provider lied about providing (%s) service',
-                    $id
+                    $id,
                 ));
             }
 

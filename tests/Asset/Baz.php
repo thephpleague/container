@@ -6,7 +6,5 @@ namespace League\Container\Test\Asset;
 
 class Baz
 {
-    public function __construct(?BarInterface $bar = null)
-    {
-    }
+    public function __construct(?BarInterface $bar = null) {}
 }

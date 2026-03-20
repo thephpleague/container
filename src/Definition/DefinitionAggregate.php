@@ -7,6 +7,7 @@ namespace League\Container\Definition;
 use Generator;
 use League\Container\ContainerAwareTrait;
 use League\Container\Exception\NotFoundException;
+use Override;
 
 class DefinitionAggregate implements DefinitionAggregateInterface
 {
@@ -23,7 +24,7 @@ class DefinitionAggregate implements DefinitionAggregateInterface
         }));
     }
 
-    #[\Override]
+    #[Override]
     public function add(string $id, mixed $definition, bool $overwrite = false): DefinitionInterface
     {
         if (true === $overwrite) {
@@ -39,14 +40,14 @@ class DefinitionAggregate implements DefinitionAggregateInterface
         return $definition;
     }
 
-    #[\Override]
+    #[Override]
     public function addShared(string $id, mixed $definition, bool $overwrite = false): DefinitionInterface
     {
         $definition = $this->add($id, $definition, $overwrite);
         return $definition->setShared(true);
     }
 
-    #[\Override]
+    #[Override]
     public function has(string $id): bool
     {
         $id = Definition::normaliseAlias($id);
@@ -60,7 +61,7 @@ class DefinitionAggregate implements DefinitionAggregateInterface
         return false;
     }
 
-    #[\Override]
+    #[Override]
     public function hasTag(string $tag): bool
     {
         foreach ($this as $definition) {
@@ -72,7 +73,7 @@ class DefinitionAggregate implements DefinitionAggregateInterface
         return false;
     }
 
-    #[\Override]
+    #[Override]
     public function getDefinition(string $id): DefinitionInterface
     {
         $id = Definition::normaliseAlias($id);
@@ -87,20 +88,20 @@ class DefinitionAggregate implements DefinitionAggregateInterface
         throw new NotFoundException(sprintf('Alias (%s) is not being handled as a definition.', $id));
     }
 
-    #[\Override]
+    #[Override]
     public function resolve(string $id): mixed
     {
         return $this->getDefinition($id)->resolve();
     }
 
-    #[\Override]
+    #[Override]
     public function resolveNew(string $id): mixed
     {
         return $this->getDefinition($id)->resolveNew();
     }
 
     /** @return array<int, mixed> */
-    #[\Override]
+    #[Override]
     public function resolveTagged(string $tag): array
     {
         $arrayOf = [];
@@ -116,7 +117,7 @@ class DefinitionAggregate implements DefinitionAggregateInterface
     }
 
     /** @return array<int, mixed> */
-    #[\Override]
+    #[Override]
     public function resolveTaggedNew(string $tag): array
     {
         $arrayOf = [];
@@ -143,7 +144,7 @@ class DefinitionAggregate implements DefinitionAggregateInterface
     }
 
     /** @return Generator<int, DefinitionInterface> */
-    #[\Override]
+    #[Override]
     public function getIterator(): Generator
     {
         yield from $this->definitions;

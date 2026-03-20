@@ -10,31 +10,35 @@ use League\Container\Container;
 use League\Container\ContainerAwareTrait;
 use League\Container\ReflectionContainer;
 use League\Container\Test\Asset\Baz;
-use Psr\Container\NotFoundExceptionInterface;
+use League\Container\Exception\NotFoundException;
 
 test('resolver resolves arguments via reflection', function () {
-    $method = $this->getMockBuilder(ReflectionFunctionAbstract::class)->getMock();
-    $param1 = $this->getMockBuilder(ReflectionParameter::class)->disableOriginalConstructor()->getMock();
-    $param2 = $this->getMockBuilder(ReflectionParameter::class)->disableOriginalConstructor()->getMock();
-    $param3 = $this->getMockBuilder(ReflectionParameter::class)->disableOriginalConstructor()->getMock();
-    $class = $this->getMockBuilder(ReflectionNamedType::class)->disableOriginalConstructor()->getMock();
-    $container = $this->getMockBuilder(Container::class)->getMock();
+    $method = Mockery::mock(ReflectionFunctionAbstract::class);
+    $param1 = Mockery::mock(ReflectionParameter::class);
+    $param2 = Mockery::mock(ReflectionParameter::class);
+    $param3 = Mockery::mock(ReflectionParameter::class);
+    $class = Mockery::mock(ReflectionNamedType::class);
+    $container = Mockery::mock(Container::class);
 
-    $class->expects($this->any())->method('getName')->willReturn('Class');
-    $param1->expects($this->any())->method('getName')->willReturn('param1');
-    $param1->expects($this->once())->method('getType')->willReturn($class);
+    $class->allows('getName')->andReturn('Class');
 
-    $param2->expects($this->any())->method('getName')->willReturn('param2');
-    $param2->expects($this->once())->method('getType')->willReturn(null);
-    $param2->expects($this->once())->method('isDefaultValueAvailable')->willReturn(true);
-    $param2->expects($this->once())->method('getDefaultValue')->willReturn('value2');
+    $param1->allows('getName')->andReturn('param1');
+    $param1->allows('getAttributes')->andReturn([]);
+    $param1->shouldReceive('getType')->once()->andReturn($class);
+    $param1->allows('isDefaultValueAvailable')->andReturn(false);
 
-    $param3->expects($this->any())->method('getName')->willReturn('param3');
+    $param2->allows('getName')->andReturn('param2');
+    $param2->allows('getAttributes')->andReturn([]);
+    $param2->shouldReceive('getType')->once()->andReturn(null);
+    $param2->shouldReceive('isDefaultValueAvailable')->once()->andReturn(true);
+    $param2->shouldReceive('getDefaultValue')->once()->andReturn('value2');
 
-    $method->expects($this->once())->method('getParameters')->willReturn([$param1, $param2, $param3]);
+    $param3->allows('getName')->andReturn('param3');
 
-    $container->expects($this->once())->method('has')->with($this->equalTo('Class'))->willReturn(true);
-    $container->expects($this->once())->method('get')->with($this->equalTo('Class'))->willReturn('classObject');
+    $method->shouldReceive('getParameters')->once()->andReturn([$param1, $param2, $param3]);
+
+    $container->shouldReceive('has')->once()->with('Class')->andReturn(true);
+    $container->shouldReceive('get')->once()->with('Class')->andReturn('classObject');
 
     $resolver = new class implements ArgumentReflectorInterface, ArgumentResolverInterface {
         use ArgumentReflectorTrait;
@@ -74,14 +78,17 @@ test('resolves default value argument', function () {
 });
 
 test('resolver throws exception when reflection does not resolve', function () {
-    $method = $this->getMockBuilder(ReflectionFunctionAbstract::class)->getMock();
-    $param = $this->getMockBuilder(ReflectionParameter::class)->disableOriginalConstructor()->getMock();
+    $method = Mockery::mock(ReflectionFunctionAbstract::class);
+    $param = Mockery::mock(ReflectionParameter::class);
 
-    $param->expects($this->once())->method('getName')->willReturn('param1');
-    $param->expects($this->once())->method('getType')->willReturn(null);
-    $param->expects($this->once())->method('isDefaultValueAvailable')->willReturn(false);
+    $param->shouldReceive('getName')->andReturn('param1');
+    $param->allows('getAttributes')->andReturn([]);
+    $param->shouldReceive('getType')->once()->andReturn(null);
+    $param->shouldReceive('isDefaultValueAvailable')->once()->andReturn(false);
+    $param->allows('getDeclaringClass')->andReturnNull();
 
-    $method->expects($this->once())->method('getParameters')->willReturn([$param]);
+    $method->shouldReceive('getParameters')->once()->andReturn([$param]);
+    $method->allows('getName')->andReturn('testMethod');
 
     $resolver = new class implements ArgumentReflectorInterface, ArgumentResolverInterface {
         use ArgumentReflectorTrait;
@@ -94,5 +101,5 @@ test('resolver throws exception when reflection does not resolve', function () {
         }
     };
 
-    expect(fn () => $resolver->reflectArguments($method))->toThrow(NotFoundExceptionInterface::class);
+    expect(fn() => $resolver->reflectArguments($method))->toThrow(NotFoundException::class);
 });

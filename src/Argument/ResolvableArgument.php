@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace League\Container\Argument;
 
+use Override;
+
 class ResolvableArgument implements ResolvableArgumentInterface
 {
-    public function __construct(protected string $value)
-    {
-    }
+    public function __construct(protected string $value) {}
 
-    #[\Override]
+    #[Override]
     public function getValue(): string
     {
         return $this->value;

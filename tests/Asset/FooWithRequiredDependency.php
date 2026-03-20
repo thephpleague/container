@@ -6,7 +6,5 @@ namespace League\Container\Test\Asset;
 
 class FooWithRequiredDependency
 {
-    public function __construct(public readonly Bar $bar)
-    {
-    }
+    public function __construct(public readonly Bar $bar) {}
 }

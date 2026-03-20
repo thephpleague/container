@@ -2,4 +2,8 @@
 
 declare(strict_types=1);
 
-uses(PHPUnit\Framework\TestCase::class)->in(__DIR__);
+uses()
+    ->afterEach(function () {
+        Mockery::close();
+    })
+    ->in(__DIR__);

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace League\Container\Compiler;
 
 use League\Container\Exception\ContainerException;
+use Throwable;
 
 final class CompilationException extends ContainerException
 {
@@ -15,7 +16,7 @@ final class CompilationException extends ContainerException
         private readonly array $errors,
         string $message = '',
         int $code = 0,
-        ?\Throwable $previous = null,
+        ?Throwable $previous = null,
     ) {
         parent::__construct($message ?: $this->buildMessageFromErrors(), $code, $previous);
     }

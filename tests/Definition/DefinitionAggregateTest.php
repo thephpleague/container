@@ -10,16 +10,15 @@ use League\Container\Exception\NotFoundException;
 use League\Container\Test\Asset\Foo;
 
 test('aggregate adds definition', function () {
-    $container = $this->getMockBuilder(Container::class)->getMock();
-    $definition = $this->getMockBuilder(DefinitionInterface::class)->getMock();
+    $container = Mockery::mock(Container::class);
+    $definition = Mockery::mock(DefinitionInterface::class);
 
     $definition
-        ->expects($this->once())
-        ->method('setAlias')
-        ->with($this->equalTo('alias'))
-        ->willReturnSelf();
+        ->shouldReceive('setAlias')
+        ->once()
+        ->with('alias')
+        ->andReturnSelf();
 
-    /** @var DefinitionAggregate $aggregate */
     $aggregate = (new DefinitionAggregate())->setContainer($container);
     $definition = $aggregate->add('alias', $definition);
 
@@ -27,8 +26,7 @@ test('aggregate adds definition', function () {
 });
 
 test('aggregate creates definition', function () {
-    $container = $this->getMockBuilder(Container::class)->getMock();
-    /** @var DefinitionAggregate $aggregate */
+    $container = Mockery::mock(Container::class);
     $aggregate = (new DefinitionAggregate())->setContainer($container);
     $definition = $aggregate->add('alias', Foo::class);
 
@@ -36,8 +34,7 @@ test('aggregate creates definition', function () {
 });
 
 test('aggregate has definition', function () {
-    $container = $this->getMockBuilder(Container::class)->getMock();
-    /** @var DefinitionAggregate $aggregate */
+    $container = Mockery::mock(Container::class);
     $aggregate = (new DefinitionAggregate())->setContainer($container);
     $aggregate->add('alias', Foo::class);
 
@@ -46,8 +43,7 @@ test('aggregate has definition', function () {
 });
 
 test('aggregate adds and iterates multiple definitions', function () {
-    $container = $this->getMockBuilder(Container::class)->getMock();
-    /** @var DefinitionAggregate $aggregate */
+    $container = Mockery::mock(Container::class);
     $aggregate = (new DefinitionAggregate())->setContainer($container);
 
     $definitions = [];
@@ -63,48 +59,18 @@ test('aggregate adds and iterates multiple definitions', function () {
 
 test('aggregate iterates and resolves definition', function () {
     $aggregate = new DefinitionAggregate();
-    $definition1 = $this->getMockBuilder(DefinitionInterface::class)->getMock();
-    $definition2 = $this->getMockBuilder(DefinitionInterface::class)->getMock();
-    $container = $this->getMockBuilder(Container::class)->getMock();
+    $definition1 = Mockery::mock(DefinitionInterface::class);
+    $definition2 = Mockery::mock(DefinitionInterface::class);
+    $container = Mockery::mock(Container::class);
 
-    $definition1
-        ->expects($this->once())
-        ->method('getAlias')
-        ->willReturn('alias1');
+    $definition1->shouldReceive('getAlias')->andReturn('alias1');
+    $definition1->shouldReceive('setAlias')->once()->with('alias1')->andReturnSelf();
 
-    $definition1
-        ->expects($this->once())
-        ->method('setAlias')
-        ->with($this->equalTo('alias1'))
-        ->willReturnSelf();
-
-    $definition2
-        ->expects($this->once())
-        ->method('getAlias')
-        ->willReturn('alias2');
-
-    $definition2
-        ->expects($this->once())
-        ->method('setContainer')
-        ->with($this->equalTo($container))
-        ->willReturnSelf();
-
-    $definition2
-        ->expects($this->once())
-        ->method('setShared')
-        ->with($this->equalTo(true))
-        ->willReturnSelf();
-
-    $definition2
-        ->expects($this->once())
-        ->method('setAlias')
-        ->with($this->equalTo('alias2'))
-        ->willReturnSelf();
-
-    $definition2
-        ->expects($this->once())
-        ->method('resolve')
-        ->willReturnSelf();
+    $definition2->shouldReceive('getAlias')->andReturn('alias2');
+    $definition2->shouldReceive('setContainer')->once()->with($container)->andReturnSelf();
+    $definition2->shouldReceive('setShared')->once()->with(true)->andReturnSelf();
+    $definition2->shouldReceive('setAlias')->once()->with('alias2')->andReturnSelf();
+    $definition2->shouldReceive('resolve')->once()->andReturnSelf();
 
     $aggregate->setContainer($container);
 
@@ -117,43 +83,17 @@ test('aggregate iterates and resolves definition', function () {
 });
 
 test('aggregate can resolve array of tagged definitions', function () {
-    $definition1 = $this->getMockBuilder(DefinitionInterface::class)->getMock();
-    $definition2 = $this->getMockBuilder(DefinitionInterface::class)->getMock();
-    $container = $this->getMockBuilder(Container::class)->getMock();
+    $definition1 = Mockery::mock(DefinitionInterface::class);
+    $definition2 = Mockery::mock(DefinitionInterface::class);
+    $container = Mockery::mock(Container::class);
 
-    $definition1
-        ->expects($this->once())
-        ->method('setContainer')
-        ->with($this->equalTo($container))
-        ->willReturnSelf();
+    $definition1->shouldReceive('setContainer')->once()->with($container)->andReturnSelf();
+    $definition1->shouldReceive('hasTag')->with('tag')->twice()->andReturn(true);
+    $definition1->shouldReceive('resolve')->once()->andReturn('definition1');
 
-    $definition1
-        ->expects($this->exactly(2))
-        ->method('hasTag')
-        ->with($this->equalTo('tag'))
-        ->willReturn(true);
-
-    $definition1
-        ->expects($this->once())
-        ->method('resolve')
-        ->willReturn('definition1');
-
-    $definition2
-        ->expects($this->once())
-        ->method('setContainer')
-        ->with($this->equalTo($container))
-        ->willReturnSelf();
-
-    $definition2
-        ->expects($this->once())
-        ->method('hasTag')
-        ->with($this->equalTo('tag'))
-        ->willReturn(true);
-
-    $definition2
-        ->expects($this->once())
-        ->method('resolve')
-        ->willReturn('definition2');
+    $definition2->shouldReceive('setContainer')->once()->with($container)->andReturnSelf();
+    $definition2->shouldReceive('hasTag')->with('tag')->once()->andReturn(true);
+    $definition2->shouldReceive('resolve')->once()->andReturn('definition2');
 
     $aggregate = new DefinitionAggregate([$definition1, $definition2]);
 
@@ -165,52 +105,31 @@ test('aggregate can resolve array of tagged definitions', function () {
 
 test('aggregate throws exception when cannot resolve', function () {
     $aggregate = new DefinitionAggregate();
-    $definition1 = $this->getMockBuilder(DefinitionInterface::class)->getMock();
-    $definition2 = $this->getMockBuilder(DefinitionInterface::class)->getMock();
-    $container = $this->getMockBuilder(Container::class)->getMock();
+    $definition1 = Mockery::mock(DefinitionInterface::class);
+    $definition2 = Mockery::mock(DefinitionInterface::class);
+    $container = Mockery::mock(Container::class);
 
-    $definition1
-        ->expects($this->once())
-        ->method('getAlias')
-        ->willReturn('alias1');
+    $definition1->shouldReceive('getAlias')->andReturn('alias1');
+    $definition1->shouldReceive('setAlias')->once()->with('alias1')->andReturnSelf();
 
-    $definition1
-        ->expects($this->once())
-        ->method('setAlias')
-        ->with($this->equalTo('alias1'))
-        ->willReturnSelf();
-
-    $definition2
-        ->expects($this->once())
-        ->method('getAlias')
-        ->willReturn('alias2');
-
-    $definition2
-        ->expects($this->once())
-        ->method('setShared')
-        ->with($this->equalTo(true))
-        ->willReturnSelf();
-
-    $definition2
-        ->expects($this->once())
-        ->method('setAlias')
-        ->with($this->equalTo('alias2'))
-        ->willReturnSelf();
+    $definition2->shouldReceive('getAlias')->andReturn('alias2');
+    $definition2->shouldReceive('setShared')->once()->with(true)->andReturnSelf();
+    $definition2->shouldReceive('setAlias')->once()->with('alias2')->andReturnSelf();
 
     $aggregate->setContainer($container);
 
     $aggregate->add('alias1', $definition1);
     $aggregate->addShared('alias2', $definition2);
 
-    expect(fn () => $aggregate->resolveNew('alias'))->toThrow(NotFoundException::class);
+    expect(fn() => $aggregate->resolveNew('alias'))->toThrow(NotFoundException::class);
 });
 
 test('definition preceding slash', function () {
-    $container = $this->getMockBuilder(Container::class)->getMock();
+    $container = Mockery::mock(Container::class);
     $aggregate = new DefinitionAggregate();
     $aggregate->setContainer($container);
 
-    $someClass = "\\League\\Container\\Test\\Asset\\Foo";
+    $someClass = '\\League\\Container\\Test\\Asset\\Foo';
     $aggregate->add($someClass, null);
 
     $definition = $aggregate->getDefinition(Foo::class);
@@ -219,20 +138,20 @@ test('definition preceding slash', function () {
 });
 
 test('get preceding slash', function () {
-    $container = $this->getMockBuilder(Container::class)->getMock();
+    $container = Mockery::mock(Container::class);
     $aggregate = new DefinitionAggregate();
     $aggregate->setContainer($container);
 
     $someClass = Foo::class;
     $aggregate->add($someClass, null);
 
-    $definition = $aggregate->getDefinition("\\League\\Container\\Test\\Asset\\Foo");
+    $definition = $aggregate->getDefinition('\\League\\Container\\Test\\Asset\\Foo');
 
     expect($definition)->toBeInstanceOf(Definition::class);
 });
 
 test('definition preceding slash singular quotes', function () {
-    $container = $this->getMockBuilder(Container::class)->getMock();
+    $container = Mockery::mock(Container::class);
     $aggregate = new DefinitionAggregate();
     $aggregate->setContainer($container);
 
@@ -245,7 +164,7 @@ test('definition preceding slash singular quotes', function () {
 });
 
 test('get preceding slash singular quote', function () {
-    $container = $this->getMockBuilder(Container::class)->getMock();
+    $container = Mockery::mock(Container::class);
     $aggregate = new DefinitionAggregate();
     $aggregate->setContainer($container);
 

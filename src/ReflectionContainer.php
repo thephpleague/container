@@ -9,6 +9,7 @@ use League\Container\Argument\ArgumentReflectorTrait;
 use League\Container\Argument\ArgumentResolverInterface;
 use League\Container\Argument\ArgumentResolverTrait;
 use League\Container\Exception\NotFoundException;
+use Override;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -31,9 +32,8 @@ class ReflectionContainer implements ArgumentReflectorInterface, ArgumentResolve
 
     public function __construct(
         protected bool $cacheResolutions = false,
-        protected int $mode = self::AUTO_WIRING | self::ATTRIBUTE_RESOLUTION
-    ) {
-    }
+        protected int $mode = self::AUTO_WIRING | self::ATTRIBUTE_RESOLUTION,
+    ) {}
 
     public function setMode(int $mode): void
     {
@@ -51,7 +51,7 @@ class ReflectionContainer implements ArgumentReflectorInterface, ArgumentResolve
      * @throws NotFoundExceptionInterface
      * @throws ReflectionException
      */
-    #[\Override]
+    #[Override]
     public function get(string $id, array $args = []): mixed
     {
         if (true === $this->cacheResolutions && array_key_exists($id, $this->cache)) {
@@ -60,7 +60,7 @@ class ReflectionContainer implements ArgumentReflectorInterface, ArgumentResolve
 
         if (!$this->has($id)) {
             throw new NotFoundException(
-                sprintf('Alias (%s) is not an existing class and therefore cannot be resolved', $id)
+                sprintf('Alias (%s) is not an existing class and therefore cannot be resolved', $id),
             );
         }
 
@@ -70,7 +70,7 @@ class ReflectionContainer implements ArgumentReflectorInterface, ArgumentResolve
 
         if ($construct && !$construct->isPublic()) {
             throw new NotFoundException(
-                sprintf('Alias (%s) has a non-public constructor and therefore cannot be instantiated', $id)
+                sprintf('Alias (%s) has a non-public constructor and therefore cannot be instantiated', $id),
             );
         }
 
@@ -86,7 +86,7 @@ class ReflectionContainer implements ArgumentReflectorInterface, ArgumentResolve
         return $resolution;
     }
 
-    #[\Override]
+    #[Override]
     public function has(string $id): bool
     {
         return class_exists($id);

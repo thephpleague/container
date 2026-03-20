@@ -7,8 +7,8 @@ use League\Container\Container;
 use League\Container\Test\Asset\Foo;
 
 test('can instantiate with id', function () {
-    $container = $this->createMock(Container::class);
-    $container->method('get')->with(Foo::class)->willReturn(new Foo());
+    $container = Mockery::mock(Container::class);
+    $container->allows('get')->with(Foo::class)->andReturn(new Foo());
 
     $inject = new Inject(Foo::class);
     $inject->setContainer($container);

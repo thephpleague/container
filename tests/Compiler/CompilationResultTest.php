@@ -66,5 +66,5 @@ test('properties are readonly', function () {
         serviceCount: 0,
     );
 
-    expect(fn () => $result->phpSource = 'mutated')->toThrow(Error::class);
+    expect(fn() => $result->phpSource = 'mutated')->toThrow(Error::class);
 });

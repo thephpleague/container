@@ -21,6 +21,5 @@ final readonly class CompiledDefinition
         public ?string $concreteClass,
         public ?string $factoryClass,
         public ?string $factoryMethod,
-    ) {
-    }
+    ) {}
 }

@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace League\Container\Definition;
 
+use ArgumentCountError;
 use League\Container\Argument\ArgumentInterface;
 use League\Container\Argument\ArgumentResolverInterface;
 use League\Container\Argument\ArgumentResolverTrait;
 use League\Container\Argument\LiteralArgumentInterface;
 use League\Container\ContainerAwareTrait;
 use League\Container\Exception\ContainerException;
+use Override;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -40,7 +42,7 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
         $this->concrete ??= $this->id;
     }
 
-    #[\Override]
+    #[Override]
     public function addTag(string $tag): DefinitionInterface
     {
         $this->tags[$tag] = true;
@@ -48,13 +50,13 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
     }
 
     /** @return list<string> */
-    #[\Override]
+    #[Override]
     public function getTags(): array
     {
         return array_keys($this->tags);
     }
 
-    #[\Override]
+    #[Override]
     public function hasTag(string $tag): bool
     {
         return isset($this->tags[$tag]);
@@ -71,38 +73,38 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
         return static::normaliseAlias($this->id);
     }
 
-    #[\Override]
+    #[Override]
     public function setAlias(string $id): DefinitionInterface
     {
         return $this->setId($id);
     }
 
-    #[\Override]
+    #[Override]
     public function getAlias(): string
     {
         return $this->getId();
     }
 
-    #[\Override]
+    #[Override]
     public function setShared(bool $shared = true): DefinitionInterface
     {
         $this->shared = $shared;
         return $this;
     }
 
-    #[\Override]
+    #[Override]
     public function isShared(): bool
     {
         return $this->shared;
     }
 
-    #[\Override]
+    #[Override]
     public function getConcrete(): mixed
     {
         return $this->concrete;
     }
 
-    #[\Override]
+    #[Override]
     public function setConcrete(mixed $concrete): DefinitionInterface
     {
         $this->concrete = $concrete;
@@ -110,7 +112,7 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
         return $this;
     }
 
-    #[\Override]
+    #[Override]
     public function addArgument(mixed $arg): DefinitionInterface
     {
         $this->arguments[] = $arg;
@@ -118,7 +120,7 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
     }
 
     /** @param array<int, mixed> $args */
-    #[\Override]
+    #[Override]
     public function addArguments(array $args): DefinitionInterface
     {
         foreach ($args as $arg) {
@@ -129,19 +131,19 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
     }
 
     /** @param array<int, mixed> $args */
-    #[\Override]
+    #[Override]
     public function addMethodCall(string $method, array $args = []): DefinitionInterface
     {
         $this->methods[] = [
             'method' => $method,
-            'arguments' => $args
+            'arguments' => $args,
         ];
 
         return $this;
     }
 
     /** @param array<string, array<int, mixed>> $methods */
-    #[\Override]
+    #[Override]
     public function addMethodCalls(array $methods = []): DefinitionInterface
     {
         foreach ($methods as $method => $args) {
@@ -156,7 +158,7 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
      * @throws NotFoundExceptionInterface
      * @throws ReflectionException
      */
-    #[\Override]
+    #[Override]
     public function resolve(): mixed
     {
         if (null !== $this->resolved && $this->isShared()) {
@@ -171,7 +173,7 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
      * @throws NotFoundExceptionInterface
      * @throws ReflectionException
      */
-    #[\Override]
+    #[Override]
     public function resolveNew(): mixed
     {
         $concrete = $this->concrete;
@@ -251,7 +253,7 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
 
         try {
             return $reflection->newInstanceArgs($resolved);
-        } catch (\ArgumentCountError $e) {
+        } catch (ArgumentCountError $e) {
             throw new ContainerException(sprintf(
                 'Class "%s" was registered as a definition but its constructor has '
                 . 'unsatisfied dependencies. Either provide arguments using '
@@ -279,6 +281,6 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
 
     public static function normaliseAlias(string $alias): string
     {
-        return ltrim($alias, "\\");
+        return ltrim($alias, '\\');
     }
 }
