@@ -2,12 +2,10 @@
 
 declare(strict_types=1);
 
-use League\Container\Compiler\CodeGenerator;
 use League\Container\Compiler\CompilationConfig;
 use League\Container\Compiler\CompilationException;
 use League\Container\Compiler\CompilationResult;
 use League\Container\Compiler\Compiler;
-use League\Container\Compiler\DefinitionAnalyser;
 use League\Container\Container;
 use League\Container\Test\Asset\Bar;
 use League\Container\Test\Asset\Foo;
