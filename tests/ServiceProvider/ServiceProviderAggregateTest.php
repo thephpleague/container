@@ -2,166 +2,146 @@
 
 declare(strict_types=1);
 
-namespace League\Container\Test\ServiceProvider;
-
-use Exception;
 use League\Container\Container;
 use League\Container\Exception\ContainerException;
 use League\Container\ServiceProvider\AbstractServiceProvider;
 use League\Container\ServiceProvider\BootableServiceProviderInterface;
 use League\Container\ServiceProvider\ServiceProviderAggregate;
 use League\Container\ServiceProvider\ServiceProviderInterface;
-use PHPUnit\Framework\TestCase;
 
-class ServiceProviderAggregateTest extends TestCase
+function createAggregateTestServiceProvider(): ServiceProviderInterface
 {
-    protected function getServiceProvider(): ServiceProviderInterface
-    {
-        return new class extends AbstractServiceProvider implements BootableServiceProviderInterface {
-            public int $booted = 0;
-            public int $registered = 0;
+    return new class extends AbstractServiceProvider implements BootableServiceProviderInterface {
+        public int $booted = 0;
+        public int $registered = 0;
 
-            public function provides(string $id): bool
-            {
-                return in_array($id, [
-                    'SomeService',
-                    'AnotherService',
-                ], true);
-            }
+        public function provides(string $id): bool
+        {
+            return in_array($id, [
+                'SomeService',
+                'AnotherService',
+            ], true);
+        }
 
-            public function boot(): void
-            {
-                $this->booted++;
-            }
+        public function boot(): void
+        {
+            $this->booted++;
+        }
 
-            public function register(): void
-            {
-                $this->registered++;
+        public function register(): void
+        {
+            $this->registered++;
 
-                $this->getContainer()->add('SomeService', function ($arg) {
-                    return $arg;
-                });
-            }
-        };
-    }
-
-    public function testAggregateAddsClassNameServiceProvider(): void
-    {
-        $container = $this->getMockBuilder(Container::class)->getMock();
-        $aggregate = new ServiceProviderAggregate();
-        $aggregate->setContainer($container);
-        $aggregate->add($this->getServiceProvider());
-        $this->assertTrue($aggregate->provides('SomeService'));
-        $this->assertTrue($aggregate->provides('AnotherService'));
-    }
-
-    public function testAggregateThrowsWhenRegisteringForServiceThatIsNotAdded(): void
-    {
-        $this->expectException(ContainerException::class);
-        $container = $this->getMockBuilder(Container::class)->getMock();
-        $aggregate = new ServiceProviderAggregate();
-        $aggregate->setContainer($container);
-        $aggregate->register('SomeService');
-    }
-
-    public function testAggregateInvokesCorrectRegisterMethodOnlyOnce(): void
-    {
-        $container = $this->getMockBuilder(Container::class)->getMock();
-        $aggregate = new ServiceProviderAggregate();
-        $aggregate->setContainer($container);
-        $provider = $this->getServiceProvider();
-        $aggregate->add($provider);
-        $aggregate->register('SomeService');
-        $aggregate->register('AnotherService');
-        // @phpstan-ignore-next-line
-        $this->assertSame(1, $provider->registered);
-    }
-
-    public function testRegisterAllRegistersEveryProvider(): void
-    {
-        $container = $this->getMockBuilder(Container::class)->getMock();
-        $aggregate = new ServiceProviderAggregate();
-        $aggregate->setContainer($container);
-
-        $firstProvider = $this->getServiceProvider();
-
-        $secondProvider = new class extends AbstractServiceProvider {
-            public int $registered = 0;
-
-            public function provides(string $id): bool
-            {
-                return $id === 'SecondService';
-            }
-
-            public function register(): void
-            {
-                $this->registered++;
-            }
-        };
-
-        $aggregate->add($firstProvider);
-        $aggregate->add($secondProvider);
-
-        $aggregate->registerAll();
-
-        // @phpstan-ignore-next-line
-        $this->assertSame(1, $firstProvider->registered);
-        // @phpstan-ignore-next-line
-        $this->assertSame(1, $secondProvider->registered);
-    }
-
-    public function testRegisterAllPreventsDoubleRegistration(): void
-    {
-        $container = $this->getMockBuilder(Container::class)->getMock();
-        $aggregate = new ServiceProviderAggregate();
-        $aggregate->setContainer($container);
-
-        $provider = $this->getServiceProvider();
-        $aggregate->add($provider);
-
-        $aggregate->registerAll();
-        $aggregate->registerAll();
-
-        // @phpstan-ignore-next-line
-        $this->assertSame(1, $provider->registered);
-    }
-
-    public function testRegisterAllAndRegisterShareDoubleRegistrationTracking(): void
-    {
-        $container = $this->getMockBuilder(Container::class)->getMock();
-        $aggregate = new ServiceProviderAggregate();
-        $aggregate->setContainer($container);
-
-        $provider = $this->getServiceProvider();
-        $aggregate->add($provider);
-
-        $aggregate->register('SomeService');
-        $aggregate->registerAll();
-
-        // @phpstan-ignore-next-line
-        $this->assertSame(1, $provider->registered);
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function testAggregateSkipsExistingProviders(): void
-    {
-        $container = $this->getMockBuilder(Container::class)->getMock();
-        $aggregate = new ServiceProviderAggregate();
-        $aggregate->setContainer($container);
-        $provider = $this->getServiceProvider();
-        $aggregate->add($provider);
-        $aggregate->add($provider);
-
-        // assert after adding provider multiple times, that it
-        // was only aggregated and booted once
-        $this->assertSame(
-            [$provider],
-            iterator_to_array($aggregate->getIterator())
-        );
-
-        // @phpstan-ignore-next-line
-        $this->assertSame(1, $provider->booted);
-    }
+            $this->getContainer()->add('SomeService', function ($arg) {
+                return $arg;
+            });
+        }
+    };
 }
+
+test('aggregate adds class name service provider', function () {
+    $container = $this->getMockBuilder(Container::class)->getMock();
+    $aggregate = new ServiceProviderAggregate();
+    $aggregate->setContainer($container);
+    $aggregate->add(createAggregateTestServiceProvider());
+
+    expect($aggregate->provides('SomeService'))->toBeTrue();
+    expect($aggregate->provides('AnotherService'))->toBeTrue();
+});
+
+test('aggregate throws when registering for service that is not added', function () {
+    $container = $this->getMockBuilder(Container::class)->getMock();
+    $aggregate = new ServiceProviderAggregate();
+    $aggregate->setContainer($container);
+
+    expect(fn () => $aggregate->register('SomeService'))->toThrow(ContainerException::class);
+});
+
+test('aggregate invokes correct register method only once', function () {
+    $container = $this->getMockBuilder(Container::class)->getMock();
+    $aggregate = new ServiceProviderAggregate();
+    $aggregate->setContainer($container);
+    $provider = createAggregateTestServiceProvider();
+    $aggregate->add($provider);
+    $aggregate->register('SomeService');
+    $aggregate->register('AnotherService');
+
+    // @phpstan-ignore-next-line
+    expect($provider->registered)->toBe(1);
+});
+
+test('register all registers every provider', function () {
+    $container = $this->getMockBuilder(Container::class)->getMock();
+    $aggregate = new ServiceProviderAggregate();
+    $aggregate->setContainer($container);
+
+    $firstProvider = createAggregateTestServiceProvider();
+
+    $secondProvider = new class extends AbstractServiceProvider {
+        public int $registered = 0;
+
+        public function provides(string $id): bool
+        {
+            return $id === 'SecondService';
+        }
+
+        public function register(): void
+        {
+            $this->registered++;
+        }
+    };
+
+    $aggregate->add($firstProvider);
+    $aggregate->add($secondProvider);
+
+    $aggregate->registerAll();
+
+    // @phpstan-ignore-next-line
+    expect($firstProvider->registered)->toBe(1);
+    // @phpstan-ignore-next-line
+    expect($secondProvider->registered)->toBe(1);
+});
+
+test('register all prevents double registration', function () {
+    $container = $this->getMockBuilder(Container::class)->getMock();
+    $aggregate = new ServiceProviderAggregate();
+    $aggregate->setContainer($container);
+
+    $provider = createAggregateTestServiceProvider();
+    $aggregate->add($provider);
+
+    $aggregate->registerAll();
+    $aggregate->registerAll();
+
+    // @phpstan-ignore-next-line
+    expect($provider->registered)->toBe(1);
+});
+
+test('register all and register share double registration tracking', function () {
+    $container = $this->getMockBuilder(Container::class)->getMock();
+    $aggregate = new ServiceProviderAggregate();
+    $aggregate->setContainer($container);
+
+    $provider = createAggregateTestServiceProvider();
+    $aggregate->add($provider);
+
+    $aggregate->register('SomeService');
+    $aggregate->registerAll();
+
+    // @phpstan-ignore-next-line
+    expect($provider->registered)->toBe(1);
+});
+
+test('aggregate skips existing providers', function () {
+    $container = $this->getMockBuilder(Container::class)->getMock();
+    $aggregate = new ServiceProviderAggregate();
+    $aggregate->setContainer($container);
+    $provider = createAggregateTestServiceProvider();
+    $aggregate->add($provider);
+    $aggregate->add($provider);
+
+    expect(iterator_to_array($aggregate->getIterator()))->toBe([$provider]);
+
+    // @phpstan-ignore-next-line
+    expect($provider->booted)->toBe(1);
+});

@@ -2,95 +2,83 @@
 
 declare(strict_types=1);
 
-namespace League\Container\Test\Compiler;
-
 use League\Container\Compiler\CompilationException;
 use League\Container\Exception\ContainerException;
-use PHPUnit\Framework\TestCase;
 
-class CompilationExceptionTest extends TestCase
-{
-    public function testExtendsContainerException(): void
-    {
-        $exception = new CompilationException([]);
+test('extends container exception', function () {
+    $exception = new CompilationException([]);
 
-        $this->assertInstanceOf(ContainerException::class, $exception);
-    }
+    expect($exception)->toBeInstanceOf(ContainerException::class);
+});
 
-    public function testGetErrorsReturnsAllProvidedErrors(): void
-    {
-        $errors = [
-            [
-                'serviceId' => 'App\Service',
-                'errorType' => 'closure',
-                'message' => 'Cannot compile a closure.',
-                'suggestedFix' => 'Replace the closure with a factory class.',
-            ],
-            [
-                'serviceId' => 'App\Broken',
-                'errorType' => 'missing_class',
-                'message' => 'Class "App\Broken" does not exist.',
-                'suggestedFix' => 'Ensure the class is autoloadable.',
-            ],
-        ];
+test('get errors returns all provided errors', function () {
+    $errors = [
+        [
+            'serviceId' => 'App\Service',
+            'errorType' => 'closure',
+            'message' => 'Cannot compile a closure.',
+            'suggestedFix' => 'Replace the closure with a factory class.',
+        ],
+        [
+            'serviceId' => 'App\Broken',
+            'errorType' => 'missing_class',
+            'message' => 'Class "App\Broken" does not exist.',
+            'suggestedFix' => 'Ensure the class is autoloadable.',
+        ],
+    ];
 
-        $exception = new CompilationException($errors);
+    $exception = new CompilationException($errors);
 
-        $this->assertSame($errors, $exception->getErrors());
-    }
+    expect($exception->getErrors())->toBe($errors);
+});
 
-    public function testMessageIsBuiltFromErrorsWhenNoMessageProvided(): void
-    {
-        $errors = [
-            [
-                'serviceId' => 'App\Service',
-                'errorType' => 'closure',
-                'message' => 'Cannot compile a closure.',
-                'suggestedFix' => 'Use a factory.',
-            ],
-        ];
+test('message is built from errors when no message provided', function () {
+    $errors = [
+        [
+            'serviceId' => 'App\Service',
+            'errorType' => 'closure',
+            'message' => 'Cannot compile a closure.',
+            'suggestedFix' => 'Use a factory.',
+        ],
+    ];
 
-        $exception = new CompilationException($errors);
+    $exception = new CompilationException($errors);
 
-        $this->assertStringContainsString('closure', $exception->getMessage());
-        $this->assertStringContainsString('App\Service', $exception->getMessage());
-        $this->assertStringContainsString('Cannot compile a closure.', $exception->getMessage());
-    }
+    expect($exception->getMessage())->toContain('closure');
+    expect($exception->getMessage())->toContain('App\Service');
+    expect($exception->getMessage())->toContain('Cannot compile a closure.');
+});
 
-    public function testCustomMessageOverridesGeneratedMessage(): void
-    {
-        $exception = new CompilationException([], 'Custom failure message.');
+test('custom message overrides generated message', function () {
+    $exception = new CompilationException([], 'Custom failure message.');
 
-        $this->assertSame('Custom failure message.', $exception->getMessage());
-    }
+    expect($exception->getMessage())->toBe('Custom failure message.');
+});
 
-    public function testEmptyErrorsProducesDefaultMessage(): void
-    {
-        $exception = new CompilationException([]);
+test('empty errors produces default message', function () {
+    $exception = new CompilationException([]);
 
-        $this->assertSame('Container compilation failed.', $exception->getMessage());
-    }
+    expect($exception->getMessage())->toBe('Container compilation failed.');
+});
 
-    public function testMultipleErrorsAreEachRepresentedInMessage(): void
-    {
-        $errors = [
-            [
-                'serviceId' => 'App\First',
-                'errorType' => 'closure',
-                'message' => 'First error.',
-                'suggestedFix' => '',
-            ],
-            [
-                'serviceId' => 'App\Second',
-                'errorType' => 'missing_class',
-                'message' => 'Second error.',
-                'suggestedFix' => '',
-            ],
-        ];
+test('multiple errors are each represented in message', function () {
+    $errors = [
+        [
+            'serviceId' => 'App\First',
+            'errorType' => 'closure',
+            'message' => 'First error.',
+            'suggestedFix' => '',
+        ],
+        [
+            'serviceId' => 'App\Second',
+            'errorType' => 'missing_class',
+            'message' => 'Second error.',
+            'suggestedFix' => '',
+        ],
+    ];
 
-        $exception = new CompilationException($errors);
+    $exception = new CompilationException($errors);
 
-        $this->assertStringContainsString('App\First', $exception->getMessage());
-        $this->assertStringContainsString('App\Second', $exception->getMessage());
-    }
-}
+    expect($exception->getMessage())->toContain('App\First');
+    expect($exception->getMessage())->toContain('App\Second');
+});

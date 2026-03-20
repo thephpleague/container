@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-namespace League\Container\Test\Definition;
-
 use League\Container\Argument\Literal;
 use League\Container\Argument\ResolvableArgument;
 use League\Container\Container;
@@ -13,268 +11,186 @@ use League\Container\Test\Asset\BarInterface;
 use League\Container\Test\Asset\Foo;
 use League\Container\Test\Asset\FooCallable;
 use League\Container\Test\Asset\FooWithRequiredDependency;
-use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
-use ReflectionException;
 
-class DefinitionTest extends TestCase
-{
-    /**
-     * @throws ContainerExceptionInterface
-     * @throws ReflectionException
-     * @throws NotFoundExceptionInterface
-     */
-    public function testDefinitionResolvesClosureWithDefinedArgs(): void
-    {
-        $definition = new Definition('callable', function (...$args) {
-            return implode(' ', $args);
-        });
+test('definition resolves closure with defined args', function () {
+    $definition = new Definition('callable', function (...$args) {
+        return implode(' ', $args);
+    });
 
-        $definition->addArguments(['hello', 'world']);
-        $actual = $definition->resolve();
-        $this->assertSame('hello world', $actual);
-    }
+    $definition->addArguments(['hello', 'world']);
 
-    /**
-     * @throws ContainerExceptionInterface
-     * @throws ReflectionException
-     * @throws NotFoundExceptionInterface
-     */
-    public function testDefinitionResolvesClosureReturningRawArgument(): void
-    {
-        $definition = new Definition('callable', function () {
-            return new Literal\StringArgument('hello world');
-        });
+    expect($definition->resolve())->toBe('hello world');
+});
 
-        $actual = $definition->resolve();
-        $this->assertSame('hello world', $actual);
-    }
+test('definition resolves closure returning raw argument', function () {
+    $definition = new Definition('callable', function () {
+        return new Literal\StringArgument('hello world');
+    });
 
-    /**
-     * @throws ReflectionException
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
-    public function testDefinitionResolvesCallableClass(): void
-    {
-        $definition = new Definition('callable', new FooCallable());
-        $definition->addArgument(new Bar());
-        $actual = $definition->resolve();
-        $this->assertInstanceOf(Foo::class, $actual);
-    }
+    expect($definition->resolve())->toBe('hello world');
+});
 
-    /**
-     * @throws ReflectionException
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
-    public function testDefinitionResolvesArrayCallable(): void
-    {
-        $definition = new Definition('callable', [new FooCallable(), '__invoke']);
-        $definition->addArgument(new Bar());
-        $actual = $definition->resolve();
-        $this->assertInstanceOf(Foo::class, $actual);
-    }
+test('definition resolves callable class', function () {
+    $definition = new Definition('callable', new FooCallable());
+    $definition->addArgument(new Bar());
 
-    /**
-     * @throws ContainerExceptionInterface
-     * @throws ReflectionException
-     * @throws NotFoundExceptionInterface
-     */
-    public function testDefinitionResolvesClassWithMethodCalls(): void
-    {
-        $container = $this->getMockBuilder(Container::class)->getMock();
-        $bar = new Bar();
+    expect($definition->resolve())->toBeInstanceOf(Foo::class);
+});
 
-        $container->method('has')->willReturnMap([
-            [Foo::class, false],
-            [Bar::class, true],
-        ]);
-        $container->expects($this->once())->method('get')->with($this->equalTo(Bar::class))->willReturn($bar);
+test('definition resolves array callable', function () {
+    $definition = new Definition('callable', [new FooCallable(), '__invoke']);
+    $definition->addArgument(new Bar());
 
-        $definition = new Definition('callable', Foo::class);
+    expect($definition->resolve())->toBeInstanceOf(Foo::class);
+});
 
-        $definition->setContainer($container);
-        $definition->addMethodCalls(['setBar' => [Bar::class]]);
+test('definition resolves class with method calls', function () {
+    $container = $this->getMockBuilder(Container::class)->getMock();
+    $bar = new Bar();
 
-        $actual = $definition->resolve();
-        $this->assertInstanceOf(Foo::class, $actual);
-        $this->assertInstanceOf(Bar::class, $actual->bar);
-    }
+    $container->method('has')->willReturnMap([
+        [Foo::class, false],
+        [Bar::class, true],
+    ]);
+    $container->expects($this->once())->method('get')->with($this->equalTo(Bar::class))->willReturn($bar);
 
-    /**
-     * @throws ContainerExceptionInterface
-     * @throws ReflectionException
-     * @throws NotFoundExceptionInterface
-     */
-    public function testDefinitionResolvesClassWithDefinedArgs(): void
-    {
-        $container = $this->getMockBuilder(Container::class)->getMock();
-        $bar = new Bar();
+    $definition = new Definition('callable', Foo::class);
+    $definition->setContainer($container);
+    $definition->addMethodCalls(['setBar' => [Bar::class]]);
 
-        $container->method('has')->willReturnMap([
-            [Foo::class, false],
-            [Bar::class, true],
-        ]);
-        $container->expects($this->once())->method('get')->with($this->equalTo(Bar::class))->willReturn($bar);
+    $actual = $definition->resolve();
 
-        $definition = new Definition('callable', Foo::class);
+    expect($actual)->toBeInstanceOf(Foo::class);
+    expect($actual->bar)->toBeInstanceOf(Bar::class);
+});
 
-        $definition->setContainer($container);
-        $definition->addArgument(Bar::class);
+test('definition resolves class with defined args', function () {
+    $container = $this->getMockBuilder(Container::class)->getMock();
+    $bar = new Bar();
 
-        $actual = $definition->resolve();
-        $this->assertInstanceOf(Foo::class, $actual);
-        $this->assertInstanceOf(Bar::class, $actual->bar);
-    }
+    $container->method('has')->willReturnMap([
+        [Foo::class, false],
+        [Bar::class, true],
+    ]);
+    $container->expects($this->once())->method('get')->with($this->equalTo(Bar::class))->willReturn($bar);
 
-    /**
-     * @throws NotFoundExceptionInterface
-     * @throws ContainerExceptionInterface
-     * @throws ReflectionException
-     */
-    public function testDefinitionResolvesSharedItemOnlyOnce(): void
-    {
-        $definition = new Definition('class', Foo::class);
-        $definition->setShared();
-        $actual1 = $definition->resolve();
-        $actual2 = $definition->resolve();
-        $actual3 = $definition->resolveNew();
-        $this->assertSame($actual1, $actual2);
-        $this->assertNotSame($actual1, $actual3);
-    }
+    $definition = new Definition('callable', Foo::class);
+    $definition->setContainer($container);
+    $definition->addArgument(Bar::class);
 
-    /**
-     * @throws NotFoundExceptionInterface
-     * @throws ContainerExceptionInterface
-     * @throws ReflectionException
-     */
-    public function testDefinitionResolvesNestedAlias(): void
-    {
-        $aliasDefinition = new Definition('alias', new ResolvableArgument('class'));
-        $definition = new Definition('class', Foo::class);
-        $container = $this->getMockBuilder(Container::class)->getMock();
+    $actual = $definition->resolve();
 
-        $expected = $definition->resolve();
+    expect($actual)->toBeInstanceOf(Foo::class);
+    expect($actual->bar)->toBeInstanceOf(Bar::class);
+});
 
-        $container->expects($this->once())->method('has')->with($this->equalTo('class'))->willReturn(true);
-        $container->expects($this->once())->method('get')->with($this->equalTo('class'))->willReturn($expected);
+test('definition resolves shared item only once', function () {
+    $definition = new Definition('class', Foo::class);
+    $definition->setShared();
 
-        $aliasDefinition->setContainer($container);
-        $actual = $aliasDefinition->resolve();
-        $this->assertSame($expected, $actual);
-    }
+    $actual1 = $definition->resolve();
+    $actual2 = $definition->resolve();
+    $actual3 = $definition->resolveNew();
 
-    public function testDefinitionCanAddTags(): void
-    {
-        $definition = new Definition('class', Foo::class);
-        $definition->addTag('tag1')->addTag('tag2');
-        $this->assertTrue($definition->hasTag('tag1'));
-        $this->assertTrue($definition->hasTag('tag2'));
-        $this->assertFalse($definition->hasTag('tag3'));
-    }
+    expect($actual2)->toBe($actual1);
+    expect($actual3)->not->toBe($actual1);
+});
 
-    public function testDefinitionCanGetConcrete(): void
-    {
-        $concrete = new Literal\StringArgument(Foo::class);
-        $definition = new Definition('class', $concrete);
-        $this->assertSame($concrete, $definition->getConcrete());
-    }
+test('definition resolves nested alias', function () {
+    $aliasDefinition = new Definition('alias', new ResolvableArgument('class'));
+    $definition = new Definition('class', Foo::class);
+    $container = $this->getMockBuilder(Container::class)->getMock();
 
-    public function testDefinitionCanSetConcrete(): void
-    {
-        $definition = new Definition('class', null);
-        $concrete = new Literal\StringArgument(Foo::class);
-        $definition->setConcrete($concrete);
-        $this->assertSame($concrete, $definition->getConcrete());
-    }
+    $expected = $definition->resolve();
 
-    /**
-     * @throws ReflectionException
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
-    public function testNonExistentClassIsReturnedAsIdenticalString(): void
-    {
-        $nonExistent = 'NonExistent';
-        $definition = new Definition($nonExistent);
+    $container->expects($this->once())->method('has')->with($this->equalTo('class'))->willReturn(true);
+    $container->expects($this->once())->method('get')->with($this->equalTo('class'))->willReturn($expected);
 
-        self::assertSame($nonExistent, $definition->getAlias());
-        self::assertSame($nonExistent, $definition->resolve());
-    }
+    $aliasDefinition->setContainer($container);
 
-    /**
-     * @throws ReflectionException
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
-    public function testDefinitionDelegatesToContainerForDifferentConcrete(): void
-    {
-        $container = $this->getMockBuilder(Container::class)->getMock();
-        $bar = new Bar();
+    expect($aliasDefinition->resolve())->toBe($expected);
+});
 
-        $container->expects($this->once())->method('has')->with($this->equalTo(Bar::class))->willReturn(true);
-        $container->expects($this->once())->method('get')->with($this->equalTo(Bar::class))->willReturn($bar);
+test('definition can add tags', function () {
+    $definition = new Definition('class', Foo::class);
+    $definition->addTag('tag1')->addTag('tag2');
 
-        $definition = new Definition(BarInterface::class, Bar::class);
-        $definition->setContainer($container);
+    expect($definition->hasTag('tag1'))->toBeTrue();
+    expect($definition->hasTag('tag2'))->toBeTrue();
+    expect($definition->hasTag('tag3'))->toBeFalse();
+});
 
-        $actual = $definition->resolveNew();
+test('definition can get concrete', function () {
+    $concrete = new Literal\StringArgument(Foo::class);
+    $definition = new Definition('class', $concrete);
 
-        $this->assertInstanceOf(Bar::class, $actual);
-        $this->assertSame($bar, $actual);
-    }
+    expect($definition->getConcrete())->toBe($concrete);
+});
 
-    /**
-     * @throws ReflectionException
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
-    public function testDefinitionResolvesOwnClassWhenConcreteMatchesId(): void
-    {
-        $container = $this->getMockBuilder(Container::class)->getMock();
+test('definition can set concrete', function () {
+    $definition = new Definition('class', null);
+    $concrete = new Literal\StringArgument(Foo::class);
+    $definition->setConcrete($concrete);
 
-        $container->expects($this->never())->method('has');
-        $container->expects($this->never())->method('get');
+    expect($definition->getConcrete())->toBe($concrete);
+});
 
-        $definition = new Definition(Foo::class, Foo::class);
-        $definition->setContainer($container);
+test('non existent class is returned as identical string', function () {
+    $nonExistent = 'NonExistent';
+    $definition = new Definition($nonExistent);
 
-        $actual = $definition->resolveNew();
+    expect($definition->getAlias())->toBe($nonExistent);
+    expect($definition->resolve())->toBe($nonExistent);
+});
 
-        $this->assertInstanceOf(Foo::class, $actual);
-    }
+test('definition delegates to container for different concrete', function () {
+    $container = $this->getMockBuilder(Container::class)->getMock();
+    $bar = new Bar();
 
-    /**
-     * @throws ReflectionException
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
-    public function testDefinitionDelegatesToContainerWhenConcreteComesFromResolvableArgument(): void
-    {
-        $container = $this->getMockBuilder(Container::class)->getMock();
-        $bar = new Bar();
+    $container->expects($this->once())->method('has')->with($this->equalTo(Bar::class))->willReturn(true);
+    $container->expects($this->once())->method('get')->with($this->equalTo(Bar::class))->willReturn($bar);
 
-        $container->expects($this->once())->method('has')->with($this->equalTo(Bar::class))->willReturn(true);
-        $container->expects($this->once())->method('get')->with($this->equalTo(Bar::class))->willReturn($bar);
+    $definition = new Definition(BarInterface::class, Bar::class);
+    $definition->setContainer($container);
 
-        $definition = new Definition(BarInterface::class, new ResolvableArgument(Bar::class));
-        $definition->setContainer($container);
+    $actual = $definition->resolveNew();
 
-        $actual = $definition->resolveNew();
+    expect($actual)->toBeInstanceOf(Bar::class);
+    expect($actual)->toBe($bar);
+});
 
-        $this->assertInstanceOf(Bar::class, $actual);
-        $this->assertSame($bar, $actual);
-    }
+test('definition resolves own class when concrete matches id', function () {
+    $container = $this->getMockBuilder(Container::class)->getMock();
 
-    public function testResolveClassThrowsContainerExceptionForUnsatisfiedDependencies(): void
-    {
-        $definition = new Definition(FooWithRequiredDependency::class);
+    $container->expects($this->never())->method('has');
+    $container->expects($this->never())->method('get');
 
-        $this->expectException(ContainerExceptionInterface::class);
-        $this->expectExceptionMessage('unsatisfied dependencies');
+    $definition = new Definition(Foo::class, Foo::class);
+    $definition->setContainer($container);
 
-        $definition->resolveNew();
-    }
-}
+    expect($definition->resolveNew())->toBeInstanceOf(Foo::class);
+});
+
+test('definition delegates to container when concrete comes from resolvable argument', function () {
+    $container = $this->getMockBuilder(Container::class)->getMock();
+    $bar = new Bar();
+
+    $container->expects($this->once())->method('has')->with($this->equalTo(Bar::class))->willReturn(true);
+    $container->expects($this->once())->method('get')->with($this->equalTo(Bar::class))->willReturn($bar);
+
+    $definition = new Definition(BarInterface::class, new ResolvableArgument(Bar::class));
+    $definition->setContainer($container);
+
+    $actual = $definition->resolveNew();
+
+    expect($actual)->toBeInstanceOf(Bar::class);
+    expect($actual)->toBe($bar);
+});
+
+test('resolve class throws container exception for unsatisfied dependencies', function () {
+    $definition = new Definition(FooWithRequiredDependency::class);
+
+    expect(fn () => $definition->resolveNew())
+        ->toThrow(ContainerExceptionInterface::class, 'unsatisfied dependencies');
+});

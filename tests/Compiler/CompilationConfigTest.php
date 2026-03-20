@@ -2,37 +2,27 @@
 
 declare(strict_types=1);
 
-namespace League\Container\Test\Compiler;
-
 use League\Container\Compiler\CompilationConfig;
-use PHPUnit\Framework\TestCase;
 
-class CompilationConfigTest extends TestCase
-{
-    public function testDefaultValuesAreUsedWhenNoArgumentsProvided(): void
-    {
-        $config = new CompilationConfig();
+test('default values are used when no arguments provided', function () {
+    $config = new CompilationConfig();
 
-        $this->assertSame('', $config->namespace);
-        $this->assertSame('CompiledContainer', $config->className);
-    }
+    expect($config->namespace)->toBe('');
+    expect($config->className)->toBe('CompiledContainer');
+});
 
-    public function testCustomValuesOverrideDefaults(): void
-    {
-        $config = new CompilationConfig(
-            namespace: 'App\Generated',
-            className: 'MyContainer',
-        );
+test('custom values override defaults', function () {
+    $config = new CompilationConfig(
+        namespace: 'App\Generated',
+        className: 'MyContainer',
+    );
 
-        $this->assertSame('App\Generated', $config->namespace);
-        $this->assertSame('MyContainer', $config->className);
-    }
+    expect($config->namespace)->toBe('App\Generated');
+    expect($config->className)->toBe('MyContainer');
+});
 
-    public function testPropertiesAreReadonly(): void
-    {
-        $config = new CompilationConfig();
+test('properties are readonly', function () {
+    $config = new CompilationConfig();
 
-        $this->expectException(\Error::class);
-        $config->className = 'mutated';
-    }
-}
+    expect(fn () => $config->className = 'mutated')->toThrow(Error::class);
+});

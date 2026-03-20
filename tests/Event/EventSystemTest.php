@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-namespace League\Container\Test\Event;
-
 use League\Container\Container;
 use League\Container\Event\BeforeResolveEvent;
 use League\Container\Event\DefinitionResolvedEvent;
@@ -13,567 +11,527 @@ use League\Container\Event\OnDefineEvent;
 use League\Container\Event\ServiceResolvedEvent;
 use League\Container\Test\Asset\Bar;
 use League\Container\Test\Asset\Foo;
-use PHPUnit\Framework\TestCase;
-
-class EventSystemTest extends TestCase
-{
-    protected Container $container;
-    protected EventDispatcher $dispatcher;
-
-    protected function setUp(): void
-    {
-        $this->dispatcher = new EventDispatcher();
-        $this->container = new Container();
-        $this->container->setEventDispatcher($this->dispatcher);
-    }
-
-    public function testOnDefineEventIsDispatched(): void
-    {
-        $eventFired = false;
-        $capturedEvent = null;
-
-        $this->dispatcher->addListener(OnDefineEvent::class, function (OnDefineEvent $event) use (&$eventFired, &$capturedEvent) {
-            $eventFired = true;
-            $capturedEvent = $event;
-        });
-
-        $this->container->add(Foo::class);
-
-        $this->assertTrue($eventFired);
-        $this->assertInstanceOf(OnDefineEvent::class, $capturedEvent);
-        $this->assertSame(Foo::class, $capturedEvent->getId());
-        $this->assertNotNull($capturedEvent->getDefinition());
-    }
-
-    public function testBeforeResolveEventIsDispatched(): void
-    {
-        $eventFired = false;
-        $capturedEvent = null;
-
-        $this->dispatcher->addListener(BeforeResolveEvent::class, function (BeforeResolveEvent $event) use (&$eventFired, &$capturedEvent) {
-            $eventFired = true;
-            $capturedEvent = $event;
-        });
-
-        $this->container->add(Foo::class);
-        $this->container->get(Foo::class);
-
-        $this->assertTrue($eventFired);
-        $this->assertInstanceOf(BeforeResolveEvent::class, $capturedEvent);
-        $this->assertSame(Foo::class, $capturedEvent->getId());
-    }
-
-    public function testServiceResolvedEventIsDispatched(): void
-    {
-        $eventFired = false;
-        $capturedEvent = null;
-
-        $this->dispatcher->addListener(ServiceResolvedEvent::class, function (ServiceResolvedEvent $event) use (&$eventFired, &$capturedEvent) {
-            $eventFired = true;
-            $capturedEvent = $event;
-        });
-
-        $this->container->add(Foo::class);
-        $resolvedObject = $this->container->get(Foo::class);
-
-        $this->assertTrue($eventFired);
-        $this->assertInstanceOf(ServiceResolvedEvent::class, $capturedEvent);
-        $this->assertSame(Foo::class, $capturedEvent->getId());
-        $this->assertSame($resolvedObject, $capturedEvent->getResolved());
-        $this->assertTrue($capturedEvent->isInstanceOf(Foo::class));
-    }
-
-    public function testEventCanModifyResolvedObject(): void
-    {
-        $this->dispatcher->addListener(ServiceResolvedEvent::class, function (ServiceResolvedEvent $event) {
-            if ($event->isInstanceOf(Foo::class)) {
-                $foo = $event->getResolved();
-                $foo->modified = true;
-                $event->setResolved($foo);
-            }
-        });
-
-        $this->container->add(Foo::class);
-        $foo = $this->container->get(Foo::class);
-
-        $this->assertTrue(property_exists($foo, 'modified'));
-        $this->assertTrue($foo->modified);
-    }
-
-    public function testEventFilterForType(): void
-    {
-        $fooEventFired = false;
-        $barEventFired = false;
-
-        $this->container->listen(ServiceResolvedEvent::class, function () use (&$fooEventFired) {
-            $fooEventFired = true;
-        })->forType(Foo::class);
-
-        $this->container->listen(ServiceResolvedEvent::class, function () use (&$barEventFired) {
-            $barEventFired = true;
-        })->forType(Bar::class);
-
-        $this->container->add(Foo::class);
-        $this->container->add(Bar::class);
-
-        $this->container->get(Foo::class);
-        $this->assertTrue($fooEventFired);
-        $this->assertFalse($barEventFired);
-
-        $this->container->get(Bar::class);
-        $this->assertTrue($barEventFired);
-    }
-
-    public function testEventFilterForTag(): void
-    {
-        $taggedEventFired = false;
-        $untaggedEventFired = false;
-
-        $this->container->listen(ServiceResolvedEvent::class, function () use (&$taggedEventFired) {
-            $taggedEventFired = true;
-        })->forTag('shared');
-
-        $this->container->listen(ServiceResolvedEvent::class, function () use (&$untaggedEventFired) {
-            $untaggedEventFired = true;
-        })->forTag('custom');
-
-        $this->container->addShared(Foo::class); // This will have 'shared' tag
-        $this->container->add(Bar::class);       // This won't have 'shared' tag
-
-        $this->container->get(Foo::class);
-        $this->assertTrue($taggedEventFired);
-        $this->assertFalse($untaggedEventFired);
-    }
-
-    public function testEventFilterForId(): void
-    {
-        $specificEventFired = false;
-        $otherEventFired = false;
-
-        $this->container->listen(ServiceResolvedEvent::class, function () use (&$specificEventFired) {
-            $specificEventFired = true;
-        })->forId(Foo::class);
-
-        $this->container->listen(ServiceResolvedEvent::class, function () use (&$otherEventFired) {
-            $otherEventFired = true;
-        })->forId(Bar::class);
-
-        $this->container->add(Foo::class);
-        $this->container->add(Bar::class);
-
-        $this->container->get(Foo::class);
-        $this->assertTrue($specificEventFired);
-        $this->assertFalse($otherEventFired);
-    }
-
-    public function testCustomEventFilter(): void
-    {
-        $customEventFired = false;
-
-        $this->container->listen(ServiceResolvedEvent::class, function () use (&$customEventFired) {
-            $customEventFired = true;
-        })->where(function (ServiceResolvedEvent $event) {
-            return $event->getId() === Foo::class && $event->isInstanceOf(Foo::class);
-        });
-
-        $this->container->add(Foo::class);
-        $this->container->add(Bar::class);
-
-        $this->container->get(Foo::class);
-        $this->assertTrue($customEventFired);
-
-        $customEventFired = false;
-        $this->container->get(Bar::class);
-        $this->assertFalse($customEventFired);
-    }
-
-    public function testEventPropagationCanBeStopped(): void
-    {
-        $firstListenerFired = false;
-        $secondListenerFired = false;
-
-        $this->dispatcher->addListener(ServiceResolvedEvent::class, function (ServiceResolvedEvent $event) use (&$firstListenerFired) {
-            $firstListenerFired = true;
-            $event->stopPropagation();
-        });
-
-        $this->dispatcher->addListener(ServiceResolvedEvent::class, function () use (&$secondListenerFired) {
-            $secondListenerFired = true;
-        });
-
-        $this->container->add(Foo::class);
-        $this->container->get(Foo::class);
-
-        $this->assertTrue($firstListenerFired);
-        $this->assertFalse($secondListenerFired);
-    }
-
-    public function testEarlyResolutionInBeforeResolveEvent(): void
-    {
-        $customObject = new Foo();
-        $customObject->isCustom = true;
-
-        $this->dispatcher->addListener(BeforeResolveEvent::class, function (BeforeResolveEvent $event) use ($customObject) {
-            if ($event->getId() === Foo::class) {
-                $event->setResolved($customObject);
-            }
-        });
-
-        $this->container->add(Foo::class);
-        $resolved = $this->container->get(Foo::class);
-
-        $this->assertSame($customObject, $resolved);
-        $this->assertTrue($resolved->isCustom);
-    }
-
-    public function testDefinitionResolvedEventIsDispatched(): void
-    {
-        $capturedEvent = null;
-
-        $this->dispatcher->addListener(DefinitionResolvedEvent::class, function (DefinitionResolvedEvent $event) use (&$capturedEvent) {
-            $capturedEvent = $event;
-        });
-
-        $this->container->add(Foo::class);
-        $this->container->get(Foo::class);
-
-        $this->assertInstanceOf(DefinitionResolvedEvent::class, $capturedEvent);
-        $this->assertSame(Foo::class, $capturedEvent->getId());
-        $this->assertNotNull($capturedEvent->getDefinition());
-        $this->assertIsArray($capturedEvent->getTags());
-    }
-
-    public function testDefinitionResolvedEventCanShortCircuitResolution(): void
-    {
-        $customFoo = new Foo();
-
-        $this->dispatcher->addListener(DefinitionResolvedEvent::class, function (DefinitionResolvedEvent $event) use ($customFoo) {
-            $event->setResolved($customFoo);
-        });
-
-        $this->container->add(Foo::class);
-        $resolved = $this->container->get(Foo::class);
-
-        $this->assertSame($customFoo, $resolved);
-    }
-
-    public function testForTypeOnNonServiceResolvedEventReturnsFalse(): void
-    {
-        $listenerFired = false;
-
-        $this->dispatcher->listen(BeforeResolveEvent::class)->forType(Foo::class)->then(function () use (&$listenerFired) {
-            $listenerFired = true;
-        });
-
-        $this->container->add(Foo::class);
-        $this->container->get(Foo::class);
-
-        $this->assertFalse($listenerFired);
-    }
-
-    public function testStopPropagationInListenerPreventsFiltersFromExecuting(): void
-    {
-        $directListenerFired = false;
-        $filterListenerFired = false;
-
-        $this->dispatcher->addListener(ServiceResolvedEvent::class, function (ServiceResolvedEvent $event) use (&$directListenerFired) {
-            $directListenerFired = true;
-            $event->stopPropagation();
-        });
-
-        $this->container->listen(ServiceResolvedEvent::class, function () use (&$filterListenerFired) {
-            $filterListenerFired = true;
-        });
-
-        $this->container->add(Foo::class);
-        $this->container->get(Foo::class);
-
-        $this->assertTrue($directListenerFired);
-        $this->assertFalse($filterListenerFired);
-    }
-
-    public function testEarlyResolutionWithNullValue(): void
-    {
-        $this->dispatcher->addListener(BeforeResolveEvent::class, function (BeforeResolveEvent $event) {
-            if ($event->getId() === Foo::class) {
-                $event->setResolved(null);
-            }
-        });
-
-        $this->container->add(Foo::class);
-        $resolved = $this->container->get(Foo::class);
-
-        $this->assertNull($resolved);
-    }
-
-    public function testSetEventDispatcherAcceptsConcreteDispatcher(): void
-    {
-        $newDispatcher = new EventDispatcher();
-        $this->container->setEventDispatcher($newDispatcher);
-
-        $this->assertSame($newDispatcher, $this->container->getEventDispatcher());
-    }
-
-    public function testRemoveListenerRemovesSpecificListener(): void
-    {
-        $firstListenerFired = false;
-        $secondListenerFired = false;
-
-        $firstListener = function () use (&$firstListenerFired) {
-            $firstListenerFired = true;
-        };
-
-        $secondListener = function () use (&$secondListenerFired) {
-            $secondListenerFired = true;
-        };
-
-        $this->dispatcher->addListener(ServiceResolvedEvent::class, $firstListener);
-        $this->dispatcher->addListener(ServiceResolvedEvent::class, $secondListener);
-        $this->dispatcher->removeListener(ServiceResolvedEvent::class, $firstListener);
 
-        $this->container->add(Foo::class);
-        $this->container->get(Foo::class);
+beforeEach(function () {
+    $this->dispatcher = new EventDispatcher();
+    $this->container = new Container();
+    $this->container->setEventDispatcher($this->dispatcher);
+});
+
+test('on define event is dispatched', function () {
+    $eventFired = false;
+    $capturedEvent = null;
+
+    $this->dispatcher->addListener(OnDefineEvent::class, function (OnDefineEvent $event) use (&$eventFired, &$capturedEvent) {
+        $eventFired = true;
+        $capturedEvent = $event;
+    });
+
+    $this->container->add(Foo::class);
+
+    expect($eventFired)->toBeTrue();
+    expect($capturedEvent)->toBeInstanceOf(OnDefineEvent::class);
+    expect($capturedEvent->getId())->toBe(Foo::class);
+    expect($capturedEvent->getDefinition())->not->toBeNull();
+});
+
+test('before resolve event is dispatched', function () {
+    $eventFired = false;
+    $capturedEvent = null;
+
+    $this->dispatcher->addListener(BeforeResolveEvent::class, function (BeforeResolveEvent $event) use (&$eventFired, &$capturedEvent) {
+        $eventFired = true;
+        $capturedEvent = $event;
+    });
+
+    $this->container->add(Foo::class);
+    $this->container->get(Foo::class);
+
+    expect($eventFired)->toBeTrue();
+    expect($capturedEvent)->toBeInstanceOf(BeforeResolveEvent::class);
+    expect($capturedEvent->getId())->toBe(Foo::class);
+});
+
+test('service resolved event is dispatched', function () {
+    $eventFired = false;
+    $capturedEvent = null;
+
+    $this->dispatcher->addListener(ServiceResolvedEvent::class, function (ServiceResolvedEvent $event) use (&$eventFired, &$capturedEvent) {
+        $eventFired = true;
+        $capturedEvent = $event;
+    });
+
+    $this->container->add(Foo::class);
+    $resolvedObject = $this->container->get(Foo::class);
+
+    expect($eventFired)->toBeTrue();
+    expect($capturedEvent)->toBeInstanceOf(ServiceResolvedEvent::class);
+    expect($capturedEvent->getId())->toBe(Foo::class);
+    expect($capturedEvent->getResolved())->toBe($resolvedObject);
+    expect($capturedEvent->isInstanceOf(Foo::class))->toBeTrue();
+});
+
+test('event can modify resolved object', function () {
+    $this->dispatcher->addListener(ServiceResolvedEvent::class, function (ServiceResolvedEvent $event) {
+        if ($event->isInstanceOf(Foo::class)) {
+            $foo = $event->getResolved();
+            $foo->modified = true;
+            $event->setResolved($foo);
+        }
+    });
+
+    $this->container->add(Foo::class);
+    $foo = $this->container->get(Foo::class);
+
+    expect(property_exists($foo, 'modified'))->toBeTrue();
+    expect($foo->modified)->toBeTrue();
+});
+
+test('event filter for type', function () {
+    $fooEventFired = false;
+    $barEventFired = false;
+
+    $this->container->listen(ServiceResolvedEvent::class, function () use (&$fooEventFired) {
+        $fooEventFired = true;
+    })->forType(Foo::class);
+
+    $this->container->listen(ServiceResolvedEvent::class, function () use (&$barEventFired) {
+        $barEventFired = true;
+    })->forType(Bar::class);
+
+    $this->container->add(Foo::class);
+    $this->container->add(Bar::class);
+
+    $this->container->get(Foo::class);
+    expect($fooEventFired)->toBeTrue();
+    expect($barEventFired)->toBeFalse();
+
+    $this->container->get(Bar::class);
+    expect($barEventFired)->toBeTrue();
+});
+
+test('event filter for tag', function () {
+    $taggedEventFired = false;
+    $untaggedEventFired = false;
+
+    $this->container->listen(ServiceResolvedEvent::class, function () use (&$taggedEventFired) {
+        $taggedEventFired = true;
+    })->forTag('shared');
 
-        $this->assertFalse($firstListenerFired);
-        $this->assertTrue($secondListenerFired);
-    }
+    $this->container->listen(ServiceResolvedEvent::class, function () use (&$untaggedEventFired) {
+        $untaggedEventFired = true;
+    })->forTag('custom');
+
+    $this->container->addShared(Foo::class);
+    $this->container->add(Bar::class);
+
+    $this->container->get(Foo::class);
+    expect($taggedEventFired)->toBeTrue();
+    expect($untaggedEventFired)->toBeFalse();
+});
+
+test('event filter for id', function () {
+    $specificEventFired = false;
+    $otherEventFired = false;
 
-    public function testRemoveListenersClearsListenersAndFilters(): void
-    {
-        $directListenerFired = false;
-        $filterListenerFired = false;
-
-        $this->dispatcher->addListener(ServiceResolvedEvent::class, function () use (&$directListenerFired) {
-            $directListenerFired = true;
-        });
+    $this->container->listen(ServiceResolvedEvent::class, function () use (&$specificEventFired) {
+        $specificEventFired = true;
+    })->forId(Foo::class);
 
-        $this->dispatcher->listen(ServiceResolvedEvent::class)->then(function () use (&$filterListenerFired) {
-            $filterListenerFired = true;
-        });
+    $this->container->listen(ServiceResolvedEvent::class, function () use (&$otherEventFired) {
+        $otherEventFired = true;
+    })->forId(Bar::class);
 
-        $this->dispatcher->removeListeners(ServiceResolvedEvent::class);
+    $this->container->add(Foo::class);
+    $this->container->add(Bar::class);
 
-        $this->container->add(Foo::class);
-        $this->container->get(Foo::class);
+    $this->container->get(Foo::class);
+    expect($specificEventFired)->toBeTrue();
+    expect($otherEventFired)->toBeFalse();
+});
 
-        $this->assertFalse($directListenerFired);
-        $this->assertFalse($filterListenerFired);
-    }
+test('custom event filter', function () {
+    $customEventFired = false;
 
-    public function testGetNewDispatchesEventsWithNewFlag(): void
-    {
-        $capturedBeforeEvent = null;
-        $capturedServiceEvent = null;
+    $this->container->listen(ServiceResolvedEvent::class, function () use (&$customEventFired) {
+        $customEventFired = true;
+    })->where(function (ServiceResolvedEvent $event) {
+        return $event->getId() === Foo::class && $event->isInstanceOf(Foo::class);
+    });
 
-        $this->dispatcher->addListener(BeforeResolveEvent::class, function (BeforeResolveEvent $event) use (&$capturedBeforeEvent) {
-            $capturedBeforeEvent = $event;
-        });
+    $this->container->add(Foo::class);
+    $this->container->add(Bar::class);
 
-        $this->dispatcher->addListener(ServiceResolvedEvent::class, function (ServiceResolvedEvent $event) use (&$capturedServiceEvent) {
-            $capturedServiceEvent = $event;
-        });
+    $this->container->get(Foo::class);
+    expect($customEventFired)->toBeTrue();
 
-        $this->container->add(Foo::class);
-        $this->container->getNew(Foo::class);
-
-        $this->assertTrue($capturedBeforeEvent->isNew());
-        $this->assertTrue($capturedServiceEvent->isNew());
-    }
+    $customEventFired = false;
+    $this->container->get(Bar::class);
+    expect($customEventFired)->toBeFalse();
+});
 
-    public function testTaggedResolutionDispatchesServiceResolvedPerService(): void
-    {
-        $collectedEvents = [];
+test('event propagation can be stopped', function () {
+    $firstListenerFired = false;
+    $secondListenerFired = false;
 
-        $this->dispatcher->addListener(ServiceResolvedEvent::class, function (ServiceResolvedEvent $event) use (&$collectedEvents) {
-            $collectedEvents[] = $event;
-        });
+    $this->dispatcher->addListener(ServiceResolvedEvent::class, function (ServiceResolvedEvent $event) use (&$firstListenerFired) {
+        $firstListenerFired = true;
+        $event->stopPropagation();
+    });
 
-        $this->container->add(Foo::class)->addTag('my-group');
-        $this->container->add(Bar::class)->addTag('my-group');
-        $this->container->get('my-group');
+    $this->dispatcher->addListener(ServiceResolvedEvent::class, function () use (&$secondListenerFired) {
+        $secondListenerFired = true;
+    });
 
-        $this->assertCount(2, $collectedEvents);
-    }
+    $this->container->add(Foo::class);
+    $this->container->get(Foo::class);
 
-    public function testWhereComposesMultipleClosuresWithAnd(): void
-    {
-        $listenerFiredCount = 0;
+    expect($firstListenerFired)->toBeTrue();
+    expect($secondListenerFired)->toBeFalse();
+});
 
-        $this->container->listen(ServiceResolvedEvent::class, function () use (&$listenerFiredCount) {
-            $listenerFiredCount++;
-        })
-            ->where(fn($e) => $e->getId() === Foo::class)
-            ->where(fn($e) => $e instanceof ServiceResolvedEvent && $e->isInstanceOf(Foo::class));
+test('early resolution in before resolve event', function () {
+    $customObject = new Foo();
+    $customObject->isCustom = true;
 
-        $this->container->add(Foo::class);
-        $this->container->add(Bar::class);
+    $this->dispatcher->addListener(BeforeResolveEvent::class, function (BeforeResolveEvent $event) use ($customObject) {
+        if ($event->getId() === Foo::class) {
+            $event->setResolved($customObject);
+        }
+    });
 
-        $this->container->get(Foo::class);
-        $this->container->get(Bar::class);
+    $this->container->add(Foo::class);
+    $resolved = $this->container->get(Foo::class);
 
-        $this->assertSame(1, $listenerFiredCount);
-    }
+    expect($resolved)->toBe($customObject);
+    expect($resolved->isCustom)->toBeTrue();
+});
 
-    public function testIsNewFlagIsCorrectlySetOnServiceResolvedEvent(): void
-    {
-        $capturedEvent = null;
+test('definition resolved event is dispatched', function () {
+    $capturedEvent = null;
 
-        $this->dispatcher->addListener(ServiceResolvedEvent::class, function (ServiceResolvedEvent $event) use (&$capturedEvent) {
-            $capturedEvent = $event;
-        });
+    $this->dispatcher->addListener(DefinitionResolvedEvent::class, function (DefinitionResolvedEvent $event) use (&$capturedEvent) {
+        $capturedEvent = $event;
+    });
 
-        $this->container->addShared(Foo::class);
+    $this->container->add(Foo::class);
+    $this->container->get(Foo::class);
 
-        $this->container->get(Foo::class);
-        $this->assertInstanceOf(ServiceResolvedEvent::class, $capturedEvent);
-        $this->assertFalse($capturedEvent->isNew());
+    expect($capturedEvent)->toBeInstanceOf(DefinitionResolvedEvent::class);
+    expect($capturedEvent->getId())->toBe(Foo::class);
+    expect($capturedEvent->getDefinition())->not->toBeNull();
+    expect($capturedEvent->getTags())->toBeArray();
+});
 
-        $capturedEvent = null;
+test('definition resolved event can short circuit resolution', function () {
+    $customFoo = new Foo();
 
-        $this->container->get(Foo::class);
-        $this->assertInstanceOf(ServiceResolvedEvent::class, $capturedEvent);
-        $this->assertFalse($capturedEvent->isNew());
-    }
+    $this->dispatcher->addListener(DefinitionResolvedEvent::class, function (DefinitionResolvedEvent $event) use ($customFoo) {
+        $event->setResolved($customFoo);
+    });
 
-    public function testResolveWithNoListenersDoesNotCrashAndReturnsCorrectObject(): void
-    {
-        $container = new Container();
-        $container->setEventDispatcher(new EventDispatcher());
+    $this->container->add(Foo::class);
+    $resolved = $this->container->get(Foo::class);
 
-        $container->add(Foo::class);
-        $resolved = $container->get(Foo::class);
+    expect($resolved)->toBe($customFoo);
+});
 
-        $this->assertInstanceOf(Foo::class, $resolved);
-    }
+test('for type on non service resolved event returns false', function () {
+    $listenerFired = false;
 
-    public function testHasListenersForReturnsFalseWhenEmpty(): void
-    {
-        $dispatcher = new EventDispatcher();
+    $this->dispatcher->listen(BeforeResolveEvent::class)->forType(Foo::class)->then(function () use (&$listenerFired) {
+        $listenerFired = true;
+    });
 
-        $this->assertFalse($dispatcher->hasListenersFor(ServiceResolvedEvent::class));
-        $this->assertFalse($dispatcher->hasListenersFor(BeforeResolveEvent::class));
-    }
+    $this->container->add(Foo::class);
+    $this->container->get(Foo::class);
 
-    public function testHasListenersForReturnsTrueForDirectListener(): void
-    {
-        $dispatcher = new EventDispatcher();
-        $dispatcher->addListener(ServiceResolvedEvent::class, fn() => null);
+    expect($listenerFired)->toBeFalse();
+});
 
-        $this->assertTrue($dispatcher->hasListenersFor(ServiceResolvedEvent::class));
-        $this->assertFalse($dispatcher->hasListenersFor(BeforeResolveEvent::class));
-    }
+test('stop propagation in listener prevents filters from executing', function () {
+    $directListenerFired = false;
+    $filterListenerFired = false;
 
-    public function testHasListenersForReturnsTrueForFilter(): void
-    {
-        $dispatcher = new EventDispatcher();
-        $dispatcher->listen(ServiceResolvedEvent::class)->then(fn() => null);
+    $this->dispatcher->addListener(ServiceResolvedEvent::class, function (ServiceResolvedEvent $event) use (&$directListenerFired) {
+        $directListenerFired = true;
+        $event->stopPropagation();
+    });
 
-        $this->assertTrue($dispatcher->hasListenersFor(ServiceResolvedEvent::class));
-    }
+    $this->container->listen(ServiceResolvedEvent::class, function () use (&$filterListenerFired) {
+        $filterListenerFired = true;
+    });
 
-    public function testHasListenersForReturnsFalseAfterRemoveListeners(): void
-    {
-        $dispatcher = new EventDispatcher();
-        $dispatcher->addListener(ServiceResolvedEvent::class, fn() => null);
+    $this->container->add(Foo::class);
+    $this->container->get(Foo::class);
 
-        $this->assertTrue($dispatcher->hasListenersFor(ServiceResolvedEvent::class));
+    expect($directListenerFired)->toBeTrue();
+    expect($filterListenerFired)->toBeFalse();
+});
 
-        $dispatcher->removeListeners(ServiceResolvedEvent::class);
+test('early resolution with null value', function () {
+    $this->dispatcher->addListener(BeforeResolveEvent::class, function (BeforeResolveEvent $event) {
+        if ($event->getId() === Foo::class) {
+            $event->setResolved(null);
+        }
+    });
 
-        $this->assertFalse($dispatcher->hasListenersFor(ServiceResolvedEvent::class));
-    }
+    $this->container->add(Foo::class);
+    $resolved = $this->container->get(Foo::class);
 
-    public function testBeforeResolveEventSkippedWhenNoListenersRegisteredForIt(): void
-    {
-        $serviceEventFired = false;
-        $beforeEventFired = false;
+    expect($resolved)->toBeNull();
+});
 
-        $this->dispatcher->addListener(ServiceResolvedEvent::class, function () use (&$serviceEventFired) {
-            $serviceEventFired = true;
-        });
+test('set event dispatcher accepts concrete dispatcher', function () {
+    $newDispatcher = new EventDispatcher();
+    $this->container->setEventDispatcher($newDispatcher);
 
-        $this->container->add(Foo::class);
-        $this->container->get(Foo::class);
+    expect($this->container->getEventDispatcher())->toBe($newDispatcher);
+});
 
-        $this->assertTrue($serviceEventFired);
-        $this->assertFalse($beforeEventFired);
+test('remove listener removes specific listener', function () {
+    $firstListenerFired = false;
+    $secondListenerFired = false;
 
-        $serviceEventFired = false;
-        $this->dispatcher->addListener(BeforeResolveEvent::class, function () use (&$beforeEventFired) {
-            $beforeEventFired = true;
-        });
+    $firstListener = function () use (&$firstListenerFired) {
+        $firstListenerFired = true;
+    };
 
-        $this->container->get(Foo::class);
+    $secondListener = function () use (&$secondListenerFired) {
+        $secondListenerFired = true;
+    };
 
-        $this->assertTrue($serviceEventFired);
-        $this->assertTrue($beforeEventFired);
-    }
+    $this->dispatcher->addListener(ServiceResolvedEvent::class, $firstListener);
+    $this->dispatcher->addListener(ServiceResolvedEvent::class, $secondListener);
+    $this->dispatcher->removeListener(ServiceResolvedEvent::class, $firstListener);
 
-    public function testAfterResolveCallbackReceivesResolvedObject(): void
-    {
-        $received = null;
+    $this->container->add(Foo::class);
+    $this->container->get(Foo::class);
 
-        $this->container->add(Foo::class);
-        $this->container->afterResolve(Foo::class, function ($obj) use (&$received) {
-            $received = $obj;
-        });
+    expect($firstListenerFired)->toBeFalse();
+    expect($secondListenerFired)->toBeTrue();
+});
 
-        $resolved = $this->container->get(Foo::class);
+test('remove listeners clears listeners and filters', function () {
+    $directListenerFired = false;
+    $filterListenerFired = false;
 
-        $this->assertSame($resolved, $received);
-        $this->assertNotInstanceOf(ServiceResolvedEvent::class, $received);
-    }
+    $this->dispatcher->addListener(ServiceResolvedEvent::class, function () use (&$directListenerFired) {
+        $directListenerFired = true;
+    });
 
-    public function testAfterResolveFiltersByType(): void
-    {
-        $fooCount = 0;
-        $barCount = 0;
+    $this->dispatcher->listen(ServiceResolvedEvent::class)->then(function () use (&$filterListenerFired) {
+        $filterListenerFired = true;
+    });
 
-        $this->container->afterResolve(Foo::class, function () use (&$fooCount) {
-            $fooCount++;
-        });
+    $this->dispatcher->removeListeners(ServiceResolvedEvent::class);
 
-        $this->container->afterResolve(Bar::class, function () use (&$barCount) {
-            $barCount++;
-        });
+    $this->container->add(Foo::class);
+    $this->container->get(Foo::class);
 
-        $this->container->add(Foo::class);
-        $this->container->get(Foo::class);
+    expect($directListenerFired)->toBeFalse();
+    expect($filterListenerFired)->toBeFalse();
+});
 
-        $this->assertSame(1, $fooCount);
-        $this->assertSame(0, $barCount);
+test('get new dispatches events with new flag', function () {
+    $capturedBeforeEvent = null;
+    $capturedServiceEvent = null;
 
-        $this->container->add(Bar::class);
-        $this->container->get(Bar::class);
+    $this->dispatcher->addListener(BeforeResolveEvent::class, function (BeforeResolveEvent $event) use (&$capturedBeforeEvent) {
+        $capturedBeforeEvent = $event;
+    });
 
-        $this->assertSame(1, $barCount);
-    }
+    $this->dispatcher->addListener(ServiceResolvedEvent::class, function (ServiceResolvedEvent $event) use (&$capturedServiceEvent) {
+        $capturedServiceEvent = $event;
+    });
 
-    public function testAfterResolveReturnsEventFilterForChaining(): void
-    {
-        $filter = $this->container->afterResolve(Foo::class, fn() => null);
+    $this->container->add(Foo::class);
+    $this->container->getNew(Foo::class);
 
-        $this->assertInstanceOf(EventFilter::class, $filter);
-        $filter->forTag('shared');
-    }
+    expect($capturedBeforeEvent->isNew())->toBeTrue();
+    expect($capturedServiceEvent->isNew())->toBeTrue();
+});
 
-    public function testAfterResolveWorksAlongsideDirectListeners(): void
-    {
-        $directFired = false;
-        $afterResolveFired = false;
+test('tagged resolution dispatches service resolved per service', function () {
+    $collectedEvents = [];
 
-        $this->dispatcher->addListener(ServiceResolvedEvent::class, function () use (&$directFired) {
-            $directFired = true;
-        });
+    $this->dispatcher->addListener(ServiceResolvedEvent::class, function (ServiceResolvedEvent $event) use (&$collectedEvents) {
+        $collectedEvents[] = $event;
+    });
 
-        $this->container->afterResolve(Foo::class, function () use (&$afterResolveFired) {
-            $afterResolveFired = true;
-        });
+    $this->container->add(Foo::class)->addTag('my-group');
+    $this->container->add(Bar::class)->addTag('my-group');
+    $this->container->get('my-group');
 
-        $this->container->add(Foo::class);
-        $this->container->get(Foo::class);
+    expect($collectedEvents)->toHaveCount(2);
+});
 
-        $this->assertTrue($directFired);
-        $this->assertTrue($afterResolveFired);
-    }
-}
+test('where composes multiple closures with and', function () {
+    $listenerFiredCount = 0;
+
+    $this->container->listen(ServiceResolvedEvent::class, function () use (&$listenerFiredCount) {
+        $listenerFiredCount++;
+    })
+        ->where(fn ($e) => $e->getId() === Foo::class)
+        ->where(fn ($e) => $e instanceof ServiceResolvedEvent && $e->isInstanceOf(Foo::class));
+
+    $this->container->add(Foo::class);
+    $this->container->add(Bar::class);
+
+    $this->container->get(Foo::class);
+    $this->container->get(Bar::class);
+
+    expect($listenerFiredCount)->toBe(1);
+});
+
+test('is new flag is correctly set on service resolved event', function () {
+    $capturedEvent = null;
+
+    $this->dispatcher->addListener(ServiceResolvedEvent::class, function (ServiceResolvedEvent $event) use (&$capturedEvent) {
+        $capturedEvent = $event;
+    });
+
+    $this->container->addShared(Foo::class);
+
+    $this->container->get(Foo::class);
+    expect($capturedEvent)->toBeInstanceOf(ServiceResolvedEvent::class);
+    expect($capturedEvent->isNew())->toBeFalse();
+
+    $capturedEvent = null;
+
+    $this->container->get(Foo::class);
+    expect($capturedEvent)->toBeInstanceOf(ServiceResolvedEvent::class);
+    expect($capturedEvent->isNew())->toBeFalse();
+});
+
+test('resolve with no listeners does not crash and returns correct object', function () {
+    $container = new Container();
+    $container->setEventDispatcher(new EventDispatcher());
+
+    $container->add(Foo::class);
+    $resolved = $container->get(Foo::class);
+
+    expect($resolved)->toBeInstanceOf(Foo::class);
+});
+
+test('has listeners for returns false when empty', function () {
+    $dispatcher = new EventDispatcher();
+
+    expect($dispatcher->hasListenersFor(ServiceResolvedEvent::class))->toBeFalse();
+    expect($dispatcher->hasListenersFor(BeforeResolveEvent::class))->toBeFalse();
+});
+
+test('has listeners for returns true for direct listener', function () {
+    $dispatcher = new EventDispatcher();
+    $dispatcher->addListener(ServiceResolvedEvent::class, fn () => null);
+
+    expect($dispatcher->hasListenersFor(ServiceResolvedEvent::class))->toBeTrue();
+    expect($dispatcher->hasListenersFor(BeforeResolveEvent::class))->toBeFalse();
+});
+
+test('has listeners for returns true for filter', function () {
+    $dispatcher = new EventDispatcher();
+    $dispatcher->listen(ServiceResolvedEvent::class)->then(fn () => null);
+
+    expect($dispatcher->hasListenersFor(ServiceResolvedEvent::class))->toBeTrue();
+});
+
+test('has listeners for returns false after remove listeners', function () {
+    $dispatcher = new EventDispatcher();
+    $dispatcher->addListener(ServiceResolvedEvent::class, fn () => null);
+
+    expect($dispatcher->hasListenersFor(ServiceResolvedEvent::class))->toBeTrue();
+
+    $dispatcher->removeListeners(ServiceResolvedEvent::class);
+
+    expect($dispatcher->hasListenersFor(ServiceResolvedEvent::class))->toBeFalse();
+});
+
+test('before resolve event skipped when no listeners registered for it', function () {
+    $serviceEventFired = false;
+    $beforeEventFired = false;
+
+    $this->dispatcher->addListener(ServiceResolvedEvent::class, function () use (&$serviceEventFired) {
+        $serviceEventFired = true;
+    });
+
+    $this->container->add(Foo::class);
+    $this->container->get(Foo::class);
+
+    expect($serviceEventFired)->toBeTrue();
+    expect($beforeEventFired)->toBeFalse();
+
+    $serviceEventFired = false;
+    $this->dispatcher->addListener(BeforeResolveEvent::class, function () use (&$beforeEventFired) {
+        $beforeEventFired = true;
+    });
+
+    $this->container->get(Foo::class);
+
+    expect($serviceEventFired)->toBeTrue();
+    expect($beforeEventFired)->toBeTrue();
+});
+
+test('after resolve callback receives resolved object', function () {
+    $received = null;
+
+    $this->container->add(Foo::class);
+    $this->container->afterResolve(Foo::class, function ($obj) use (&$received) {
+        $received = $obj;
+    });
+
+    $resolved = $this->container->get(Foo::class);
+
+    expect($received)->toBe($resolved);
+    expect($received)->not->toBeInstanceOf(ServiceResolvedEvent::class);
+});
+
+test('after resolve filters by type', function () {
+    $fooCount = 0;
+    $barCount = 0;
+
+    $this->container->afterResolve(Foo::class, function () use (&$fooCount) {
+        $fooCount++;
+    });
+
+    $this->container->afterResolve(Bar::class, function () use (&$barCount) {
+        $barCount++;
+    });
+
+    $this->container->add(Foo::class);
+    $this->container->get(Foo::class);
+
+    expect($fooCount)->toBe(1);
+    expect($barCount)->toBe(0);
+
+    $this->container->add(Bar::class);
+    $this->container->get(Bar::class);
+
+    expect($barCount)->toBe(1);
+});
+
+test('after resolve returns event filter for chaining', function () {
+    $filter = $this->container->afterResolve(Foo::class, fn () => null);
+
+    expect($filter)->toBeInstanceOf(EventFilter::class);
+    $filter->forTag('shared');
+});
+
+test('after resolve works alongside direct listeners', function () {
+    $directFired = false;
+    $afterResolveFired = false;
+
+    $this->dispatcher->addListener(ServiceResolvedEvent::class, function () use (&$directFired) {
+        $directFired = true;
+    });
+
+    $this->container->afterResolve(Foo::class, function () use (&$afterResolveFired) {
+        $afterResolveFired = true;
+    });
+
+    $this->container->add(Foo::class);
+    $this->container->get(Foo::class);
+
+    expect($directFired)->toBeTrue();
+    expect($afterResolveFired)->toBeTrue();
+});

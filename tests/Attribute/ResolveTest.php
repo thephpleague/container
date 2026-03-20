@@ -2,65 +2,41 @@
 
 declare(strict_types=1);
 
-namespace League\Container\Test\Attribute;
-
 use League\Container\Attribute\Resolve;
 use League\Container\Container;
 use League\Container\Test\Asset\Bar;
 use League\Container\Test\Asset\Foo;
-use PHPUnit\Framework\MockObject\Exception;
-use PHPUnit\Framework\TestCase;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
 
-class ResolveTest extends TestCase
-{
-    /**
-     * @throws Exception
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
-    public function testCanInstantiateWithClassResolverAndSingleSegmentPath(): void
-    {
-        $foo = new Foo();
-        $foo->setBar(new Bar());
+test('can instantiate with class resolver and single segment path', function () {
+    $foo = new Foo();
+    $foo->setBar(new Bar());
 
-        $container = $this->createMock(Container::class);
-        $container->method('get')->with(Foo::class)->willReturn($foo);
+    $container = $this->createMock(Container::class);
+    $container->method('get')->with(Foo::class)->willReturn($foo);
 
-        $resolve = new Resolve(Foo::class, 'bar');
-        $resolve->setContainer($container);
+    $resolve = new Resolve(Foo::class, 'bar');
+    $resolve->setContainer($container);
 
-        $this->assertInstanceOf(Resolve::class, $resolve);
-        $this->assertObjectHasProperty('resolver', $resolve);
-        $this->assertObjectHasProperty('path', $resolve);
+    expect($resolve)->toBeInstanceOf(Resolve::class);
+    expect($resolve)->toHaveProperty('resolver');
+    expect($resolve)->toHaveProperty('path');
+    expect($resolve->resolve())->toBeInstanceOf(Bar::class);
+});
 
-        $this->assertInstanceOf(Bar::class, $resolve->resolve());
-    }
+test('can instantiate with class resolver and multi segment path', function () {
+    $foo = new Foo();
+    $bar = new Bar();
+    $bar->setSomething(['foo' => 'bar']);
+    $foo->setBar($bar);
 
-    /**
-     * @throws Exception
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
-    public function testCanInstantiateWithClassResolverAndMultiSegmentPath(): void
-    {
-        $foo = new Foo();
-        $bar = new Bar();
-        $bar->setSomething(['foo' => 'bar']);
+    $container = $this->createMock(Container::class);
+    $container->method('get')->with(Foo::class)->willReturn($foo);
 
-        $foo->setBar($bar);
+    $resolve = new Resolve(Foo::class, 'bar.getSomething.foo');
+    $resolve->setContainer($container);
 
-        $container = $this->createMock(Container::class);
-        $container->method('get')->with(Foo::class)->willReturn($foo);
-
-        $resolve = new Resolve(Foo::class, 'bar.getSomething.foo');
-        $resolve->setContainer($container);
-
-        $this->assertInstanceOf(Resolve::class, $resolve);
-        $this->assertObjectHasProperty('resolver', $resolve);
-        $this->assertObjectHasProperty('path', $resolve);
-
-        $this->assertEquals('bar', $resolve->resolve());
-    }
-}
+    expect($resolve)->toBeInstanceOf(Resolve::class);
+    expect($resolve)->toHaveProperty('resolver');
+    expect($resolve)->toHaveProperty('path');
+    expect($resolve->resolve())->toEqual('bar');
+});
