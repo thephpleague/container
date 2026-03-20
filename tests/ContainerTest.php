@@ -2,9 +2,6 @@
 
 declare(strict_types=1);
 
-namespace League\Container\Test;
-
-use BadMethodCallException;
 use League\Container\Container;
 use League\Container\ContainerAwareTrait;
 use League\Container\Exception\ContainerException;
@@ -13,332 +10,240 @@ use League\Container\ReflectionContainer;
 use League\Container\ServiceProvider\AbstractServiceProvider;
 use League\Container\Test\Asset\Bar;
 use League\Container\Test\Asset\Foo;
-use PHPUnit\Framework\TestCase;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
-use stdClass;
 
-class ContainerTest extends TestCase
-{
-    /**
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
-    public function testContainerAddsAndGets(): void
-    {
-        $container = new Container();
-        $container->add(Foo::class);
-        $this->assertTrue($container->has(Foo::class));
-        $foo = $container->get(Foo::class);
-        $this->assertInstanceOf(Foo::class, $foo);
-    }
+test('container adds and gets', function () {
+    $container = new Container();
+    $container->add(Foo::class);
 
-    /**
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
-    public function testContainerAddsAndGetsRecursively(): void
-    {
-        $container = new Container();
-        $container->add(Bar::class, Foo::class);
-        $container->add(Foo::class);
-        $this->assertTrue($container->has(Foo::class));
-        $foo = $container->get(Bar::class);
-        $this->assertInstanceOf(Foo::class, $foo);
-    }
+    expect($container->has(Foo::class))->toBeTrue();
+    expect($container->get(Foo::class))->toBeInstanceOf(Foo::class);
+});
 
-    /**
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
-    public function testContainerAddsAndGetsShared(): void
-    {
-        $container = new Container();
-        $container->addShared(Foo::class);
-        $this->assertTrue($container->has(Foo::class));
+test('container adds and gets recursively', function () {
+    $container = new Container();
+    $container->add(Bar::class, Foo::class);
+    $container->add(Foo::class);
 
-        $fooOne = $container->get(Foo::class);
-        $fooTwo = $container->get(Foo::class);
+    expect($container->has(Foo::class))->toBeTrue();
+    expect($container->get(Bar::class))->toBeInstanceOf(Foo::class);
+});
 
-        $this->assertInstanceOf(Foo::class, $fooOne);
-        $this->assertInstanceOf(Foo::class, $fooTwo);
-        $this->assertSame($fooOne, $fooTwo);
-    }
+test('container adds and gets shared', function () {
+    $container = new Container();
+    $container->addShared(Foo::class);
 
-    /**
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
-    public function testContainerAddsAndGetsSharedByDefault(): void
-    {
-        $container = new Container();
-        $container->defaultToShared();
-        $container->add(Foo::class);
-        $this->assertTrue($container->has(Foo::class));
+    expect($container->has(Foo::class))->toBeTrue();
 
-        $fooOne = $container->get(Foo::class);
-        $fooTwo = $container->get(Foo::class);
+    $fooOne = $container->get(Foo::class);
+    $fooTwo = $container->get(Foo::class);
 
-        $this->assertInstanceOf(Foo::class, $fooOne);
-        $this->assertInstanceOf(Foo::class, $fooTwo);
-        $this->assertSame($fooOne, $fooTwo);
-    }
+    expect($fooOne)->toBeInstanceOf(Foo::class);
+    expect($fooTwo)->toBeInstanceOf(Foo::class);
+    expect($fooTwo)->toBe($fooOne);
+});
 
-    /**
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
-    public function testContainerAddsAndGetsFromTag(): void
-    {
-        $container = new Container();
-        $container->add(Foo::class)->addTag('foobar');
-        $container->add(Bar::class)->addTag('foobar');
-        $this->assertTrue($container->has(Foo::class));
+test('container adds and gets shared by default', function () {
+    $container = new Container();
+    $container->defaultToShared();
+    $container->add(Foo::class);
 
-        $arrayOf = $container->get('foobar');
+    expect($container->has(Foo::class))->toBeTrue();
 
-        $this->assertTrue($container->has('foobar'));
-        $this->assertIsArray($arrayOf);
-        $this->assertCount(2, $arrayOf);
-        $this->assertInstanceOf(Foo::class, $arrayOf[0]);
-        $this->assertInstanceOf(Bar::class, $arrayOf[1]);
-    }
+    $fooOne = $container->get(Foo::class);
+    $fooTwo = $container->get(Foo::class);
 
-    /**
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
-    public function testContainerAddsAndGetsNewFromTag(): void
-    {
-        $container = new Container();
-        $container->add(Foo::class)->addTag('foobar');
-        $container->add(Bar::class)->addTag('foobar');
-        $this->assertTrue($container->has(Foo::class));
+    expect($fooOne)->toBeInstanceOf(Foo::class);
+    expect($fooTwo)->toBeInstanceOf(Foo::class);
+    expect($fooTwo)->toBe($fooOne);
+});
 
-        $arrayOf = $container->get('foobar');
+test('container adds and gets from tag', function () {
+    $container = new Container();
+    $container->add(Foo::class)->addTag('foobar');
+    $container->add(Bar::class)->addTag('foobar');
 
-        $this->assertTrue($container->has('foobar'));
-        $this->assertIsArray($arrayOf);
-        $this->assertCount(2, $arrayOf);
-        $this->assertInstanceOf(Foo::class, $arrayOf[0]);
-        $this->assertInstanceOf(Bar::class, $arrayOf[1]);
+    expect($container->has(Foo::class))->toBeTrue();
 
-        $arrayOfTwo = $container->getNew('foobar');
-        $this->assertNotSame($arrayOfTwo, $arrayOf);
-    }
+    $arrayOf = $container->get('foobar');
 
-    /**
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
-    public function testContainerAddsAndGetsWithServiceProvider(): void
-    {
-        $provider = new class extends AbstractServiceProvider
+    expect($container->has('foobar'))->toBeTrue();
+    expect($arrayOf)->toBeArray();
+    expect($arrayOf)->toHaveCount(2);
+    expect($arrayOf[0])->toBeInstanceOf(Foo::class);
+    expect($arrayOf[1])->toBeInstanceOf(Bar::class);
+});
+
+test('container adds and gets new from tag', function () {
+    $container = new Container();
+    $container->add(Foo::class)->addTag('foobar');
+    $container->add(Bar::class)->addTag('foobar');
+
+    expect($container->has(Foo::class))->toBeTrue();
+
+    $arrayOf = $container->get('foobar');
+
+    expect($container->has('foobar'))->toBeTrue();
+    expect($arrayOf)->toBeArray();
+    expect($arrayOf)->toHaveCount(2);
+    expect($arrayOf[0])->toBeInstanceOf(Foo::class);
+    expect($arrayOf[1])->toBeInstanceOf(Bar::class);
+
+    $arrayOfTwo = $container->getNew('foobar');
+    expect($arrayOfTwo)->not->toBe($arrayOf);
+});
+
+test('container adds and gets with service provider', function () {
+    $provider = new class extends AbstractServiceProvider {
+        public function provides(string $id): bool
         {
-            public function provides(string $id): bool
-            {
-                return $id === Foo::class;
-            }
+            return $id === Foo::class;
+        }
 
-            public function register(): void
-            {
-                $this->getContainer()->add(Foo::class);
-            }
-        };
-
-        $container = new Container();
-
-        $container->addServiceProvider($provider);
-        $this->assertTrue($container->has(Foo::class));
-
-        $foo = $container->get(Foo::class);
-        $this->assertInstanceOf(Foo::class, $foo);
-    }
-
-    /**
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
-    public function testThrowsWhenServiceProviderLies(): void
-    {
-        $liar = new class extends AbstractServiceProvider
+        public function register(): void
         {
-            public function provides(string $id): bool
-            {
-                return true;
-            }
+            $this->getContainer()->add(Foo::class);
+        }
+    };
 
-            public function register(): void
-            {
-            }
-        };
+    $container = new Container();
+    $container->addServiceProvider($provider);
 
-        $container = new Container();
+    expect($container->has(Foo::class))->toBeTrue();
+    expect($container->get(Foo::class))->toBeInstanceOf(Foo::class);
+});
 
-        $container->addServiceProvider($liar);
-        $this->assertTrue($container->has('lie'));
-
-        $this->expectException(ContainerException::class);
-        $container->get('lie');
-    }
-
-    /**
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
-    public function testContainerAddsAndGetsFromDelegate(): void
-    {
-        $delegate  = new ReflectionContainer();
-        $container = new Container();
-        $container->delegate($delegate);
-        $foo = $container->get(Foo::class);
-        $this->assertInstanceOf(Foo::class, $foo);
-    }
-
-    /**
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
-    public function testContainerThrowsWhenCannotGetService(): void
-    {
-        $this->expectException(NotFoundException::class);
-        $container = new Container();
-        $this->assertFalse($container->has(Foo::class));
-        $container->get(Foo::class);
-    }
-
-    public function testContainerCanExtendDefinition(): void
-    {
-        $container = new Container();
-        $container->add(Foo::class);
-        $definition = $container->extend(Foo::class);
-        $this->assertSame(Foo::class, $definition->getAlias());
-        $this->assertSame(Foo::class, $definition->getConcrete());
-    }
-
-    public function testContainerCanExtendDefinitionFromServiceProvider(): void
-    {
-        $provider = new class extends AbstractServiceProvider
+test('throws when service provider lies', function () {
+    $liar = new class extends AbstractServiceProvider {
+        public function provides(string $id): bool
         {
-            public function provides(string $id): bool
-            {
-                return $id === Foo::class;
-            }
+            return true;
+        }
 
-            public function register(): void
-            {
-                $this->getContainer()->add(Foo::class);
-            }
-        };
+        public function register(): void
+        {
+        }
+    };
 
-        $container = new Container();
-        $container->addServiceProvider($provider);
-        $definition = $container->extend(Foo::class);
-        $this->assertSame(Foo::class, $definition->getAlias());
-        $this->assertSame(Foo::class, $definition->getConcrete());
-    }
+    $container = new Container();
+    $container->addServiceProvider($liar);
 
-    public function testContainerThrowsWhenCannotGetDefinitionToExtend(): void
-    {
-        $this->expectException(NotFoundException::class);
-        $container = new Container();
-        $this->assertFalse($container->has(Foo::class));
-        $container->extend(Foo::class);
-    }
+    expect($container->has('lie'))->toBeTrue();
 
-    /**
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
-    public function testContainerAddsAndInvokesInflector(): void
-    {
-        $container = new Container();
-        $container->inflector(Foo::class)->setProperty('bar', Bar::class);
-        $container->add(Foo::class);
-        $container->add(Bar::class);
-        $foo = $container->get(Foo::class);
-        $this->assertInstanceOf(Foo::class, $foo);
-        $this->assertInstanceOf(Bar::class, $foo->bar);
-    }
+    expect(fn () => $container->get('lie'))->toThrow(ContainerException::class);
+});
 
-    public function testContainerAwareCannotBeUsedWithoutImplementingInterface(): void
-    {
-        $this->expectException(BadMethodCallException::class);
+test('container adds and gets from delegate', function () {
+    $delegate = new ReflectionContainer();
+    $container = new Container();
+    $container->delegate($delegate);
 
-        $class = new class {
-            use ContainerAwareTrait;
-        };
+    expect($container->get(Foo::class))->toBeInstanceOf(Foo::class);
+});
 
-        $container = $this->getMockBuilder(Container::class)->getMock();
-        $class->setContainer($container);
-    }
+test('container throws when cannot get service', function () {
+    $container = new Container();
 
-    /**
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
-    public function testNonExistentClassResolvesAsString(): void
-    {
-        $container = new Container();
-        $container->add('NonExistent');
+    expect($container->has(Foo::class))->toBeFalse();
+    expect(fn () => $container->get(Foo::class))->toThrow(NotFoundException::class);
+});
 
-        $this->assertTrue($container->has('NonExistent'));
-        $this->assertSame('NonExistent', $container->get('NonExistent'));
-    }
+test('container can extend definition', function () {
+    $container = new Container();
+    $container->add(Foo::class);
+    $definition = $container->extend(Foo::class);
 
-    /**
-     * @throws NotFoundExceptionInterface
-     * @throws ContainerExceptionInterface
-     */
-    public function testRuntimeOverwrite(): void
-    {
-        $concreteOne = new stdClass();
-        $concreteTwo = new stdClass();
+    expect($definition->getAlias())->toBe(Foo::class);
+    expect($definition->getConcrete())->toBe(Foo::class);
+});
 
-        $container = new Container();
-        $container->add('foo', $concreteOne);
-        $this->assertSame($concreteOne, $container->get('foo'));
+test('container can extend definition from service provider', function () {
+    $provider = new class extends AbstractServiceProvider {
+        public function provides(string $id): bool
+        {
+            return $id === Foo::class;
+        }
 
-        $container->add('foo', $concreteTwo, true);
-        $this->assertSame($concreteTwo, $container->get('foo'));
-        $this->assertNotSame($concreteOne, $container->get('foo'));
-    }
+        public function register(): void
+        {
+            $this->getContainer()->add(Foo::class);
+        }
+    };
 
-    /**
-     * @throws NotFoundExceptionInterface
-     * @throws ContainerExceptionInterface
-     */
-    public function testDefaultOverwrite(): void
-    {
-        $concreteOne = new stdClass();
-        $concreteTwo = new stdClass();
+    $container = new Container();
+    $container->addServiceProvider($provider);
+    $definition = $container->extend(Foo::class);
 
-        $container = new Container();
-        $container->defaultToOverwrite();
-        $container->add('foo', $concreteOne);
-        $this->assertSame($concreteOne, $container->get('foo'));
+    expect($definition->getAlias())->toBe(Foo::class);
+    expect($definition->getConcrete())->toBe(Foo::class);
+});
 
-        $container->add('foo', $concreteTwo);
-        $this->assertSame($concreteTwo, $container->get('foo'));
-        $this->assertNotSame($concreteOne, $container->get('foo'));
-    }
+test('container throws when cannot get definition to extend', function () {
+    $container = new Container();
 
-    public function testGetDelegateReturnsMatchingDelegate(): void
-    {
-        $container = new Container();
-        $delegate  = new ReflectionContainer();
-        $container->delegate($delegate);
+    expect($container->has(Foo::class))->toBeFalse();
+    expect(fn () => $container->extend(Foo::class))->toThrow(NotFoundException::class);
+});
 
-        $this->assertSame($delegate, $container->getDelegate(ReflectionContainer::class));
-    }
+test('container aware cannot be used without implementing interface', function () {
+    $class = new class {
+        use ContainerAwareTrait;
+    };
 
-    public function testGetDelegateThrowsWhenNoDelegateOfTypeExists(): void
-    {
-        $container = new Container();
+    $container = $this->getMockBuilder(Container::class)->getMock();
 
-        $this->expectException(NotFoundException::class);
-        $this->expectExceptionMessage('No delegate container of type');
+    expect(fn () => $class->setContainer($container))->toThrow(BadMethodCallException::class);
+});
 
-        $container->getDelegate(ReflectionContainer::class);
-    }
-}
+test('non existent class resolves as string', function () {
+    $container = new Container();
+    $container->add('NonExistent');
+
+    expect($container->has('NonExistent'))->toBeTrue();
+    expect($container->get('NonExistent'))->toBe('NonExistent');
+});
+
+test('runtime overwrite', function () {
+    $concreteOne = new stdClass();
+    $concreteTwo = new stdClass();
+
+    $container = new Container();
+    $container->add('foo', $concreteOne);
+
+    expect($container->get('foo'))->toBe($concreteOne);
+
+    $container->add('foo', $concreteTwo, true);
+
+    expect($container->get('foo'))->toBe($concreteTwo);
+    expect($container->get('foo'))->not->toBe($concreteOne);
+});
+
+test('default overwrite', function () {
+    $concreteOne = new stdClass();
+    $concreteTwo = new stdClass();
+
+    $container = new Container();
+    $container->defaultToOverwrite();
+    $container->add('foo', $concreteOne);
+
+    expect($container->get('foo'))->toBe($concreteOne);
+
+    $container->add('foo', $concreteTwo);
+
+    expect($container->get('foo'))->toBe($concreteTwo);
+    expect($container->get('foo'))->not->toBe($concreteOne);
+});
+
+test('get delegate returns matching delegate', function () {
+    $container = new Container();
+    $delegate = new ReflectionContainer();
+    $container->delegate($delegate);
+
+    expect($container->getDelegate(ReflectionContainer::class))->toBe($delegate);
+});
+
+test('get delegate throws when no delegate of type exists', function () {
+    $container = new Container();
+
+    expect(fn () => $container->getDelegate(ReflectionContainer::class))
+        ->toThrow(NotFoundException::class, 'No delegate container of type');
+});

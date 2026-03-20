@@ -16,9 +16,6 @@ use League\Container\Event\OnDefineEvent;
 use League\Container\Event\ServiceResolvedEvent;
 use League\Container\Exception\ContainerException;
 use League\Container\Exception\NotFoundException;
-use League\Container\Inflector\InflectorAggregate;
-use League\Container\Inflector\InflectorAggregateInterface;
-use League\Container\Inflector\InflectorInterface;
 use League\Container\ServiceProvider\ServiceProviderAggregate;
 use League\Container\ServiceProvider\ServiceProviderAggregateInterface;
 use League\Container\ServiceProvider\ServiceProviderInterface;
@@ -30,25 +27,22 @@ class Container implements DefinitionContainerInterface
 {
     use EventAwareTrait;
 
-    /**
-     * @var ContainerInterface[]
-     */
+    /** @var list<ContainerInterface> */
     protected array $delegates = [];
 
     public function __construct(
         protected DefinitionAggregateInterface $definitions = new DefinitionAggregate(),
         protected ServiceProviderAggregateInterface $providers = new ServiceProviderAggregate(),
-        protected InflectorAggregateInterface $inflectors = new InflectorAggregate(),
         protected bool $defaultToShared = false,
         protected bool $defaultToOverwrite = false,
     ) {
         $this->definitions->setContainer($this);
         $this->providers->setContainer($this);
-        $this->inflectors->setContainer($this);
 
         $this->eventDispatcher = new EventDispatcher();
     }
 
+    #[\Override]
     public function add(string $id, mixed $concrete = null, bool $overwrite = false): DefinitionInterface
     {
         $toOverwrite = $this->defaultToOverwrite || $overwrite;
@@ -60,7 +54,7 @@ class Container implements DefinitionContainerInterface
 
         $definition = $this->definitions->add($id, $concrete, $toOverwrite);
 
-        if ($this->eventDispatcher->hasListenersFor(OnDefineEvent::class)) {
+        if ($this->eventDispatcher?->hasListenersFor(OnDefineEvent::class)) {
             $tags = $this->getDefinitionTags($definition);
             $event = new OnDefineEvent($id, $definition, $tags);
             $this->dispatchEvent($event);
@@ -70,6 +64,7 @@ class Container implements DefinitionContainerInterface
         return $definition;
     }
 
+    #[\Override]
     public function addShared(string $id, mixed $concrete = null, bool $overwrite = false): DefinitionInterface
     {
         $toOverwrite = $this->defaultToOverwrite || $overwrite;
@@ -77,7 +72,7 @@ class Container implements DefinitionContainerInterface
         $definition = $this->definitions->addShared($id, $concrete, $toOverwrite);
         $definition->addTag('shared');
 
-        if ($this->eventDispatcher->hasListenersFor(OnDefineEvent::class)) {
+        if ($this->eventDispatcher?->hasListenersFor(OnDefineEvent::class)) {
             $tags = $this->getDefinitionTags($definition);
             $event = new OnDefineEvent($id, $definition, $tags);
             $this->dispatchEvent($event);
@@ -99,6 +94,7 @@ class Container implements DefinitionContainerInterface
         return $this;
     }
 
+    #[\Override]
     public function extend(string $id): DefinitionInterface
     {
         if ($this->providers->provides($id)) {
@@ -115,13 +111,15 @@ class Container implements DefinitionContainerInterface
         ));
     }
 
+    #[\Override]
     public function addServiceProvider(ServiceProviderInterface $provider): DefinitionContainerInterface
     {
         $this->providers->add($provider);
         return $this;
     }
 
-    public function get(string $id)
+    #[\Override]
+    public function get(string $id): mixed
     {
         return $this->resolve($id);
     }
@@ -130,11 +128,13 @@ class Container implements DefinitionContainerInterface
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
+    #[\Override]
     public function getNew(string $id): mixed
     {
         return $this->resolve($id, true);
     }
 
+    #[\Override]
     public function has(string $id): bool
     {
         if ($this->definitions->has($id)) {
@@ -156,19 +156,6 @@ class Container implements DefinitionContainerInterface
         }
 
         return false;
-    }
-
-    /**
-     * @deprecated Use event system instead. This method will be removed in v6.0
-     */
-    public function inflector(string $type, ?callable $callback = null): InflectorInterface
-    {
-        trigger_error(
-            'Inflectors are deprecated. Use the event system with ServiceResolvedEvent instead.',
-            E_USER_DEPRECATED
-        );
-
-        return $this->inflectors->add($type, $callback);
     }
 
     public function afterResolve(string $type, callable $callback): EventFilter
@@ -209,7 +196,7 @@ class Container implements DefinitionContainerInterface
      */
     protected function resolve(string $id, bool $new = false): mixed
     {
-        if ($this->eventDispatcher->hasListenersFor(BeforeResolveEvent::class)) {
+        if ($this->eventDispatcher?->hasListenersFor(BeforeResolveEvent::class)) {
             $beforeEvent = new BeforeResolveEvent($id, $new);
             $this->dispatchEvent($beforeEvent);
 
@@ -222,7 +209,7 @@ class Container implements DefinitionContainerInterface
             $definition = $this->definitions->getDefinition($id);
             $definitionTags = $this->getDefinitionTags($definition);
 
-            if ($this->eventDispatcher->hasListenersFor(DefinitionResolvedEvent::class)) {
+            if ($this->eventDispatcher?->hasListenersFor(DefinitionResolvedEvent::class)) {
                 $definitionEvent = new DefinitionResolvedEvent($id, $definition, $definitionTags, $new);
                 $this->dispatchEvent($definitionEvent);
 
@@ -235,9 +222,7 @@ class Container implements DefinitionContainerInterface
                 $resolved = $new ? $this->definitions->resolveNew($id) : $this->definitions->resolve($id);
             }
 
-            $resolved = $this->inflectors->inflect($resolved);
-
-            if ($this->eventDispatcher->hasListenersFor(ServiceResolvedEvent::class)) {
+            if ($this->eventDispatcher?->hasListenersFor(ServiceResolvedEvent::class)) {
                 $objectEvent = new ServiceResolvedEvent($id, $resolved, $definition, $definitionTags, $new);
                 $this->dispatchEvent($objectEvent);
                 return $objectEvent->getResolved();
@@ -251,11 +236,9 @@ class Container implements DefinitionContainerInterface
                 ? $this->definitions->resolveTaggedNew($id)
                 : $this->definitions->resolveTagged($id);
 
-            $hasServiceListeners = $this->eventDispatcher->hasListenersFor(ServiceResolvedEvent::class);
+            $hasServiceListeners = $this->eventDispatcher?->hasListenersFor(ServiceResolvedEvent::class) ?? false;
 
             array_walk($arrayOf, function (&$resolved) use ($id, $new, $hasServiceListeners) {
-                $resolved = $this->inflectors->inflect($resolved);
-
                 if ($hasServiceListeners) {
                     $objectEvent = new ServiceResolvedEvent($id, $resolved, null, [$id], $new);
                     $this->dispatchEvent($objectEvent);
@@ -270,8 +253,8 @@ class Container implements DefinitionContainerInterface
             $this->providers->register($id);
 
             if (
-                false === $this->definitions->has($id) && // @phpstan-ignore-line
-                false === $this->definitions->hasTag($id) // @phpstan-ignore-line
+                false === $this->definitions->has($id) // @phpstan-ignore identical.alwaysTrue, booleanAnd.alwaysTrue
+                && false === $this->definitions->hasTag($id) // @phpstan-ignore identical.alwaysTrue
             ) {
                 throw new ContainerException(sprintf(
                     'Service provider lied about providing (%s) service',
@@ -279,15 +262,14 @@ class Container implements DefinitionContainerInterface
                 ));
             }
 
-            return $this->resolve($id, $new); // @phpstan-ignore-line
+            return $this->resolve($id, $new); // @phpstan-ignore deadCode.unreachable
         }
 
         foreach ($this->delegates as $delegate) {
             if ($delegate->has($id)) {
                 $resolved = $delegate->get($id);
-                $resolved = $this->inflectors->inflect($resolved);
 
-                if ($this->eventDispatcher->hasListenersFor(ServiceResolvedEvent::class)) {
+                if ($this->eventDispatcher?->hasListenersFor(ServiceResolvedEvent::class)) {
                     $objectEvent = new ServiceResolvedEvent($id, $resolved, null, [], $new);
                     $this->dispatchEvent($objectEvent);
                     return $objectEvent->getResolved();
@@ -300,6 +282,7 @@ class Container implements DefinitionContainerInterface
         throw new NotFoundException(sprintf('Alias (%s) is not being managed by the container or delegates', $id));
     }
 
+    /** @return list<string> */
     protected function getDefinitionTags(DefinitionInterface $definition): array
     {
         return $definition->getTags();
