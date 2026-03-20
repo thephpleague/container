@@ -153,6 +153,20 @@ class Definition implements ArgumentResolverInterface, DefinitionInterface
         return $this;
     }
 
+    /** @return array<int, mixed> */
+    #[Override]
+    public function getArguments(): array
+    {
+        return $this->arguments;
+    }
+
+    /** @return list<array{method: string, arguments: array<int, mixed>}> */
+    #[Override]
+    public function getMethodCalls(): array
+    {
+        return $this->methods;
+    }
+
     /**
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface

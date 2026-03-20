@@ -21,7 +21,14 @@ interface DefinitionInterface extends ContainerAwareInterface
 
     public function addTag(string $tag): DefinitionInterface;
     public function getAlias(): string;
+
+    /** @return array<int, mixed> */
+    public function getArguments(): array;
+
     public function getConcrete(): mixed;
+
+    /** @return list<array{method: string, arguments: array<int, mixed>}> */
+    public function getMethodCalls(): array;
 
     /** @return list<string> */
     public function getTags(): array;

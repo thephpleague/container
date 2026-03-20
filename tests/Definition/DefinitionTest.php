@@ -194,3 +194,51 @@ test('resolve class throws container exception for unsatisfied dependencies', fu
     expect(fn() => $definition->resolveNew())
         ->toThrow(ContainerException::class, 'unsatisfied dependencies');
 });
+
+test('getArguments returns empty array when no arguments added', function () {
+    $definition = new Definition(Foo::class);
+
+    expect($definition->getArguments())->toBe([]);
+});
+
+test('getArguments returns all arguments added via addArgument', function () {
+    $definition = new Definition(Foo::class);
+    $definition->addArgument('first')->addArgument('second');
+
+    expect($definition->getArguments())->toBe(['first', 'second']);
+});
+
+test('getArguments returns all arguments added via addArguments', function () {
+    $definition = new Definition(Foo::class);
+    $definition->addArguments(['alpha', 'beta', 'gamma']);
+
+    expect($definition->getArguments())->toBe(['alpha', 'beta', 'gamma']);
+});
+
+test('getMethodCalls returns empty array when no method calls added', function () {
+    $definition = new Definition(Foo::class);
+
+    expect($definition->getMethodCalls())->toBe([]);
+});
+
+test('getMethodCalls returns correct structure after addMethodCall', function () {
+    $definition = new Definition(Foo::class);
+    $definition->addMethodCall('setBar', [Bar::class]);
+
+    expect($definition->getMethodCalls())->toBe([
+        ['method' => 'setBar', 'arguments' => [Bar::class]],
+    ]);
+});
+
+test('getMethodCalls returns all method calls added via addMethodCalls', function () {
+    $definition = new Definition(Foo::class);
+    $definition->addMethodCalls([
+        'setBar' => [Bar::class],
+        'setName' => ['test'],
+    ]);
+
+    expect($definition->getMethodCalls())->toBe([
+        ['method' => 'setBar', 'arguments' => [Bar::class]],
+        ['method' => 'setName', 'arguments' => ['test']],
+    ]);
+});
