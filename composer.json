@@ -34,6 +34,9 @@
     "provide": {
         "psr/container-implementation": "^2.0"
     },
+    "bin": [
+        "bin/container-compile"
+    ],
     "autoload": {
         "psr-4": {
             "League\\Container\\": "src"

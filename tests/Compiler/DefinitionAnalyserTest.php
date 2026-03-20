@@ -63,7 +63,7 @@ test('interface to class definition produces Alias type', function () {
     $aliasDefinition = findCompiledDefinition($result->compiledDefinitions, BarInterface::class);
 
     expect($aliasDefinition->concreteType)->toBe(ConcreteType::Alias)
-        ->and($aliasDefinition->concreteClass)->toBeNull()
+        ->and($aliasDefinition->concreteClass)->toBe(Bar::class)
         ->and($aliasDefinition->factoryClass)->toBeNull();
 });
 

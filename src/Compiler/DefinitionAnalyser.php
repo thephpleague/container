@@ -59,11 +59,22 @@ final readonly class DefinitionAnalyser
             $factoryClass = $classificationResult['factoryClass'];
             $factoryMethod = $classificationResult['factoryMethod'];
 
-            [$resolvedArguments, $argumentErrors] = $this->compileArguments(
-                $definition->getArguments(),
-                $knownServices,
-                $definition->getAlias(),
-            );
+            $concrete = $definition->getConcrete();
+            $explicitArguments = $definition->getArguments();
+
+            if ($concreteType === ConcreteType::Literal && $concrete instanceof LiteralArgumentInterface && $explicitArguments === []) {
+                [$resolvedArguments, $argumentErrors] = $this->compileArguments(
+                    [$concrete],
+                    $knownServices,
+                    $definition->getAlias(),
+                );
+            } else {
+                [$resolvedArguments, $argumentErrors] = $this->compileArguments(
+                    $explicitArguments,
+                    $knownServices,
+                    $definition->getAlias(),
+                );
+            }
 
             foreach ($argumentErrors as $error) {
                 $errors[] = $error;
@@ -693,7 +704,7 @@ final readonly class DefinitionAnalyser
         }
 
         if (in_array($normalisedConcrete, $knownServices, strict: true)) {
-            return $this->classificationSuccess(ConcreteType::Alias);
+            return $this->classificationSuccess(ConcreteType::Alias, concreteClass: $normalisedConcrete);
         }
 
         if (class_exists($concrete) && method_exists($concrete, '__invoke')) {

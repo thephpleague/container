@@ -1,0 +1,178 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+use League\Container\Compiler\CodeGenerator;
+use League\Container\Compiler\CompilationConfig;
+use League\Container\Compiler\CompilationException;
+use League\Container\Compiler\Compiler;
+
+(static function (): void {
+    $autoloaderPaths = [
+        __DIR__ . '/../vendor/autoload.php',
+        __DIR__ . '/../../../autoload.php',
+    ];
+
+    foreach ($autoloaderPaths as $autoloaderPath) {
+        if (file_exists($autoloaderPath)) {
+            require $autoloaderPath;
+            break;
+        }
+    }
+
+    if (!class_exists(Compiler::class)) {
+        fwrite(STDERR, 'Could not find Composer autoloader. Run "composer install" first.' . PHP_EOL);
+        exit(1);
+    }
+
+    $options = getopt('', [
+        'input:',
+        'output:',
+        'class:',
+        'namespace:',
+        'check',
+        'dry-run',
+        'help',
+    ]);
+
+    if ($options === false) {
+        fwrite(STDERR, 'Failed to parse command-line options.' . PHP_EOL);
+        exit(2);
+    }
+
+    if (isset($options['help'])) {
+        printUsage();
+        exit(0);
+    }
+
+    if (!isset($options['input'])) {
+        fwrite(STDERR, 'Error: --input is required.' . PHP_EOL . PHP_EOL);
+        printUsage();
+        exit(2);
+    }
+
+    $inputFile = (string) $options['input'];
+    $outputFile = isset($options['output']) ? (string) $options['output'] : './CompiledContainer.php';
+    $className = isset($options['class']) ? (string) $options['class'] : 'CompiledContainer';
+    $namespace = isset($options['namespace']) ? (string) $options['namespace'] : '';
+    $isDryRun = isset($options['dry-run']);
+    $isCheckMode = isset($options['check']);
+
+    try {
+        $compiler = new Compiler();
+
+        if ($isCheckMode) {
+            $exitCode = runCheckMode($compiler, $inputFile, $namespace, $className);
+            exit($exitCode);
+        } else {
+            runCompilationMode($compiler, $inputFile, $outputFile, $className, $namespace, $isDryRun);
+        }
+    } catch (CompilationException $exception) {
+        printVersionHeader();
+        printCompilationErrors($exception);
+        exit(1);
+    } catch (Throwable $throwable) {
+        fwrite(STDERR, 'Unexpected error: ' . $throwable->getMessage() . PHP_EOL);
+        exit(1);
+    }
+})();
+
+function printVersionHeader(): void
+{
+    fwrite(STDOUT, 'league/container compiler v' . CodeGenerator::COMPILER_VERSION . PHP_EOL . PHP_EOL);
+}
+
+function printUsage(): void
+{
+    fwrite(STDOUT, <<<USAGE
+    Usage: vendor/bin/container-compile [options]
+
+    Options:
+      --input=FILE        Bootstrap file returning a Container instance (required)
+      --output=FILE       Output path for compiled class (default: ./CompiledContainer.php)
+      --class=NAME        Generated class name (default: CompiledContainer)
+      --namespace=NS      Generated class namespace (default: none)
+      --check             Check if compiled container is stale (exit 0=fresh, 1=stale)
+      --dry-run           Validate and report without writing output
+      --help              Show usage information
+
+    USAGE);
+}
+
+function runCompilationMode(
+    Compiler $compiler,
+    string $inputFile,
+    string $outputFile,
+    string $className,
+    string $namespace,
+    bool $isDryRun,
+): void {
+    printVersionHeader();
+
+    fwrite(STDOUT, 'Analysing: ' . $inputFile . PHP_EOL . PHP_EOL);
+
+    $startTime = microtime(true);
+    $config = new CompilationConfig(namespace: $namespace, className: $className);
+    $result = $compiler->compile($inputFile, $config);
+
+    foreach ($result->warnings as $warning) {
+        fwrite(STDERR, '[WARN] ' . $warning . PHP_EOL);
+    }
+
+    if ($isDryRun) {
+        fwrite(STDOUT, 'Dry run: ' . $result->fullyQualifiedClassName . ' (' . $result->serviceCount . ' services)' . PHP_EOL);
+        fwrite(STDOUT, 'No files written.' . PHP_EOL);
+    } else {
+        fwrite(STDOUT, 'Compiling: ' . $outputFile . PHP_EOL);
+        $result->writeTo($outputFile);
+        fwrite(STDOUT, '  [OK] ' . $result->fullyQualifiedClassName . ' (' . $result->serviceCount . ' services)' . PHP_EOL);
+    }
+
+    $elapsed = round(microtime(true) - $startTime, 2);
+    fwrite(STDOUT, PHP_EOL . 'Time: ' . $elapsed . 's' . PHP_EOL);
+}
+
+function runCheckMode(
+    Compiler $compiler,
+    string $inputFile,
+    string $namespace,
+    string $className,
+): int {
+    printVersionHeader();
+
+    $fullyQualifiedClassName = $namespace !== ''
+        ? $namespace . '\\' . $className
+        : $className;
+
+    $isStale = $compiler->isStale($fullyQualifiedClassName, $inputFile);
+
+    if ($isStale) {
+        fwrite(STDOUT, '[STALE] Compiled container is outdated. Recompile with:' . PHP_EOL);
+        fwrite(STDOUT, '  vendor/bin/container-compile --input=' . $inputFile . PHP_EOL);
+        return 1;
+    }
+
+    fwrite(STDOUT, '[OK] Compiled container is up to date.' . PHP_EOL);
+    return 0;
+}
+
+function printCompilationErrors(CompilationException $exception): void
+{
+    $errors = $exception->getErrors();
+
+    if ($errors === []) {
+        fwrite(STDOUT, '[FAIL] ' . $exception->getMessage() . PHP_EOL);
+        return;
+    }
+
+    fwrite(STDOUT, '[FAIL] ' . count($errors) . ' error' . (count($errors) === 1 ? '' : 's') . ' found:' . PHP_EOL . PHP_EOL);
+
+    foreach ($errors as $index => $error) {
+        $number = $index + 1;
+        fwrite(STDOUT, '  ' . $number . '. ' . $error['errorType'] . PHP_EOL);
+        fwrite(STDOUT, '     Service:  ' . $error['serviceId'] . PHP_EOL);
+        fwrite(STDOUT, '     ' . $error['message'] . PHP_EOL);
+        fwrite(STDOUT, '     Fix:      ' . $error['suggestedFix'] . PHP_EOL . PHP_EOL);
+    }
+}
