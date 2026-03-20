@@ -27,7 +27,7 @@ composer require league/container
 
 ## Requirements
 
-The following versions of PHP are supported by this version.
+This version supports the following versions of PHP.
 
 * PHP 8.1
 * PHP 8.2

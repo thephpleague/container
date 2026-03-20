@@ -41,7 +41,8 @@ coverage/
 .env
 .env.local
 .env.*.local
-*mise.toml*
+mise.toml
+*mise.*toml*
 
 # Miscellaneous
 *.log
