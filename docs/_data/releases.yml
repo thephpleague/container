@@ -1,8 +1,8 @@
 -
   version: unstable
-  name: League\Container (dev-5.x)
+  name: League\Container (dev-6.x)
   type: Unstable
-  requires: PHP >= 8.1
+  requires: PHP >= 8.3
   release: None
   support: Own Risk
   url: /unstable/
