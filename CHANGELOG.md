@@ -5,6 +5,19 @@ All Notable changes to `League\Container` will be documented in this file
 ## Unreleased (6.0.0)
 
 ### Added
+- **Container compilation** - compile a bootstrapped container into a standalone PHP class implementing PSR-11 `ContainerInterface`, eliminating reflection and definition resolution at runtime (#279)
+  - `Compiler` entry point with `compile()` and `isStale()` methods
+  - `DefinitionAnalyser` for inspecting definitions, classifying types, resolving autowiring, and building the dependency graph
+  - `CodeGenerator` for producing compiled PHP source via string templating (zero new dependencies)
+  - `ArgumentCompiler` for converting argument descriptors to PHP code expressions
+  - `DependencyGraph` with cycle detection (DFS with visited/in-stack colouring) and topological ordering
+  - Value objects: `CompiledDefinition`, `CompilationConfig`, `CompilationResult`, `AnalysisResult`, `ConcreteType` enum
+  - `CompilationException` with structured errors (service ID, error type, message, suggested fix)
+  - `ContainerFactory` for switching between compiled and dynamic containers based on environment
+  - `bin/container-compile` CLI binary with `--input`, `--output`, `--class`, `--namespace`, `--check`, `--dry-run` options
+  - `ServiceProviderAggregateInterface::registerAll()` for force-registering all lazy providers before compilation
+  - Pre-flight validation collecting all errors before failing, with actionable suggested fixes
+  - SHA-256 source hash for staleness detection based on normalised definition state
 - PHP 8.5 support (first-class CI target)
 - Typed class constants throughout (`ReflectionContainer`, `LiteralArgument`, `DependencyGraph`)
 - `#[\Override]` attribute on all interface implementations and trait methods

@@ -23,6 +23,7 @@ sections:
 3. Speed. Because Container is simple, it is also very fast.
 4. Service Providers allow you to package code or configuration for packages that you reuse regularly.
 5. Event system with `afterResolve()` allows you to hook into the container lifecycle and apply cross-cutting behaviour to resolved services.
+6. [Container compilation](/unstable/compilation/) compiles your container into a standalone PHP class for production, eliminating reflection and definition resolution at runtime.
 
 ## Introduction
 
