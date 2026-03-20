@@ -20,24 +20,18 @@
         }
     ],
     "require": {
-        "php": "^8.1",
+        "php": "^8.3",
         "psr/container": "^2.0.2",
         "psr/event-dispatcher": "^1.0"
     },
     "require-dev": {
-        "nette/php-generator": "^4.1",
-        "nikic/php-parser": "^5.0",
         "phpstan/phpstan": "^2.1.11",
-        "phpunit/phpunit": "^10.5.45|^11.5.15|^12.0",
+        "pestphp/pest": "^4.0",
         "roave/security-advisories": "dev-latest",
-        "scrutinizer/ocular": "^1.9",
-        "squizlabs/php_codesniffer": "^3.9"
+        "friendsofphp/php-cs-fixer": "^3.0"
     },
     "provide": {
-        "psr/container-implementation": "^1.0"
-    },
-    "replace": {
-        "orno/di": "~2.0"
+        "psr/container-implementation": "^2.0"
     },
     "autoload": {
         "psr-4": {
@@ -45,27 +39,30 @@
         }
     },
     "autoload-dev": {
-        "psr-4": {
-            "League\\Container\\Test\\": "tests"
-        },
         "files": [
             "tests/Asset/function.php"
         ]
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.x-dev",
-            "dev-5.x": "5.x-dev",
-            "dev-4.x": "4.x-dev",
-            "dev-3.x": "3.x-dev",
-            "dev-2.x": "2.x-dev",
-            "dev-1.x": "1.x-dev"
+            "dev-6.x": "6.x-dev",
+            "dev-5.x": "5.x-dev"
         }
     },
     "scripts": {
         "test": [
-            "vendor/bin/phpunit",
-            "vendor/bin/phpstan analyse"
-        ]
+            "@test:unit",
+            "@test:types",
+            "@test:style"
+        ],
+        "test:unit": "vendor/bin/pest",
+        "test:types": "vendor/bin/phpstan analyse --no-progress",
+        "test:style": "vendor/bin/php-cs-fixer fix --dry-run --diff"
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        },
+        "sort-packages": true
     }
 }
