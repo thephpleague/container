@@ -13,6 +13,7 @@
     Argument Types: '/unstable/argument-types/'
     Service Providers: '/unstable/service-providers/'
     Events: '/unstable/events/'
+    Compiled Containers: '/unstable/compilation/'
     Inflectors: '/unstable/inflectors/'
     Delegate Containers: '/unstable/delegate-containers/'
     Reflection Modes: '/unstable/reflection-modes/'
