@@ -9,7 +9,7 @@ use DateTimeInterface;
 
 final readonly class CodeGenerator
 {
-    private const string COMPILER_VERSION = '1.0.0';
+    public const string COMPILER_VERSION = '1.0.0';
 
     /** @param list<CompiledDefinition> $compiledDefinitions */
     public function generate(

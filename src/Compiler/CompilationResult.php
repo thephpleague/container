@@ -6,11 +6,13 @@ namespace League\Container\Compiler;
 
 final readonly class CompilationResult
 {
+    /** @param list<string> $warnings */
     public function __construct(
         public string $phpSource,
         public string $fullyQualifiedClassName,
         public string $sourceHash,
         public int $serviceCount,
+        public array $warnings = [],
     ) {}
 
     public function writeTo(string $path): void
