@@ -3,7 +3,8 @@ layout: post
 title: Upgrade Guide
 sections:
     Introduction: introduction
-    5.x to unstable: 5x-to-unstable
+    5.x to 6.0: 5x-to-60
+    5.1 to 5.2: 51-to-52
     3.x to 4.x: 3x-to-4x
     2.x to 4.x: 2x-to-4x
 ---
@@ -13,7 +14,87 @@ Here we will attempt to provide as clear a guide as possible for upgrading to th
 
 If you notice anything missing from this page, please create an issue, or pull request.
 
-## 5.x to unstable
+## 5.x to 6.0
+
+### PHP Version
+
+PHP 8.3+ is now required. PHP 8.1 and 8.2 have reached end of life and are no longer supported.
+
+### Inflector Subsystem Removed
+
+The entire inflector subsystem has been removed. `Container::inflector()` was deprecated in 5.2 and is now gone, along with `InflectorInterface`, `InflectorAggregate`, and `InflectorAggregateInterface`.
+
+The `inflector()` method has also been removed from `DefinitionContainerInterface`. If you have custom implementations of this interface, remove the `inflector()` method.
+
+Use `Container::afterResolve()` as a drop-in replacement:
+
+~~~php
+// Before (5.x)
+$container->inflector(LoggerAwareInterface::class, fn($obj) => $obj->setLogger($logger));
+
+// After (6.x)
+$container->afterResolve(LoggerAwareInterface::class, fn($obj) => $obj->setLogger($logger));
+~~~
+
+For method invocation and property setting patterns, the callback form covers all use cases:
+
+~~~php
+// Before (5.x) - method invocation
+$container->inflector(LoggerAwareInterface::class)
+    ->invokeMethod('setLogger', [Logger::class]);
+
+// After (6.x)
+$container->afterResolve(LoggerAwareInterface::class, function (object $service) use ($container) {
+    $service->setLogger($container->get(Logger::class));
+});
+
+// Before (5.x) - property setting
+$container->inflector(DatabaseAwareInterface::class)
+    ->setProperty('connection', Database::class);
+
+// After (6.x)
+$container->afterResolve(DatabaseAwareInterface::class, function (object $service) use ($container) {
+    $service->connection = $container->get(Database::class);
+});
+~~~
+
+Note: there is no direct event system equivalent for the `setProperty()` inflector pattern. Use constructor injection or the callback form shown above.
+
+See the [events documentation](/unstable/events/) for the full event API.
+
+### Container Constructor Change
+
+The `Container` constructor no longer accepts an `InflectorAggregateInterface` parameter. If you were passing arguments positionally to the constructor, update your call:
+
+~~~php
+// Before (5.x)
+$container = new Container($definitions, $providers, $inflectors);
+
+// After (6.x)
+$container = new Container($definitions, $providers);
+~~~
+
+### ContainerAwareInterface Change
+
+`ContainerAwareInterface::setContainer()` now returns `static` instead of `ContainerAwareInterface`. If you have custom implementations, update the return type:
+
+~~~php
+// Before (5.x)
+public function setContainer(DefinitionContainerInterface $container): ContainerAwareInterface
+
+// After (6.x)
+public function setContainer(DefinitionContainerInterface $container): static
+~~~
+
+### Coding Standard
+
+The project coding standard has changed from PSR-12 to [PER Coding Style 2.0](https://www.php-fig.org/per/coding-style/). Contributors should run `composer test:style` to check compliance or `vendor/bin/php-cs-fixer fix` to auto-fix.
+
+### Testing Framework
+
+Tests have migrated from PHPUnit to [Pest v4](https://pestphp.com/). Run tests with `composer test:unit` or `vendor/bin/pest`.
+
+## 5.1 to 5.2
 
 ### Event System
 
@@ -56,7 +137,7 @@ $container->afterResolve(LoggerAwareInterface::class, function (object $service)
 
 Shared definitions (registered via `addShared()`) now automatically receive a `'shared'` tag. This means `$definition->hasTag('shared')` returns `true` for shared definitions. If you were using a custom `'shared'` tag, this may conflict.
 
-See the [events documentation](/docs/unstable/events) for the full API.
+See the [events documentation](/unstable/events/) for the full API.
 
 ## 3.x to 4.x
 

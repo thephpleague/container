@@ -9,7 +9,7 @@ sections:
 ---
 ## Introduction
 
-> Note: Attribute resolution is turned off by default but can be turned on by registering the `ReflectionContainer` as a container delegate. Read below and see the [documentation on delegate containers](/5.x/delegate-containers/).
+> Note: Attribute resolution is turned off by default but can be turned on by registering the `ReflectionContainer` as a container delegate. Read below and see the [documentation on delegate containers](/unstable/delegate-containers/).
 
 Attribute resolution allows you to use PHP attributes to control how dependencies are resolved for your services. This provides a powerful and flexible alternative to auto wiring, enabling you to inject values, services, or even custom logic directly into your constructors or methods using attributes.
 

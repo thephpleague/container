@@ -6,7 +6,7 @@ We accept contributions via Pull Requests on [GitHub](https://github.com/thephpl
 
 ## Pull Requests
 
-- **[PSR-2 Coding Standard](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-2-coding-style-guide.md)** - The easiest way to apply the conventions is to install [PHP Code Sniffer](http://pear.php.net/package/PHP_CodeSniffer).
+- **[PER Coding Style](https://www.php-fig.org/per/coding-style/)** - Run `composer test:style` to check compliance, or `vendor/bin/php-cs-fixer fix` to auto-fix.
 
 - **Add tests!** - Your patch won't be accepted if it doesn't have tests.
 

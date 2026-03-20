@@ -15,7 +15,7 @@ sections:
 
 The League Container event system provides a way to hook into the container's lifecycle and modify services during resolution. Events are dispatched at key points during the container's operation, allowing you to extend functionality without modifying core container code.
 
-The event system replaces [inflectors](/docs/unstable/inflectors), providing a more flexible and powerful alternative. See `afterResolve()` below for the simplest migration path.
+The event system replaces [inflectors](/unstable/inflectors/), providing a more flexible and powerful alternative. See `afterResolve()` below for the simplest migration path.
 
 The event system is designed to be:
 - **Flexible** - Multiple filtering options and event types

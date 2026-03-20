@@ -2,6 +2,38 @@
 
 All Notable changes to `League\Container` will be documented in this file
 
+## Unreleased (6.0.0)
+
+### Added
+- PHP 8.5 support (first-class CI target)
+- Typed class constants throughout (`ReflectionContainer`, `LiteralArgument`, `DependencyGraph`)
+- `#[\Override]` attribute on all interface implementations and trait methods
+- `readonly class` declarations for compiler value objects (`CompilationConfig`, `CompilationResult`, `CompiledDefinition`)
+- Pest v4 arch tests enforcing strict types, final compiler classes, and exception hierarchy
+- Granular Composer scripts: `test:unit`, `test:types`, `test:style`
+
+### Changed
+- PHP minimum version raised from `^8.1` to `^8.3`
+- Testing framework migrated from PHPUnit to Pest v4
+- Coding standard migrated from PHP CodeSniffer (PSR-12) to PHP CS Fixer (PER-CS 2.0)
+- PHPStan analysis level raised from 6 to 8 with all blanket suppressions removed
+- `ContainerAwareInterface::setContainer()` now returns `static` instead of `ContainerAwareInterface`
+- `Container::get()` and `ReflectionContainer::get()` now declare `: mixed` return type (PSR-11 v2 alignment)
+- `LiteralArgument` now throws with actionable error messages including expected and actual types
+- `get_class()` calls replaced with `::class` syntax throughout
+- `call_user_func_array` calls replaced with spread syntax
+- `psr/container-implementation` provide version corrected from `^1.0` to `^2.0`
+
+### Removed
+- **Inflector subsystem** (`Inflector`, `InflectorAggregate`, `InflectorAggregateInterface`, `InflectorInterface`) - use `Container::afterResolve()` or the event system instead
+- `Container::inflector()` method (deprecated in 5.2)
+- `inflector()` from `DefinitionContainerInterface`
+- `Definition::$recursiveCheck` (dead code, written but never read)
+- Scrutinizer CI integration (`.scrutinizer.yml`, `scrutinizer/ocular`)
+- `orno/di` replace directive from `composer.json`
+- Unused dev dependencies: `nette/php-generator`, `nikic/php-parser`
+- Stale branch aliases for 1.x through 4.x
+
 ## 5.2.0
 
 ### Added
