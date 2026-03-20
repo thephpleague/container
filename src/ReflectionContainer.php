@@ -8,6 +8,7 @@ use League\Container\Argument\ArgumentReflectorInterface;
 use League\Container\Argument\ArgumentReflectorTrait;
 use League\Container\Argument\ArgumentResolverInterface;
 use League\Container\Argument\ArgumentResolverTrait;
+use League\Container\Attribute\Shared;
 use League\Container\Exception\NotFoundException;
 use Override;
 use Psr\Container\ContainerExceptionInterface;
@@ -58,6 +59,10 @@ class ReflectionContainer implements ArgumentReflectorInterface, ArgumentResolve
             return $this->cache[$id];
         }
 
+        if (array_key_exists($id, $this->cache)) {
+            return $this->cache[$id];
+        }
+
         if (!$this->has($id)) {
             throw new NotFoundException(
                 sprintf('Alias (%s) is not an existing class and therefore cannot be resolved', $id),
@@ -79,7 +84,9 @@ class ReflectionContainer implements ArgumentReflectorInterface, ArgumentResolve
             : $reflector->newInstanceArgs($this->reflectArguments($construct, $args))
         ;
 
-        if ($this->cacheResolutions === true) {
+        $isSharedByAttribute = $reflector->getAttributes(Shared::class) !== [];
+
+        if ($this->cacheResolutions === true || $isSharedByAttribute) {
             $this->cache[$id] = $resolution;
         }
 

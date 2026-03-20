@@ -9,8 +9,10 @@ use League\Container\Test\Asset\Bar;
 use League\Container\Test\Asset\Foo;
 use League\Container\Test\Asset\FooCallable;
 use League\Container\Test\Asset\FooWithAttr;
+use League\Container\Test\Asset\NonSharedService;
 use League\Container\Test\Asset\ProBar;
 use League\Container\Test\Asset\ProFoo;
+use League\Container\Test\Asset\SharedService;
 
 test('has returns true if class exists', function () {
     $container = new ReflectionContainer();
@@ -179,4 +181,31 @@ test('get instantiates class with constructor and attributes', function () {
 
     expect($item)->toBeInstanceOf(FooWithAttr::class);
     expect($item->bar)->toBeInstanceOf(Bar::class);
+});
+
+test('shared attribute causes caching even without global cache enabled', function () {
+    $container = new ReflectionContainer(cacheResolutions: false);
+
+    $first = $container->get(SharedService::class);
+    $second = $container->get(SharedService::class);
+
+    expect($first)->toBe($second);
+});
+
+test('non-shared class returns new instances without global cache', function () {
+    $container = new ReflectionContainer(cacheResolutions: false);
+
+    $first = $container->get(NonSharedService::class);
+    $second = $container->get(NonSharedService::class);
+
+    expect($first)->not->toBe($second);
+});
+
+test('shared attribute works alongside global cache', function () {
+    $container = new ReflectionContainer(cacheResolutions: true);
+
+    $first = $container->get(SharedService::class);
+    $second = $container->get(SharedService::class);
+
+    expect($first)->toBe($second);
 });

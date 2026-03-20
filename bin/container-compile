@@ -7,6 +7,7 @@ use League\Container\Compiler\CodeGenerator;
 use League\Container\Compiler\CompilationConfig;
 use League\Container\Compiler\CompilationException;
 use League\Container\Compiler\Compiler;
+use League\Container\Compiler\DefinitionAnalyser;
 
 (static function (): void {
     $autoloaderPaths = [
@@ -33,6 +34,7 @@ use League\Container\Compiler\Compiler;
         'namespace:',
         'check',
         'dry-run',
+        'dump',
         'help',
     ]);
 
@@ -58,6 +60,7 @@ use League\Container\Compiler\Compiler;
     $namespace = isset($options['namespace']) ? (string) $options['namespace'] : '';
     $isDryRun = isset($options['dry-run']);
     $isCheckMode = isset($options['check']);
+    $isDumpMode = isset($options['dump']);
 
     try {
         $compiler = new Compiler();
@@ -65,6 +68,8 @@ use League\Container\Compiler\Compiler;
         if ($isCheckMode) {
             $exitCode = runCheckMode($compiler, $inputFile, $namespace, $className);
             exit($exitCode);
+        } elseif ($isDumpMode) {
+            runDumpMode($inputFile);
         } else {
             runCompilationMode($compiler, $inputFile, $outputFile, $className, $namespace, $isDryRun);
         }
@@ -95,9 +100,42 @@ function printUsage(): void
       --namespace=NS      Generated class namespace (default: none)
       --check             Check if compiled container is stale (exit 0=fresh, 1=stale)
       --dry-run           Validate and report without writing output
+      --dump              Dump a summary of all registered services to stdout
       --help              Show usage information
 
     USAGE);
+}
+
+function runDumpMode(string $inputFile): void
+{
+    $analyser = new DefinitionAnalyser();
+    $container = (static function () use ($inputFile) {
+        if (!file_exists($inputFile)) {
+            fwrite(STDERR, 'Error: Bootstrap file not found: ' . $inputFile . PHP_EOL);
+            exit(1);
+        }
+
+        $resolved = require $inputFile;
+
+        if (!$resolved instanceof League\Container\Container) {
+            fwrite(STDERR, 'Error: Bootstrap file must return a Container instance.' . PHP_EOL);
+            exit(1);
+        }
+
+        return $resolved;
+    })();
+
+    $result = $analyser->analyse($container);
+
+    fwrite(STDOUT, 'Services:' . PHP_EOL);
+
+    foreach ($result->compiledDefinitions as $definition) {
+        $sharedLabel = $definition->shared ? 'yes' : 'no';
+        $tagsLabel = $definition->tags !== [] ? '[' . implode(', ', $definition->tags) . ']' : '[]';
+        $concreteLabel = $definition->concreteClass ?? $definition->factoryClass ?? '(literal)';
+
+        fwrite(STDOUT, '  ' . $definition->id . '  (class: ' . $concreteLabel . ', shared: ' . $sharedLabel . ', tags: ' . $tagsLabel . ')' . PHP_EOL);
+    }
 }
 
 function runCompilationMode(

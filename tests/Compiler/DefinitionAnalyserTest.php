@@ -11,10 +11,13 @@ use League\Container\Compiler\ConcreteType;
 use League\Container\Compiler\DefinitionAnalyser;
 use League\Container\Container;
 use League\Container\ReflectionContainer;
+use League\Container\Test\Asset\ApiService;
 use League\Container\Test\Asset\Bar;
 use League\Container\Test\Asset\BarInterface;
+use League\Container\Test\Asset\CacheInterface;
 use League\Container\Test\Asset\CycleA;
 use League\Container\Test\Asset\CycleB;
+use League\Container\Test\Asset\FileCache;
 use League\Container\Test\Asset\Foo;
 use League\Container\Test\Asset\FooCallable;
 use League\Container\Test\Asset\FooWithAttr;
@@ -26,6 +29,8 @@ use League\Container\Test\Asset\FooWithRequiredInterfaceDependency;
 use League\Container\Test\Asset\FooWithResolveAttr;
 use League\Container\Test\Asset\FooWithUnionType;
 use League\Container\Test\Asset\FooWithUnionTypeDefault;
+use League\Container\Test\Asset\LogService;
+use League\Container\Test\Asset\RedisCache;
 use Psr\Container\ContainerInterface;
 
 test('class definition with explicit resolvable argument produces ClassType with get expression', function () {
@@ -681,6 +686,82 @@ test('intersection type parameter without default produces intersection_type_par
     );
 
     expect($intersectionErrors)->not->toBeEmpty();
+});
+
+test('contextual argument with ReflectionContainer resolves to concrete get expression', function () {
+    $container = new Container();
+    $container->delegate(new ReflectionContainer());
+    $container->add(FileCache::class);
+    $container->add(LogService::class)
+        ->addContextualArgument(CacheInterface::class, FileCache::class);
+
+    $result = (new DefinitionAnalyser())->analyse($container);
+
+    $definition = findCompiledDefinition($result->compiledDefinitions, LogService::class);
+
+    expect($result->hasErrors())->toBeFalse()
+        ->and($definition->resolvedArguments)->toHaveCount(1)
+        ->and($definition->resolvedArguments[0])->toBe("\$this->get('League\\\\Container\\\\Test\\\\Asset\\\\FileCache')");
+});
+
+test('contextual argument without ReflectionContainer resolves to concrete get expression', function () {
+    $container = new Container();
+    $container->add(FileCache::class);
+    $container->add(LogService::class)
+        ->addContextualArgument(CacheInterface::class, FileCache::class);
+
+    $result = (new DefinitionAnalyser())->analyse($container);
+
+    $definition = findCompiledDefinition($result->compiledDefinitions, LogService::class);
+
+    expect($result->hasErrors())->toBeFalse()
+        ->and($definition->resolvedArguments)->toHaveCount(1)
+        ->and($definition->resolvedArguments[0])->toBe("\$this->get('League\\\\Container\\\\Test\\\\Asset\\\\FileCache')");
+});
+
+test('different contextual arguments produce distinct get expressions for each service', function () {
+    $container = new Container();
+    $container->add(FileCache::class);
+    $container->add(RedisCache::class);
+    $container->add(LogService::class)
+        ->addContextualArgument(CacheInterface::class, FileCache::class);
+    $container->add(ApiService::class)
+        ->addContextualArgument(CacheInterface::class, RedisCache::class);
+
+    $result = (new DefinitionAnalyser())->analyse($container);
+
+    $logDefinition = findCompiledDefinition($result->compiledDefinitions, LogService::class);
+    $apiDefinition = findCompiledDefinition($result->compiledDefinitions, ApiService::class);
+
+    expect($result->hasErrors())->toBeFalse()
+        ->and($logDefinition->resolvedArguments[0])->toBe("\$this->get('League\\\\Container\\\\Test\\\\Asset\\\\FileCache')")
+        ->and($apiDefinition->resolvedArguments[0])->toBe("\$this->get('League\\\\Container\\\\Test\\\\Asset\\\\RedisCache')");
+});
+
+test('contextual argument adds dependency graph edge to concrete class not interface', function () {
+    $container = new Container();
+    $container->add(FileCache::class);
+    $container->add(LogService::class)
+        ->addContextualArgument(CacheInterface::class, FileCache::class);
+
+    $result = (new DefinitionAnalyser())->analyse($container);
+
+    expect($result->dependencyGraph->getDependencies(LogService::class))->toContain(FileCache::class)
+        ->and($result->dependencyGraph->getDependencies(LogService::class))->not->toContain(CacheInterface::class);
+});
+
+test('contextual argument for unregistered concrete synthesises a compiled definition', function () {
+    $container = new Container();
+    $container->add(LogService::class)
+        ->addContextualArgument(CacheInterface::class, FileCache::class);
+
+    $result = (new DefinitionAnalyser())->analyse($container);
+
+    $synthesised = findCompiledDefinition($result->compiledDefinitions, FileCache::class);
+
+    expect($result->hasErrors())->toBeFalse()
+        ->and($synthesised->concreteType)->toBe(ConcreteType::ClassType)
+        ->and($synthesised->concreteClass)->toBe(FileCache::class);
 });
 
 /**

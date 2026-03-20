@@ -10,14 +10,19 @@ use League\Container\Compiler\Compiler;
 use League\Container\Container;
 use League\Container\Exception\NotFoundException;
 use League\Container\ReflectionContainer;
+use League\Container\Test\Asset\ApiService;
 use League\Container\Test\Asset\Bar;
 use League\Container\Test\Asset\BarInterface;
 use League\Container\Test\Asset\Baz;
+use League\Container\Test\Asset\CacheInterface;
 use League\Container\Test\Asset\Compiler\BarFactory;
 use League\Container\Test\Asset\Compiler\ServiceWithTransitiveDeps;
+use League\Container\Test\Asset\FileCache;
 use League\Container\Test\Asset\Foo;
 use League\Container\Test\Asset\FooWithDefaultScalar;
 use League\Container\Test\Asset\FooWithRequiredDependency;
+use League\Container\Test\Asset\LogService;
+use League\Container\Test\Asset\RedisCache;
 use Psr\Container\ContainerInterface;
 
 function compileAndLoad(Container $container, string $className, string $namespace = 'IntegrationTest'): ContainerInterface
@@ -239,4 +244,45 @@ test('compiled container resolves DefaultValueArgument falling back to default w
     $instance = $compiled->get(Baz::class);
 
     expect($instance)->toBeInstanceOf(Baz::class);
+});
+
+test('compiled container resolves contextual bindings with ReflectionContainer delegate', function () {
+    $container = new Container();
+    $container->delegate(new ReflectionContainer());
+    $container->add(FileCache::class);
+    $container->add(RedisCache::class);
+    $container->add(LogService::class)
+        ->addContextualArgument(CacheInterface::class, FileCache::class);
+    $container->add(ApiService::class)
+        ->addContextualArgument(CacheInterface::class, RedisCache::class);
+
+    $compiled = compileAndLoad($container, 'IntContextualWithReflection');
+
+    $logService = $compiled->get(LogService::class);
+    $apiService = $compiled->get(ApiService::class);
+
+    expect($logService)->toBeInstanceOf(LogService::class)
+        ->and($logService->cache)->toBeInstanceOf(FileCache::class)
+        ->and($apiService)->toBeInstanceOf(ApiService::class)
+        ->and($apiService->cache)->toBeInstanceOf(RedisCache::class);
+});
+
+test('compiled container resolves contextual bindings without ReflectionContainer delegate', function () {
+    $container = new Container();
+    $container->add(FileCache::class);
+    $container->add(RedisCache::class);
+    $container->add(LogService::class)
+        ->addContextualArgument(CacheInterface::class, FileCache::class);
+    $container->add(ApiService::class)
+        ->addContextualArgument(CacheInterface::class, RedisCache::class);
+
+    $compiled = compileAndLoad($container, 'IntContextualWithoutReflection');
+
+    $logService = $compiled->get(LogService::class);
+    $apiService = $compiled->get(ApiService::class);
+
+    expect($logService)->toBeInstanceOf(LogService::class)
+        ->and($logService->cache)->toBeInstanceOf(FileCache::class)
+        ->and($apiService)->toBeInstanceOf(ApiService::class)
+        ->and($apiService->cache)->toBeInstanceOf(RedisCache::class);
 });

@@ -143,6 +143,19 @@ class DefinitionAggregate implements DefinitionAggregateInterface
         }
     }
 
+    /** @return list<string> */
+    #[Override]
+    public function getAliases(): array
+    {
+        $aliases = [];
+
+        foreach ($this as $definition) {
+            $aliases[] = $definition->getAlias();
+        }
+
+        return $aliases;
+    }
+
     /** @return Generator<int, DefinitionInterface> */
     #[Override]
     public function getIterator(): Generator

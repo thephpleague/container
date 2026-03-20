@@ -10,6 +10,7 @@ use League\Container\Argument\LiteralArgumentInterface;
 use League\Container\Attribute\AttributeInterface;
 use League\Container\Attribute\Inject;
 use League\Container\Attribute\Resolve;
+use League\Container\Attribute\Shared;
 use League\Container\Container;
 use League\Container\Definition\Definition;
 use League\Container\Definition\DefinitionInterface;
@@ -80,7 +81,9 @@ final readonly class DefinitionAnalyser
                 $errors[] = $error;
             }
 
-            if ($definition->getArguments() === [] && $concreteClass !== null && $concreteType === ConcreteType::ClassType && $reflectionContainer !== null) {
+            $contextualArguments = $definition->getContextualArguments();
+
+            if ($definition->getArguments() === [] && $concreteClass !== null && $concreteType === ConcreteType::ClassType && ($reflectionContainer !== null || $contextualArguments !== [])) {
                 [$resolvedArguments, $autowireErrors, $autowireWarnings] = $this->autowireClass(
                     className: $concreteClass,
                     reflectionContainer: $reflectionContainer,
@@ -88,6 +91,7 @@ final readonly class DefinitionAnalyser
                     graph: $graph,
                     compiledDefinitions: $compiledDefinitions,
                     autowired: $autowired,
+                    contextualArguments: $contextualArguments,
                 );
 
                 foreach ($autowireErrors as $error) {
@@ -160,6 +164,7 @@ final readonly class DefinitionAnalyser
      * @param list<string> $knownServices
      * @param list<CompiledDefinition> $compiledDefinitions
      * @param list<string> $autowired
+     * @param array<string, string|object> $contextualArguments
      * @return array{
      *     0: list<string>,
      *     1: list<array{errorType: string, message: string, suggestedFix: string}>,
@@ -168,11 +173,12 @@ final readonly class DefinitionAnalyser
      */
     private function autowireClass(
         string $className,
-        ReflectionContainer $reflectionContainer,
+        ?ReflectionContainer $reflectionContainer,
         array &$knownServices,
         DependencyGraph $graph,
         array &$compiledDefinitions,
         array &$autowired,
+        array $contextualArguments = [],
     ): array {
         if (in_array($className, $autowired, strict: true)) {
             return [[], [], []];
@@ -214,13 +220,12 @@ final readonly class DefinitionAnalyser
             return [[], [], []];
         }
 
-        $mode = $reflectionContainer->getMode();
         $resolvedArguments = [];
         $errors = [];
         $warnings = [];
 
         foreach ($params as $param) {
-            if ($mode & ReflectionContainer::ATTRIBUTE_RESOLUTION) {
+            if ($reflectionContainer !== null && ($reflectionContainer->getMode() & ReflectionContainer::ATTRIBUTE_RESOLUTION)) {
                 $attributeResult = $this->resolveParameterFromAttributes(
                     param: $param,
                     knownServices: $knownServices,
@@ -263,7 +268,11 @@ final readonly class DefinitionAnalyser
                 continue;
             }
 
-            if ($mode & ReflectionContainer::AUTO_WIRING && $type instanceof ReflectionNamedType) {
+            $typeHintResolvable = $reflectionContainer !== null
+                ? ($reflectionContainer->getMode() & ReflectionContainer::AUTO_WIRING) && $type instanceof ReflectionNamedType
+                : $type instanceof ReflectionNamedType && $contextualArguments !== [];
+
+            if ($typeHintResolvable && $type instanceof ReflectionNamedType) {
                 $typeResult = $this->resolveParameterFromTypeHint(
                     param: $param,
                     type: $type,
@@ -275,6 +284,7 @@ final readonly class DefinitionAnalyser
                     reflectionContainer: $reflectionContainer,
                     errors: $errors,
                     warnings: $warnings,
+                    contextualArguments: $contextualArguments,
                 );
 
                 $resolvedArguments[] = $typeResult;
@@ -383,6 +393,7 @@ final readonly class DefinitionAnalyser
      * @param list<string> $autowired
      * @param list<array{errorType: string, message: string, suggestedFix: string}> $errors
      * @param list<string> $warnings
+     * @param array<string, string|object> $contextualArguments
      */
     private function resolveParameterFromTypeHint(
         ReflectionParameter $param,
@@ -392,11 +403,34 @@ final readonly class DefinitionAnalyser
         DependencyGraph $graph,
         array &$compiledDefinitions,
         array &$autowired,
-        ReflectionContainer $reflectionContainer,
+        ?ReflectionContainer $reflectionContainer,
         array &$errors,
         array &$warnings,
+        array $contextualArguments = [],
     ): string {
         $typeName = $type->getName();
+
+        $normalisedTypeName = Definition::normaliseAlias($typeName);
+
+        if (isset($contextualArguments[$normalisedTypeName])) {
+            $contextualConcrete = $contextualArguments[$normalisedTypeName];
+
+            if (is_string($contextualConcrete)) {
+                [$synthesisErrors, $synthesisWarnings] = $this->ensureSynthesisedIfNeeded(
+                    className: $contextualConcrete,
+                    knownServices: $knownServices,
+                    graph: $graph,
+                    compiledDefinitions: $compiledDefinitions,
+                    autowired: $autowired,
+                    reflectionContainer: $reflectionContainer,
+                );
+
+                array_push($errors, ...$synthesisErrors);
+                array_push($warnings, ...$synthesisWarnings);
+
+                return sprintf("\$this->get('%s')", addcslashes($contextualConcrete, "'\\"));
+            }
+        }
 
         if ($typeName === 'mixed') {
             $errors[] = [
@@ -513,7 +547,7 @@ final readonly class DefinitionAnalyser
         DependencyGraph $graph,
         array &$compiledDefinitions,
         array &$autowired,
-        ReflectionContainer $reflectionContainer,
+        ?ReflectionContainer $reflectionContainer,
     ): array {
         if (in_array($className, $knownServices, strict: true)) {
             return [[], []];
@@ -548,10 +582,13 @@ final readonly class DefinitionAnalyser
             }
         }
 
+        $reflectionClass = new ReflectionClass($className);
+        $isSharedByAttribute = $reflectionClass->getAttributes(Shared::class) !== [];
+
         $compiledDefinitions[] = new CompiledDefinition(
             id: $className,
             concreteType: ConcreteType::ClassType,
-            shared: false,
+            shared: $isSharedByAttribute,
             resolvedArguments: $transitiveArgs,
             methodCalls: [],
             tags: [],

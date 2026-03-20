@@ -86,6 +86,32 @@ public function setContainer(DefinitionContainerInterface $container): Container
 public function setContainer(DefinitionContainerInterface $container): static
 ~~~
 
+### New Features
+
+Several new features have been added in 6.0:
+
+- **[Contextual binding](/unstable/contextual-binding/)** allows different implementations of the same interface to be injected depending on the consumer class, via `addContextualArgument()` on definitions.
+- **Improved error messages** with "did you mean?" suggestions on `NotFoundException`, runtime circular dependency detection, and resolution chain reporting in nested failures.
+- **[Container introspection](/unstable/introspection/)** via `getDefinitionIds()` and `getServiceProviderIds()` on the `Container` class, plus a `--dump` flag on the compile CLI.
+- **[`#[Shared]` attribute](/unstable/attribute-resolution/#using-shared)** for declaring singleton intent at the class level when auto-wired via `ReflectionContainer`.
+
+### DefinitionInterface Changes
+
+`DefinitionInterface` has two new methods in 6.0:
+
+- `addContextualArgument(string $abstract, string|object $concrete): DefinitionInterface`
+- `getContextualArguments(): array`
+
+If you have custom implementations of `DefinitionInterface`, add these methods.
+
+### ServiceProviderInterface Changes
+
+`ServiceProviderInterface` has a new method in 6.0:
+
+- `getProvidedIds(): array`
+
+`AbstractServiceProvider` provides a default implementation returning `[]`. Override this method if you want your provider's services to appear in `Container::getServiceProviderIds()`.
+
 ### Coding Standard
 
 The project coding standard has changed from PSR-12 to [PER Coding Style 2.0](https://www.php-fig.org/per/coding-style/). Contributors should run `composer test:style` to check compliance or `vendor/bin/php-cs-fixer fix` to auto-fix.

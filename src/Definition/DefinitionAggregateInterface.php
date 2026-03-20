@@ -23,4 +23,7 @@ interface DefinitionAggregateInterface extends ContainerAwareInterface, Iterator
 
     /** @return array<int, mixed> */
     public function resolveTaggedNew(string $tag): array;
+
+    /** @return list<string> */
+    public function getAliases(): array;
 }

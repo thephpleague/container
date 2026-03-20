@@ -21,6 +21,7 @@ The container provides built-in attributes for common resolution scenarios:
 - `#[Resolve('resolver.id', 'path.to.value')]` — Resolves a value from a service or array in the container, traversing the given path.
   - Method calls are supported in the path, allowing you to resolve complex values or configurations.
     - e.g. `#[Resolve('config', 'getDbConfig.host')]`
+- `#[Shared]` — A class-level attribute that marks a class as a singleton when auto-wired via `ReflectionContainer`.
 
 ### Using `Inject`
 
@@ -84,6 +85,41 @@ $container->delegate(new League\Container\ReflectionContainer());
 $baz = $container->get(Baz::class);
 // $baz->dbHost === 'localhost'
 ~~~
+
+### Using `Shared`
+
+The `#[Shared]` attribute is applied at the class level (not on parameters). It declares that when the class is auto-wired via `ReflectionContainer`, the resolved instance should be cached and reused on subsequent resolutions, even when global resolution caching is disabled.
+
+~~~php
+<?php
+
+namespace Acme;
+
+use League\Container\Attribute\Shared;
+
+#[Shared]
+class DatabaseConnection
+{
+    public function __construct()
+    {
+        // expensive connection setup
+    }
+}
+
+$container = new League\Container\Container();
+$container->delegate(new League\Container\ReflectionContainer());
+
+$db1 = $container->get(Acme\DatabaseConnection::class);
+$db2 = $container->get(Acme\DatabaseConnection::class);
+
+var_dump($db1 === $db2); // true
+~~~
+
+Without `#[Shared]`, the `ReflectionContainer` returns a new instance on each call (unless global `cacheResolutions` is enabled). The `#[Shared]` attribute provides per-class opt-in to singleton behaviour without enabling global caching.
+
+`Container::getNew()` intentionally bypasses all sharing, including `#[Shared]`.
+
+The `#[Shared]` attribute is also honoured by the [container compilation](/unstable/compilation/) system. Compiled containers will mark `#[Shared]` services as shared in their output.
 
 ## Extending Attributes
 

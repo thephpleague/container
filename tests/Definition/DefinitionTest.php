@@ -7,11 +7,16 @@ use League\Container\Argument\ResolvableArgument;
 use League\Container\Container;
 use League\Container\Definition\Definition;
 use League\Container\Exception\ContainerException;
+use League\Container\Test\Asset\ApiService;
 use League\Container\Test\Asset\Bar;
 use League\Container\Test\Asset\BarInterface;
+use League\Container\Test\Asset\CacheInterface;
+use League\Container\Test\Asset\FileCache;
 use League\Container\Test\Asset\Foo;
 use League\Container\Test\Asset\FooCallable;
 use League\Container\Test\Asset\FooWithRequiredDependency;
+use League\Container\Test\Asset\LogService;
+use League\Container\Test\Asset\RedisCache;
 
 test('definition resolves closure with defined args', function () {
     $definition = new Definition('callable', function (...$args) {
@@ -241,4 +246,70 @@ test('getMethodCalls returns all method calls added via addMethodCalls', functio
         ['method' => 'setBar', 'arguments' => [Bar::class]],
         ['method' => 'setName', 'arguments' => ['test']],
     ]);
+});
+
+test('addContextualArgument stores normalised abstract as key', function () {
+    $definition = new Definition(LogService::class);
+    $definition->addContextualArgument(CacheInterface::class, FileCache::class);
+
+    $contextual = $definition->getContextualArguments();
+
+    expect($contextual)->toHaveKey(CacheInterface::class);
+    expect($contextual[CacheInterface::class])->toBe(FileCache::class);
+});
+
+test('getContextualArguments returns empty array when none added', function () {
+    $definition = new Definition(LogService::class);
+
+    expect($definition->getContextualArguments())->toBe([]);
+});
+
+test('contextual binding resolves concrete string class from definition', function () {
+    $container = Mockery::mock(Container::class);
+    $fileCache  = new FileCache();
+
+    $container->allows('has')->andReturnUsing(fn(string $id) => match ($id) {
+        LogService::class => false,
+        FileCache::class  => true,
+        default           => false,
+    });
+    $container->shouldReceive('get')->once()->with(FileCache::class)->andReturn($fileCache);
+
+    $definition = new Definition(LogService::class);
+    $definition->setContainer($container);
+    $definition->addContextualArgument(CacheInterface::class, FileCache::class);
+
+    $result = $definition->resolve();
+
+    expect($result)->toBeInstanceOf(LogService::class);
+    expect($result->cache)->toBe($fileCache);
+});
+
+test('contextual binding resolves object instance directly', function () {
+    $definition = new Definition(LogService::class);
+    $fileCache  = new FileCache();
+    $definition->addContextualArgument(CacheInterface::class, $fileCache);
+
+    $result = $definition->resolve();
+
+    expect($result)->toBeInstanceOf(LogService::class);
+    expect($result->cache)->toBe($fileCache);
+});
+
+test('contextual binding with multiple consumers resolves independently', function () {
+    $container = new Container();
+    $container->add(FileCache::class);
+    $container->add(RedisCache::class);
+    $container->add(LogService::class)
+        ->addContextualArgument(CacheInterface::class, FileCache::class);
+    $container->add(ApiService::class)
+        ->addContextualArgument(CacheInterface::class, RedisCache::class);
+
+    $log = $container->get(LogService::class);
+    $api = $container->get(ApiService::class);
+
+    expect($log->cache)->toBeInstanceOf(FileCache::class);
+    expect($api->cache)->toBeInstanceOf(RedisCache::class);
+    expect($log->cache)->not->toBeInstanceOf(RedisCache::class);
+    expect($api->cache)->not->toBeInstanceOf(FileCache::class);
 });

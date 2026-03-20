@@ -40,4 +40,9 @@ interface DefinitionInterface extends ContainerAwareInterface
     public function setAlias(string $id): DefinitionInterface;
     public function setConcrete(mixed $concrete): DefinitionInterface;
     public function setShared(bool $shared): DefinitionInterface;
+
+    public function addContextualArgument(string $abstract, string|object $concrete): DefinitionInterface;
+
+    /** @return array<string, string|object> */
+    public function getContextualArguments(): array;
 }

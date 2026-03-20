@@ -31,6 +31,9 @@ class Container implements DefinitionContainerInterface
     /** @var list<ContainerInterface> */
     protected array $delegates = [];
 
+    /** @var list<string> */
+    protected array $resolutionStack = [];
+
     public function __construct(
         protected DefinitionAggregateInterface $definitions = new DefinitionAggregate(),
         protected ServiceProviderAggregateInterface $providers = new ServiceProviderAggregate(),
@@ -159,6 +162,18 @@ class Container implements DefinitionContainerInterface
         return false;
     }
 
+    /** @return list<string> */
+    public function getDefinitionIds(): array
+    {
+        return $this->definitions->getAliases();
+    }
+
+    /** @return list<string> */
+    public function getServiceProviderIds(): array
+    {
+        return $this->providers->getProvidedIds();
+    }
+
     public function afterResolve(string $type, callable $callback): EventFilter
     {
         return $this->listen(ServiceResolvedEvent::class, function (ServiceResolvedEvent $event) use ($callback) {
@@ -197,90 +212,108 @@ class Container implements DefinitionContainerInterface
      */
     protected function resolve(string $id, bool $new = false): mixed
     {
-        if ($this->eventDispatcher?->hasListenersFor(BeforeResolveEvent::class)) {
-            $beforeEvent = new BeforeResolveEvent($id, $new);
-            $this->dispatchEvent($beforeEvent);
-
-            if ($beforeEvent->hasResolution()) {
-                return $beforeEvent->getResolved();
-            }
+        if (in_array($id, $this->resolutionStack, true)) {
+            $chain = implode(' -> ', [...$this->resolutionStack, $id]);
+            throw new ContainerException(
+                sprintf('Circular dependency detected: %s', $chain),
+            );
         }
 
-        if ($this->definitions->has($id)) {
-            $definition = $this->definitions->getDefinition($id);
-            $definitionTags = $this->getDefinitionTags($definition);
+        $stackIndex = count($this->resolutionStack);
+        $this->resolutionStack[] = $id;
 
-            if ($this->eventDispatcher?->hasListenersFor(DefinitionResolvedEvent::class)) {
-                $definitionEvent = new DefinitionResolvedEvent($id, $definition, $definitionTags, $new);
-                $this->dispatchEvent($definitionEvent);
+        try {
+            if ($this->eventDispatcher?->hasListenersFor(BeforeResolveEvent::class)) {
+                $beforeEvent = new BeforeResolveEvent($id, $new);
+                $this->dispatchEvent($beforeEvent);
 
-                if ($definitionEvent->hasResolution()) {
-                    $resolved = $definitionEvent->getResolved();
+                if ($beforeEvent->hasResolution()) {
+                    return $beforeEvent->getResolved();
+                }
+            }
+
+            if ($this->definitions->has($id)) {
+                $definition = $this->definitions->getDefinition($id);
+                $definitionTags = $this->getDefinitionTags($definition);
+
+                if ($this->eventDispatcher?->hasListenersFor(DefinitionResolvedEvent::class)) {
+                    $definitionEvent = new DefinitionResolvedEvent($id, $definition, $definitionTags, $new);
+                    $this->dispatchEvent($definitionEvent);
+
+                    if ($definitionEvent->hasResolution()) {
+                        $resolved = $definitionEvent->getResolved();
+                    } else {
+                        $resolved = $new ? $this->definitions->resolveNew($id) : $this->definitions->resolve($id);
+                    }
                 } else {
                     $resolved = $new ? $this->definitions->resolveNew($id) : $this->definitions->resolve($id);
                 }
-            } else {
-                $resolved = $new ? $this->definitions->resolveNew($id) : $this->definitions->resolve($id);
-            }
-
-            if ($this->eventDispatcher?->hasListenersFor(ServiceResolvedEvent::class)) {
-                $objectEvent = new ServiceResolvedEvent($id, $resolved, $definition, $definitionTags, $new);
-                $this->dispatchEvent($objectEvent);
-                return $objectEvent->getResolved();
-            }
-
-            return $resolved;
-        }
-
-        if ($this->definitions->hasTag($id)) {
-            $arrayOf = $new
-                ? $this->definitions->resolveTaggedNew($id)
-                : $this->definitions->resolveTagged($id);
-
-            $hasServiceListeners = $this->eventDispatcher?->hasListenersFor(ServiceResolvedEvent::class) ?? false;
-
-            array_walk($arrayOf, function (&$resolved) use ($id, $new, $hasServiceListeners) {
-                if ($hasServiceListeners) {
-                    $objectEvent = new ServiceResolvedEvent($id, $resolved, null, [$id], $new);
-                    $this->dispatchEvent($objectEvent);
-                    $resolved = $objectEvent->getResolved();
-                }
-            });
-
-            return $arrayOf;
-        }
-
-        if ($this->providers->provides($id)) {
-            $this->providers->register($id);
-
-            if (
-                false === $this->definitions->has($id) // @phpstan-ignore identical.alwaysTrue, booleanAnd.alwaysTrue
-                && false === $this->definitions->hasTag($id) // @phpstan-ignore identical.alwaysTrue
-            ) {
-                throw new ContainerException(sprintf(
-                    'Service provider lied about providing (%s) service',
-                    $id,
-                ));
-            }
-
-            return $this->resolve($id, $new); // @phpstan-ignore deadCode.unreachable
-        }
-
-        foreach ($this->delegates as $delegate) {
-            if ($delegate->has($id)) {
-                $resolved = $delegate->get($id);
 
                 if ($this->eventDispatcher?->hasListenersFor(ServiceResolvedEvent::class)) {
-                    $objectEvent = new ServiceResolvedEvent($id, $resolved, null, [], $new);
+                    $objectEvent = new ServiceResolvedEvent($id, $resolved, $definition, $definitionTags, $new);
                     $this->dispatchEvent($objectEvent);
                     return $objectEvent->getResolved();
                 }
 
                 return $resolved;
             }
-        }
 
-        throw new NotFoundException(sprintf('Alias (%s) is not being managed by the container or delegates', $id));
+            if ($this->definitions->hasTag($id)) {
+                $arrayOf = $new
+                    ? $this->definitions->resolveTaggedNew($id)
+                    : $this->definitions->resolveTagged($id);
+
+                $hasServiceListeners = $this->eventDispatcher?->hasListenersFor(ServiceResolvedEvent::class) ?? false;
+
+                array_walk($arrayOf, function (&$resolved) use ($id, $new, $hasServiceListeners) {
+                    if ($hasServiceListeners) {
+                        $objectEvent = new ServiceResolvedEvent($id, $resolved, null, [$id], $new);
+                        $this->dispatchEvent($objectEvent);
+                        $resolved = $objectEvent->getResolved();
+                    }
+                });
+
+                return $arrayOf;
+            }
+
+            if ($this->providers->provides($id)) {
+                $this->providers->register($id);
+
+                if (
+                    false === $this->definitions->has($id) // @phpstan-ignore identical.alwaysTrue, booleanAnd.alwaysTrue
+                    && false === $this->definitions->hasTag($id) // @phpstan-ignore identical.alwaysTrue
+                ) {
+                    throw new ContainerException(sprintf(
+                        'Service provider (%s) claimed to provide (%s) but failed to register it',
+                        $this->providers->providerClassFor($id),
+                        $id,
+                    ));
+                }
+
+                array_splice($this->resolutionStack, $stackIndex, 1); // @phpstan-ignore deadCode.unreachable
+                return $this->resolve($id, $new);
+            }
+
+            foreach ($this->delegates as $delegate) {
+                if ($delegate->has($id)) {
+                    $resolved = $delegate->get($id);
+
+                    if ($this->eventDispatcher?->hasListenersFor(ServiceResolvedEvent::class)) {
+                        $objectEvent = new ServiceResolvedEvent($id, $resolved, null, [], $new);
+                        $this->dispatchEvent($objectEvent);
+                        return $objectEvent->getResolved();
+                    }
+
+                    return $resolved;
+                }
+            }
+
+            throw NotFoundException::forAlias($id, $this->definitions->getAliases(), $this->resolutionStack);
+        } finally {
+            if (isset($this->resolutionStack[$stackIndex]) && $this->resolutionStack[$stackIndex] === $id) {
+                array_splice($this->resolutionStack, $stackIndex, 1);
+            }
+        }
     }
 
     /** @return list<string> */

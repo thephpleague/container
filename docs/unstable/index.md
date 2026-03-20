@@ -24,6 +24,8 @@ sections:
 4. Service Providers allow you to package code or configuration for packages that you reuse regularly.
 5. Event system with `afterResolve()` allows you to hook into the container lifecycle and apply cross-cutting behaviour to resolved services.
 6. [Container compilation](/unstable/compilation/) compiles your container into a standalone PHP class for production, eliminating reflection and definition resolution at runtime.
+7. [Contextual binding](/unstable/contextual-binding/) injects different implementations of the same interface depending on the consuming class.
+8. [Introspection](/unstable/introspection/) and improved error messages for debugging container configuration.
 
 ## Introduction
 

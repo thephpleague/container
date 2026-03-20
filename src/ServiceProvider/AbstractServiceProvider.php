@@ -24,6 +24,12 @@ abstract class AbstractServiceProvider implements ServiceProviderInterface
     }
 
     #[Override]
+    public function getProvidedIds(): array
+    {
+        return [];
+    }
+
+    #[Override]
     public function setIdentifier(string $id): ServiceProviderInterface
     {
         $this->identifier = $id;

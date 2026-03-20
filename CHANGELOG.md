@@ -18,6 +18,22 @@ All Notable changes to `League\Container` will be documented in this file
   - `ServiceProviderAggregateInterface::registerAll()` for force-registering all lazy providers before compilation
   - Pre-flight validation collecting all errors before failing, with actionable suggested fixes
   - SHA-256 source hash for staleness detection based on normalised definition state
+- **Contextual binding** - bind different implementations of an interface depending on the consuming class
+  - `DefinitionInterface::addContextualArgument(string $abstract, string|object $concrete)` for per-definition contextual resolution
+  - `DefinitionInterface::getContextualArguments()` to retrieve stored bindings
+  - Runtime resolution via `Definition::resolveClass()` with constructor reflection
+  - Full compilation support: contextual arguments resolved at compile time into direct service references
+- **Improved error messages** with runtime circular dependency detection
+  - `NotFoundException::forAlias()` with Levenshtein-based "did you mean?" suggestions for mistyped service IDs
+  - Runtime circular dependency detection via resolution stack in `Container::resolve()` with descriptive chain messages
+  - Resolution chain context in nested dependency failure messages
+  - Service provider class identification in "service provider lied" errors
+- **Container introspection** for debugging
+  - `Container::getDefinitionIds()` returns all registered service IDs
+  - `Container::getServiceProviderIds()` returns all IDs claimed by providers (lazy or registered)
+  - `ServiceProviderInterface::getProvidedIds()` for providers to declare their full service list
+  - `--dump` flag on `bin/container-compile` for service summary output
+- **`#[Shared]` attribute** - class-level attribute declaring singleton intent for auto-wired classes via `ReflectionContainer`, with compilation support
 - PHP 8.5 support (first-class CI target)
 - Typed class constants throughout (`ReflectionContainer`, `LiteralArgument`, `DependencyGraph`)
 - `#[\Override]` attribute on all interface implementations and trait methods
