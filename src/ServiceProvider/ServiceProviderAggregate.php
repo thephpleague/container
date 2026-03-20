@@ -50,6 +50,13 @@ class ServiceProviderAggregate implements ServiceProviderAggregateInterface
         yield from $this->providers;
     }
 
+    public function registerAll(): void
+    {
+        foreach ($this as $provider) {
+            $this->registerProvider($provider);
+        }
+    }
+
     public function register(string $service): void
     {
         if (false === $this->provides($service)) {
@@ -59,14 +66,19 @@ class ServiceProviderAggregate implements ServiceProviderAggregateInterface
         }
 
         foreach ($this as $provider) {
-            if (in_array($provider->getIdentifier(), $this->registered, true)) {
-                continue;
-            }
-
             if ($provider->provides($service)) {
-                $provider->register();
-                $this->registered[] = $provider->getIdentifier();
+                $this->registerProvider($provider);
             }
         }
+    }
+
+    private function registerProvider(ServiceProviderInterface $provider): void
+    {
+        if (in_array($provider->getIdentifier(), $this->registered, true)) {
+            return;
+        }
+
+        $provider->register();
+        $this->registered[] = $provider->getIdentifier();
     }
 }

@@ -77,6 +77,71 @@ class ServiceProviderAggregateTest extends TestCase
         $this->assertSame(1, $provider->registered);
     }
 
+    public function testRegisterAllRegistersEveryProvider(): void
+    {
+        $container = $this->getMockBuilder(Container::class)->getMock();
+        $aggregate = new ServiceProviderAggregate();
+        $aggregate->setContainer($container);
+
+        $firstProvider = $this->getServiceProvider();
+
+        $secondProvider = new class extends AbstractServiceProvider {
+            public int $registered = 0;
+
+            public function provides(string $id): bool
+            {
+                return $id === 'SecondService';
+            }
+
+            public function register(): void
+            {
+                $this->registered++;
+            }
+        };
+
+        $aggregate->add($firstProvider);
+        $aggregate->add($secondProvider);
+
+        $aggregate->registerAll();
+
+        // @phpstan-ignore-next-line
+        $this->assertSame(1, $firstProvider->registered);
+        // @phpstan-ignore-next-line
+        $this->assertSame(1, $secondProvider->registered);
+    }
+
+    public function testRegisterAllPreventsDoubleRegistration(): void
+    {
+        $container = $this->getMockBuilder(Container::class)->getMock();
+        $aggregate = new ServiceProviderAggregate();
+        $aggregate->setContainer($container);
+
+        $provider = $this->getServiceProvider();
+        $aggregate->add($provider);
+
+        $aggregate->registerAll();
+        $aggregate->registerAll();
+
+        // @phpstan-ignore-next-line
+        $this->assertSame(1, $provider->registered);
+    }
+
+    public function testRegisterAllAndRegisterShareDoubleRegistrationTracking(): void
+    {
+        $container = $this->getMockBuilder(Container::class)->getMock();
+        $aggregate = new ServiceProviderAggregate();
+        $aggregate->setContainer($container);
+
+        $provider = $this->getServiceProvider();
+        $aggregate->add($provider);
+
+        $aggregate->register('SomeService');
+        $aggregate->registerAll();
+
+        // @phpstan-ignore-next-line
+        $this->assertSame(1, $provider->registered);
+    }
+
     /**
      * @throws Exception
      */
