@@ -28,6 +28,7 @@ composer.phar
 .phpunit.result.cache
 .phpunit.cache
 .phpunit.xml.result.cache
+.php-cs-fixer.cache
 .phpcs-cache
 
 # Build and documentation
@@ -47,5 +48,4 @@ mise.toml
 # Miscellaneous
 *.log
 .cache
-.php_cs.cache
 .phpstan.cache/
