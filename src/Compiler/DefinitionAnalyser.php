@@ -15,10 +15,10 @@ use League\Container\Definition\Definition;
 use League\Container\Definition\DefinitionInterface;
 use League\Container\ReflectionContainer;
 use ReflectionClass;
+use ReflectionIntersectionType;
 use ReflectionMethod;
 use ReflectionNamedType;
 use ReflectionParameter;
-use ReflectionIntersectionType;
 use ReflectionProperty;
 use ReflectionUnionType;
 

@@ -8,9 +8,9 @@ use League\Container\Argument\ArgumentResolverInterface;
 use League\Container\Argument\ArgumentResolverTrait;
 use League\Container\Container;
 use League\Container\ContainerAwareTrait;
+use League\Container\Exception\NotFoundException;
 use League\Container\ReflectionContainer;
 use League\Container\Test\Asset\Baz;
-use League\Container\Exception\NotFoundException;
 
 test('resolver resolves arguments via reflection', function () {
     $method = Mockery::mock(ReflectionFunctionAbstract::class);

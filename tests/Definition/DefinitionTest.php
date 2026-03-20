@@ -6,12 +6,12 @@ use League\Container\Argument\Literal;
 use League\Container\Argument\ResolvableArgument;
 use League\Container\Container;
 use League\Container\Definition\Definition;
+use League\Container\Exception\ContainerException;
 use League\Container\Test\Asset\Bar;
 use League\Container\Test\Asset\BarInterface;
 use League\Container\Test\Asset\Foo;
 use League\Container\Test\Asset\FooCallable;
 use League\Container\Test\Asset\FooWithRequiredDependency;
-use League\Container\Exception\ContainerException;
 
 test('definition resolves closure with defined args', function () {
     $definition = new Definition('callable', function (...$args) {

@@ -6,24 +6,24 @@ use League\Container\Argument\Literal\ObjectArgument;
 use League\Container\Argument\Literal\StringArgument;
 use League\Container\Argument\LiteralArgument;
 use League\Container\Argument\ResolvableArgument;
+use League\Container\Compiler\CompiledDefinition;
 use League\Container\Compiler\ConcreteType;
 use League\Container\Compiler\DefinitionAnalyser;
 use League\Container\Container;
 use League\Container\ReflectionContainer;
 use League\Container\Test\Asset\Bar;
 use League\Container\Test\Asset\BarInterface;
-use League\Container\Test\Asset\Baz;
 use League\Container\Test\Asset\CycleA;
 use League\Container\Test\Asset\CycleB;
 use League\Container\Test\Asset\Foo;
 use League\Container\Test\Asset\FooCallable;
 use League\Container\Test\Asset\FooWithAttr;
 use League\Container\Test\Asset\FooWithDefaultScalar;
+use League\Container\Test\Asset\FooWithIntersectionType;
 use League\Container\Test\Asset\FooWithPrivateConstructor;
 use League\Container\Test\Asset\FooWithRequiredDependency;
 use League\Container\Test\Asset\FooWithRequiredInterfaceDependency;
 use League\Container\Test\Asset\FooWithResolveAttr;
-use League\Container\Test\Asset\FooWithIntersectionType;
 use League\Container\Test\Asset\FooWithUnionType;
 use League\Container\Test\Asset\FooWithUnionTypeDefault;
 use Psr\Container\ContainerInterface;
@@ -289,8 +289,14 @@ test('non-reflection delegate container produces a warning', function () {
     $container->add(Foo::class);
 
     $mockDelegate = new class implements ContainerInterface {
-        public function get(string $id): mixed { return null; }
-        public function has(string $id): bool { return false; }
+        public function get(string $id): mixed
+        {
+            return null;
+        }
+        public function has(string $id): bool
+        {
+            return false;
+        }
     };
 
     $container->delegate($mockDelegate);
@@ -678,9 +684,9 @@ test('intersection type parameter without default produces intersection_type_par
 });
 
 /**
- * @param list<\League\Container\Compiler\CompiledDefinition> $definitions
+ * @param list<CompiledDefinition> $definitions
  */
-function findCompiledDefinition(array $definitions, string $id): \League\Container\Compiler\CompiledDefinition
+function findCompiledDefinition(array $definitions, string $id): CompiledDefinition
 {
     foreach ($definitions as $definition) {
         if ($definition->id === $id) {
