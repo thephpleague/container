@@ -15,6 +15,7 @@ All Notable changes to `League\Container` will be documented in this file
 ### Changed
 - PHP minimum version raised from `^8.1` to `^8.3`
 - Testing framework migrated from PHPUnit to Pest v4
+- Test mocking framework migrated from PHPUnit mocks to Mockery, with explicit stub/expectation separation (`allows` vs `shouldReceive`)
 - Coding standard migrated from PHP CodeSniffer (PSR-12) to PHP CS Fixer (PER-CS 2.0)
 - PHPStan analysis level raised from 6 to 8 with all blanket suppressions removed
 - `ContainerAwareInterface::setContainer()` now returns `static` instead of `ContainerAwareInterface`
@@ -23,6 +24,10 @@ All Notable changes to `League\Container` will be documented in this file
 - `get_class()` calls replaced with `::class` syntax throughout
 - `call_user_func_array` calls replaced with spread syntax
 - `psr/container-implementation` provide version corrected from `^1.0` to `^2.0`
+
+### Fixed
+- Removed `ContainerAwareTrait` test that was incompatible with `#[\Override]` enforcement in PHP 8.3+
+- Test mocking of `DefinitionInterface` and Reflection classes now explicitly stubs all called methods, preventing silent pass-through on unmocked interactions
 
 ### Removed
 - **Inflector subsystem** (`Inflector`, `InflectorAggregate`, `InflectorAggregateInterface`, `InflectorInterface`) - use `Container::afterResolve()` or the event system instead
