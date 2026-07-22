@@ -50,7 +50,7 @@ class SomeServiceProvider extends AbstractServiceProvider
      * A convenience getter for the container is provided, you
      * can invoke any of the methods you would when defining
      * services directly, but remember, any alias added to the
-     * container here, when passed to the `provides` nethod
+     * container here, when passed to the `provides` method
      * must return true, or it will be ignored by the container.
      */
     public function register(): void
